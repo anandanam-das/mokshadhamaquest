@@ -1,0 +1,314 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOKSHA Quest</title>
+    <meta
+      name="description"
+      content="Игровая образовательная платформа MOKSHA Quest с персонажем, опытом, квестами и игровым полем."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <header class="hero">
+      <nav class="nav">
+        <div class="brand">MOKSHA QUEST</div>
+        <div class="nav-links">
+          <a href="#create">Регистрация</a>
+          <a href="#map">Карта</a>
+          <a href="#quests">Блоки</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">Волшебный учебный мир</p>
+          <h1>Добро пожаловать в MOKSHA Quest</h1>
+          <p class="lead">
+            Зарегистрируй героя, введи дату, время и место рождения, и отправляйся по
+            пиксельной карте в мир планетных квестов.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#create">Начать регистрацию</a>
+            <a class="btn btn-secondary" href="#map">Посмотреть карту</a>
+          </div>
+        </div>
+
+        <div class="hero-card hero-welcome">
+          <div class="card-label">Начальное задание</div>
+          <h3>Создай своего героя</h3>
+          <p>Заполни базу: имя, дата, время, место рождения.</p>
+          <div class="hero-avatar" id="heroAvatar">☀</div>
+          <div class="stats">
+            <div>
+              <span class="stat-label">Уровень</span>
+              <strong id="levelValue">1</strong>
+            </div>
+            <div>
+              <span class="stat-label">Опыт</span>
+              <strong id="xpValue">0 / 200</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section id="create" class="section registration-section">
+        <div class="section-heading">
+          <p class="eyebrow">Регистрация</p>
+          <h2>Создай героя и начни своё путешествие</h2>
+        </div>
+
+        <div class="create-grid">
+          <div class="panel">
+            <div class="character-list">
+              <button class="character-card active" data-name="Солярис" data-bio="Весёлый исследователь света и тепла." data-avatar="☀">
+                <span class="character-icon">☀</span>
+                <span>Солярис</span>
+              </button>
+              <button class="character-card" data-name="Лунелла" data-bio="Мягкая путеводительница эмоций." data-avatar="☾">
+                <span class="character-icon">☾</span>
+                <span>Лунелла</span>
+              </button>
+              <button class="character-card" data-name="Комета" data-bio="Бодрый искатель приключений." data-avatar="✦">
+                <span class="character-icon">✦</span>
+                <span>Комета</span>
+              </button>
+            </div>
+            <div class="registration-actions">
+              <input id="playerName" type="text" placeholder="Имя героя" />
+              <input id="birthDate" type="date" />
+              <input id="birthTime" type="time" />
+              <input id="birthPlace" type="text" placeholder="Город рождения" />
+              <button id="startAdventure" class="btn btn-primary">Создать героя</button>
+            </div>
+          </div>
+
+          <div class="panel panel-highlight">
+            <div class="panel-title">Профиль героя</div>
+            <div class="hero-preview">
+              <div class="hero-avatar big" id="previewAvatar">☀</div>
+              <h3 id="previewName">Солярис</h3>
+              <p id="previewBio">Весёлый исследователь света и тепла.</p>
+              <div class="profile-line">
+                <span id="previewBirth">Рождён: -</span>
+              </div>
+              <div class="xp-bar"><span id="xpBar"></span></div>
+              <p class="muted">Собери опыт, чтобы подняться на новый уровень.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="map" class="section map-section">
+        <div class="section-heading">
+          <p class="eyebrow">Кампания</p>
+          <h2>Путь ученика как RPG-маршрут</h2>
+          <p class="lead">
+            Главная точка — «Семя», за ней десять шагов-планет, затем следующая большая точка «Небо».
+          </p>
+        </div>
+
+        <div class="path-map">
+          <svg viewBox="0 0 1000 760" aria-labelledby="mapTitle" role="img">
+            <title id="mapTitle">Карта кампании MOKSHA Education</title>
+            <defs>
+              <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffd76b" />
+                <stop offset="100%" stop-color="#ffb347" />
+              </linearGradient>
+              <filter id="glow">
+                <feDropShadow dx="0" dy="0" stdDeviation="15" flood-color="#ffd76b" flood-opacity="0.3" />
+              </filter>
+            </defs>
+
+            <path class="route-path" d="M120 140 C240 20 460 20 540 140 S780 260 860 180 C820 260 780 340 720 420 C640 520 540 620 420 620 C300 620 220 560 200 440 C180 340 180 220 120 300 C120 380 120 520 120 620"
+              vector-effect="non-scaling-stroke" />
+
+            <g class="node-group">
+              <circle class="node node-main" cx="120" cy="140" r="28" />
+              <text class="node-label" x="120" y="150">Семя</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="260" cy="120" r="16" />
+              <text class="node-label node-label-small" x="260" y="150">Введение</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="400" cy="140" r="16" />
+              <text class="node-label node-label-small" x="400" y="170">☀️ Солнце</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="540" cy="180" r="16" />
+              <text class="node-label node-label-small" x="540" y="210">🌙 Луна</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="640" cy="250" r="16" />
+              <text class="node-label node-label-small" x="640" y="280">♂ Марс</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="700" cy="340" r="16" />
+              <text class="node-label node-label-small" x="700" y="370">☿ Меркурий</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="760" cy="430" r="16" />
+              <text class="node-label node-label-small" x="760" y="460">♃ Юпитер</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="680" cy="520" r="16" />
+              <text class="node-label node-label-small" x="680" y="550">♀ Венера</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="520" cy="620" r="16" />
+              <text class="node-label node-label-small" x="520" y="650">♄ Сатурн</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="340" cy="580" r="16" />
+              <text class="node-label node-label-small" x="340" y="610">☊ Раху</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node" cx="220" cy="470" r="16" />
+              <text class="node-label node-label-small" x="220" y="500">☋ Кету</text>
+            </g>
+
+            <g class="node-group">
+              <circle class="node node-main" cx="120" cy="620" r="28" />
+              <text class="node-label" x="120" y="640">Небо</text>
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <section id="natal" class="section natal-section">
+        <div class="section-heading">
+          <p class="eyebrow">Моя натальная карта</p>
+          <h2>Карта и текстовые данные из Telegram</h2>
+        </div>
+
+        <div class="natal-grid">
+          <div class="panel natal-panel">
+            <div class="panel-title">Изображение натальной карты</div>
+            <div class="natal-image-card">
+              <div class="natal-image-preview" id="natalImagePreview">Загрузите изображение</div>
+              <label class="file-label">
+                <input id="natalImageInput" type="file" accept="image/*" />
+                Загрузить изображение
+              </label>
+              <button id="removeNatalImage" class="btn btn-secondary">Удалить</button>
+            </div>
+          </div>
+
+          <div class="panel natal-panel">
+            <div class="panel-title">Астрологические данные</div>
+            <p class="natal-hint">
+              Скопируйте полностью сообщение с Telegram-бота и вставьте его сюда.
+            </p>
+            <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
+
+Солнце
+15°43'
+Лев
+Пурвапхалгуни
+2 пада
+
+..." rows="12"></textarea>
+            <div class="natal-actions">
+              <button id="saveNatalText" class="btn btn-primary">Сохранить</button>
+              <button id="clearNatalText" class="btn btn-secondary">Очистить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="quests" class="section quests-section">
+        <div class="section-heading">
+          <p class="eyebrow">Мини-блоки</p>
+          <h2>Каждый блок — как отдельный остров</h2>
+        </div>
+
+        <div class="quest-grid">
+          <article class="quest-card active-quest">
+            <div class="quest-title">☀ Солнце</div>
+            <p>Солнечная энергия: яркость, сила и креатив.</p>
+            <div class="quest-meta">Опыт: +120 · Статус: В процессе</div>
+            <button class="btn btn-secondary quest-btn" data-title="Солнце" data-xp="120">Открыть квест</button>
+          </article>
+
+          <article class="quest-card">
+            <div class="quest-title">☾ Луна</div>
+            <p>Лунная энергия: эмоции, интуиция и внутренняя мудрость.</p>
+            <div class="quest-meta">Опыт: +140 · Статус: Новый</div>
+            <button class="btn btn-secondary quest-btn" data-title="Луна" data-xp="140">Открыть квест</button>
+          </article>
+
+          <article class="quest-card">
+            <div class="quest-title">♂ Марс</div>
+            <p>Марсианский квест: действие, воля и мотивация.</p>
+            <div class="quest-meta">Опыт: +160 · Статус: Ожидает</div>
+            <button class="btn btn-secondary quest-btn" data-title="Марс" data-xp="160">Открыть квест</button>
+          </article>
+
+          <article class="quest-card">
+            <div class="quest-title">♀ Венера</div>
+            <p>Венерианский квест: чувства, ценности и гармония.</p>
+            <div class="quest-meta">Опыт: +180 · Статус: Ожидает</div>
+            <button class="btn btn-secondary quest-btn" data-title="Венера" data-xp="180">Открыть квест</button>
+          </article>
+        </div>
+      </section>
+
+      <section class="section quest-panel">
+        <div class="section-heading">
+          <p class="eyebrow">Текущий квест</p>
+          <h2 id="questTitle">Солнце</h2>
+        </div>
+
+        <div class="quest-body">
+          <div class="quest-steps">
+            <div class="step-item">1. Посмотреть видео-урок</div>
+            <div class="step-item">2. Изучить конспект</div>
+            <div class="step-item">3. Сделать мини-задание</div>
+            <div class="step-item">4. Получить опыт и двигаться дальше</div>
+          </div>
+
+          <div class="quest-materials">
+            <h3>Что внутри</h3>
+            <ul>
+              <li>Видео</li>
+              <li>Конспект</li>
+              <li>Материалы</li>
+              <li>Тест</li>
+              <li>Творческое задание</li>
+            </ul>
+            <button id="completeQuest" class="btn btn-primary">Завершить квест</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© <span id="year"></span> MOKSHA Quest. Доброе обучение как игра.</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
