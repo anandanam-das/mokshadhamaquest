@@ -3,78 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Регистрация — MOKSHA Quest</title>
-    <meta
-      name="description"
-      content="Регистрация героя MOKSHA Quest: имя и выбор одной из девяти грах."
-    />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
+    <title>MOKSHA Quest</title>
+    <script src="state.js"></script>
+    <script>
+      (function redirectToCurrentStep() {
+        var state = getUserState();
+        var next = 'login.html';
+        if (state.telegramId) {
+          if (!state.character) {
+            next = 'create-character.html';
+          } else if (!state.hasSeenPrologue) {
+            next = 'prologue.html';
+          } else {
+            next = 'village.html';
+          }
+        }
+        window.location.replace(next);
+      })();
+    </script>
   </head>
-  <body>
-    <div class="pixel-overlay"></div>
-
-    <main class="auth-main">
-      <section id="registerView" class="section registration-section">
-        <div class="section-heading">
-          <p class="eyebrow">Регистрация</p>
-          <h2>MOKSHA DHAMA QUEST</h2>
-          <p class="section-subheading">Выбери героя и начинай приключение</p>
-        </div>
-
-        <div class="create-grid">
-          <div class="panel creator-panel">
-            <div class="character-picker">
-              <div class="character-showcase">
-                <button id="charPrevBtn" type="button" class="char-arrow" aria-label="Предыдущий персонаж">‹</button>
-
-                <div class="character-stage">
-                  <div class="creator-preview-frame">
-                    <img id="creatorPreviewImg" class="creator-preview-image" src="" alt="" />
-                  </div>
-                  <div class="character-name-pixel" id="creatorPreviewName"></div>
-                  <button id="createHeroBtn" type="button" class="btn btn-primary">Выбрать героя</button>
-                </div>
-
-                <button id="charNextBtn" type="button" class="char-arrow" aria-label="Следующий персонаж">›</button>
-              </div>
-
-              <div class="character-dossier" id="characterDossier"></div>
-            </div>
-          </div>
-        </div>
-
-        <p class="auth-switch">Уже есть аккаунт? <button type="button" class="link-btn" id="showLoginBtn">Войти</button></p>
-      </section>
-
-      <section id="loginView" class="section auth-section" hidden>
-        <div class="section-heading">
-          <p class="eyebrow">Вход</p>
-          <h2>С возвращением, искатель</h2>
-        </div>
-
-        <div class="panel login-panel">
-          <div class="creator-control-block">
-            <div class="creator-control-title">Email</div>
-            <input id="loginEmail" type="email" placeholder="you@example.com" class="creator-input" />
-          </div>
-          <div class="creator-control-block">
-            <div class="creator-control-title">Пароль</div>
-            <input id="loginPassword" type="password" placeholder="••••••••" class="creator-input" />
-          </div>
-          <button id="loginBtn" type="button" class="btn btn-primary">Войти</button>
-        </div>
-
-        <p class="auth-switch">Ещё нет героя? <button type="button" class="link-btn" id="showRegisterBtn">Зарегистрироваться</button></p>
-      </section>
-    </main>
-
-    <script src="characters.js"></script>
-    <script src="creator.js"></script>
-  </body>
+  <body></body>
 </html>

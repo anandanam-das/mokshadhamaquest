@@ -1231,3 +1231,253 @@ h3 {
     font-size: 0.95rem;
   }
 }
+
+/* Login gate */
+
+.login-gate-section {
+  max-width: 560px;
+}
+
+.login-gate-panel {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+}
+
+.btn-telegram {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #29a9eb;
+  color: #ffffff;
+  box-shadow: 0 10px 0 rgba(19, 110, 156, 0.35);
+}
+
+.telegram-icon {
+  flex-shrink: 0;
+}
+
+.login-gate-hint {
+  min-height: 1.2em;
+  color: var(--muted);
+}
+
+/* Checking / subscription gate */
+
+.checking-section {
+  max-width: 480px;
+  text-align: center;
+}
+
+.checking-loader {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  padding: 40px 0;
+}
+
+.checking-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 4px solid rgba(96, 197, 255, 0.25);
+  border-top-color: var(--accent-2);
+  animation: checking-spin 0.9s linear infinite;
+}
+
+@keyframes checking-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.checking-text {
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Prologue slideshow */
+
+.prologue-section {
+  max-width: 640px;
+  display: flex;
+  min-height: 60vh;
+  align-items: center;
+}
+
+.prologue-stage {
+  width: 100%;
+  display: grid;
+  gap: 24px;
+}
+
+.prologue-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 2px solid var(--border);
+  border-radius: 28px;
+  padding: 40px 32px;
+  display: grid;
+  gap: 24px;
+  justify-items: center;
+  text-align: center;
+  box-shadow: 0 15px 30px rgba(36, 71, 120, 0.08);
+}
+
+.prologue-illustration {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.prologue-text {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0;
+}
+
+.prologue-controls {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+}
+
+.prologue-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.prologue-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(32, 59, 96, 0.2);
+}
+
+.prologue-dot.active {
+  background: var(--accent-2);
+}
+
+/* Village map */
+
+.village-layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 560px) minmax(300px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.village-stage {
+  background: radial-gradient(circle at 50% 50%, rgba(234, 250, 235, 0.9), rgba(200, 234, 205, 0.75));
+  border: 2px solid rgba(106, 162, 130, 0.24);
+  border-radius: 28px;
+}
+
+.village-building {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: default;
+  padding: 0;
+}
+
+.village-building-image {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid rgba(89, 124, 74, 0.28);
+  object-fit: contain;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.village-building[data-building-id="surya"] .village-building-image {
+  background: linear-gradient(135deg, #fff7dc, #ffe4a2);
+  border-color: #f0c876;
+}
+
+.village-building-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #2d4625;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.village-building.unlocked {
+  cursor: pointer;
+}
+
+.village-building.unlocked:hover .village-building-image {
+  transform: translateY(-2px);
+}
+
+.village-building.locked .village-building-image {
+  filter: grayscale(1) brightness(0.75);
+  opacity: 0.75;
+}
+
+.village-building-lock {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  font-size: 0.9rem;
+}
+
+.village-building.selected .village-building-image {
+  border-color: #4f8e39;
+  box-shadow: 0 0 0 4px rgba(134, 184, 92, 0.28);
+}
+
+@media (max-width: 980px) {
+  .village-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Onboarding tooltips */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 25, 20, 0.55);
+  z-index: 1000;
+}
+
+.onboarding-tooltip {
+  position: fixed;
+  width: 272px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 18px;
+  display: grid;
+  gap: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+  z-index: 1002;
+}
+
+.onboarding-text {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.onboarding-next {
+  justify-self: end;
+}
+
+.onboarding-highlight {
+  position: relative;
+  z-index: 1001;
+  border-radius: 999px;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.9), 0 0 0 10px rgba(96, 197, 255, 0.6);
+}

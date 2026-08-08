@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+  if (!getUserState().telegramId) {
+    window.location.href = 'login.html';
+    return;
+  }
+
   const creatorState = {
     characterIndex: 0,
   };
@@ -40,30 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const createHeroBtn = document.getElementById('createHeroBtn');
   createHeroBtn.addEventListener('click', () => {
     const character = getCharacter();
-    localStorage.setItem('mokshaHero', JSON.stringify({
-      name: character.title,
-      characterId: character.id,
-    }));
-    window.location.href = 'profile.html';
-  });
-
-  const registerView = document.getElementById('registerView');
-  const loginView = document.getElementById('loginView');
-  const showLoginBtn = document.getElementById('showLoginBtn');
-  const showRegisterBtn = document.getElementById('showRegisterBtn');
-
-  showLoginBtn.addEventListener('click', () => {
-    registerView.hidden = true;
-    loginView.hidden = false;
-  });
-
-  showRegisterBtn.addEventListener('click', () => {
-    loginView.hidden = true;
-    registerView.hidden = false;
-  });
-
-  const loginBtn = document.getElementById('loginBtn');
-  loginBtn.addEventListener('click', () => {
-    window.location.href = 'profile.html';
+    const previous = getUserState();
+    const unlockedLocations = previous.unlockedLocations.includes(character.id)
+      ? previous.unlockedLocations
+      : [...previous.unlockedLocations, character.id];
+    const state = setUserState({ character: { patronPlanet: character.id }, unlockedLocations });
+    window.location.href = state.hasSeenPrologue ? 'village.html' : 'prologue.html';
   });
 });

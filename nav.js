@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!logoutBtn) return;
 
   logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem('mokshaHero');
-    window.location.href = 'index.html';
+    clearUserState();
+    window.location.href = 'login.html';
   });
 });

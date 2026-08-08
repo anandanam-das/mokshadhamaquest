@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход — MOKSHA Quest</title>
+    <meta name="description" content="Вход в MOKSHA Quest через Telegram." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <main class="auth-main">
+      <section class="section auth-section login-gate-section">
+        <div class="section-heading">
+          <p class="eyebrow">MOKSHA QUEST</p>
+          <h2>Вход в деревню знания</h2>
+          <p class="section-subheading">Войди через Telegram, чтобы начать</p>
+        </div>
+
+        <div class="panel login-gate-panel">
+          <button id="telegramLoginBtn" type="button" class="btn btn-telegram">
+            <svg class="telegram-icon" viewBox="0 0 240 240" width="24" height="24" aria-hidden="true">
+              <circle cx="120" cy="120" r="120" fill="#29a9eb"/>
+              <path fill="#ffffff" d="M180.5 72.3 159 172.4c-1.6 7.1-5.8 8.9-11.8 5.5l-32.6-24-15.7 15.1c-1.7 1.7-3.2 3.2-6.5 3.2l2.3-33.1 60.2-54.4c2.6-2.3-.6-3.6-4.1-1.3l-74.4 46.9-32-10c-7-2.2-7.1-7 1.5-10.3l124.9-48.1c5.8-2.2 10.9 1.4 9 10.4Z"/>
+            </svg>
+            <span>Войти через Telegram</span>
+          </button>
+          <p class="login-gate-hint" id="loginStatus"></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="src/api/mockAuth.js"></script>
+    <script src="login.js"></script>
+  </body>
+</html>

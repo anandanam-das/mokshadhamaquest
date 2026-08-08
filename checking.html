@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Проверяем доступ — MOKSHA Quest</title>
+    <meta name="description" content="Проверка подписки на Telegram-канал MOKSHA Quest." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <main class="auth-main">
+      <section id="checkingView" class="section auth-section checking-section">
+        <div class="checking-loader">
+          <div class="checking-spinner" aria-hidden="true"></div>
+          <p class="checking-text">Проверяем доступ…</p>
+        </div>
+      </section>
+
+      <section id="noAccessView" class="section auth-section" hidden>
+        <div class="section-heading">
+          <p class="eyebrow">Доступ закрыт</p>
+          <h2>Нужна подписка</h2>
+          <p class="section-subheading">Чтобы войти в деревню знания, подпишись на Telegram-канал MOKSHA</p>
+        </div>
+
+        <div class="panel login-gate-panel">
+          <button type="button" class="btn btn-primary" id="subscribeBtn">Оформить подписку</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="src/api/mockAuth.js"></script>
+    <script src="checking.js"></script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Выбор героя — MOKSHA Quest</title>
+    <meta
+      name="description"
+      content="Выбор героя MOKSHA Quest: покровитель из девяти грах."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <main class="auth-main">
+      <section id="registerView" class="section registration-section">
+        <div class="section-heading">
+          <p class="eyebrow">Регистрация</p>
+          <h2>MOKSHA DHAMA QUEST</h2>
+          <p class="section-subheading">Выбери героя и начинай приключение</p>
+        </div>
+
+        <div class="create-grid">
+          <div class="panel creator-panel">
+            <div class="character-picker">
+              <div class="character-showcase">
+                <button id="charPrevBtn" type="button" class="char-arrow" aria-label="Предыдущий персонаж">‹</button>
+
+                <div class="character-stage">
+                  <div class="creator-preview-frame">
+                    <img id="creatorPreviewImg" class="creator-preview-image" src="" alt="" />
+                  </div>
+                  <div class="character-name-pixel" id="creatorPreviewName"></div>
+                  <button id="createHeroBtn" type="button" class="btn btn-primary">Выбрать героя</button>
+                </div>
+
+                <button id="charNextBtn" type="button" class="char-arrow" aria-label="Следующий персонаж">›</button>
+              </div>
+
+              <div class="character-dossier" id="characterDossier"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="characters.js"></script>
+    <script src="creator.js"></script>
+  </body>
+</html>
