@@ -43,22 +43,6 @@
           </div>
         </div>
 
-        <div class="hero-card hero-welcome">
-          <div class="card-label">Начальное задание</div>
-          <h3>Создай своего героя</h3>
-          <p>Заполни базу: имя, дата, время, место рождения.</p>
-          <div class="hero-avatar" id="heroAvatar">☀</div>
-          <div class="stats">
-            <div>
-              <span class="stat-label">Уровень</span>
-              <strong id="levelValue">1</strong>
-            </div>
-            <div>
-              <span class="stat-label">Опыт</span>
-              <strong id="xpValue">0 / 200</strong>
-            </div>
-          </div>
-        </div>
       </div>
     </header>
 
@@ -97,7 +81,19 @@
           <div class="panel panel-highlight">
             <div class="panel-title">Профиль героя</div>
             <div class="hero-preview">
-              <div class="hero-avatar big" id="previewAvatar">☀</div>
+              <div class="hero-preview-top">
+                <div class="hero-avatar big" id="previewAvatar">☀</div>
+                <div class="stats">
+                  <div>
+                    <span class="stat-label">Уровень</span>
+                    <strong id="levelValue">1</strong>
+                  </div>
+                  <div>
+                    <span class="stat-label">Опыт</span>
+                    <strong id="xpValue">0 / 200</strong>
+                  </div>
+                </div>
+              </div>
               <h3 id="previewName">Солярис</h3>
               <p id="previewBio">Весёлый исследователь света и тепла.</p>
               <div class="profile-line">
@@ -208,20 +204,12 @@
           <div class="panel natal-panel">
             <div class="panel-title">Изображение натальной карты</div>
             <div class="natal-image-card">
-              <div class="natal-image-preview" id="natalImagePreview">Загрузите изображение</div>
-              <label class="file-label">
-                <input id="natalImageInput" type="file" accept="image/*" />
-                Загрузить изображение
-              </label>
-              <button id="removeNatalImage" class="btn btn-secondary">Удалить</button>
+              <div class="natal-image-preview" id="natalImagePreview">Изображение</div>
             </div>
           </div>
 
           <div class="panel natal-panel">
             <div class="panel-title">Астрологические данные</div>
-            <p class="natal-hint">
-              Скопируйте полностью сообщение с Telegram-бота и вставьте его сюда.
-            </p>
             <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
 
 Солнце
@@ -232,8 +220,7 @@
 
 ..." rows="12"></textarea>
             <div class="natal-actions">
-              <button id="saveNatalText" class="btn btn-primary">Сохранить</button>
-              <button id="clearNatalText" class="btn btn-secondary">Очистить</button>
+              <button id="natalDetails" class="btn btn-primary">Подробнее</button>
             </div>
           </div>
         </div>

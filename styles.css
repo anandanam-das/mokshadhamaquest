@@ -75,10 +75,6 @@ input {
 .hero-content {
   max-width: 1180px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 24px;
-  align-items: start;
 }
 
 .eyebrow {
@@ -174,6 +170,17 @@ h1 {
   width: 96px;
   height: 96px;
   margin-bottom: 8px;
+}
+
+.hero-preview-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+
+.hero-preview-top .hero-avatar.big {
+  margin-bottom: 0;
 }
 
 .card-label,
@@ -296,29 +303,6 @@ h1 {
   text-align: center;
   color: var(--muted);
   padding: 18px;
-}
-
-.file-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 14px;
-  background: #fff7d6;
-  border: 2px solid #f0d986;
-  cursor: pointer;
-  color: var(--text);
-}
-
-.file-label input {
-  display: none;
-}
-
-.natal-hint {
-  color: var(--muted);
-  line-height: 1.7;
-  margin-bottom: 14px;
 }
 
 .natal-textarea {
@@ -485,7 +469,6 @@ h1 {
 }
 
 @media (max-width: 980px) {
-  .hero-content,
   .create-grid,
   .quest-grid,
   .quest-body,
