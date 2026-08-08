@@ -59,7 +59,7 @@ input {
   justify-content: space-between;
   align-items: center;
   max-width: 1180px;
-  margin: 0 auto 22px;
+  margin: 0 auto 10px;
 }
 
 .brand {
@@ -71,6 +71,7 @@ input {
 .nav-links {
   display: flex;
   gap: 16px;
+  margin-left: auto;
 }
 
 .nav-links a {
@@ -515,6 +516,15 @@ h3 {
   font-size: 0.7rem;
   line-height: 1.6;
   color: var(--muted);
+}
+
+.login-heading {
+  text-align: center;
+}
+
+.login-heading h2 {
+  white-space: nowrap;
+  font-size: clamp(1rem, 4.2vw, 1.8rem);
 }
 
 .create-grid,
@@ -1137,7 +1147,7 @@ h3 {
 }
 
 .app-nav {
-  padding: 20px 20px 0;
+  padding: 12px 20px 0;
 }
 
 .nav-links a.active {
@@ -1359,6 +1369,10 @@ h3 {
 }
 
 /* Village map */
+
+.village-section {
+  padding-top: 4px;
+}
 
 .village-layout {
   display: grid;

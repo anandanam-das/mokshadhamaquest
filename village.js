@@ -36,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const getTasksForBuilding = (title) => {
     const genitive = genitiveCase[title] || title;
     return [
-      { type: 'video', title: `Три лица ${genitive}` },
-      { type: 'phrase', title: 'Фраза-гуна' },
-      { type: 'audio', title: 'Письмо трёх голосов' },
-      { type: 'quiz', title: 'Найди ошибку' },
-      { type: 'image', title: 'Кто есть кто' },
-      { type: 'match', title: 'Карта планеты' },
+      { type: 'video', title: `Три лика ${genitive} (разбор видений)` },
+      { type: 'phrase', title: 'Слово гуны (быстрый выбор)' },
+      { type: 'audio', title: 'Голос трёх начал (слушай и различай)' },
+      { type: 'quiz', title: 'Изъян в писании (найди ошибку)' },
+      { type: 'image', title: 'Зеркало времён (распознай гуну)' },
+      { type: 'match', title: 'Карта звёздного покровителя (собери знания)' },
     ].map((task, index) => ({ ...task, status: index === 0 ? 'Active' : 'Locked' }));
   };
 
