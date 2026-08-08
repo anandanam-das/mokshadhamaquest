@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Личный кабинет — MOKSHA Quest</title>
+    <meta
+      name="description"
+      content="Личный кабинет MOKSHA Quest: превью героя и натальная карта."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <header class="app-nav">
+      <nav class="nav">
+        <div class="brand">MOKSHA QUEST</div>
+        <div class="nav-links">
+          <a href="profile.html" class="active">Личный кабинет</a>
+          <a href="roadmap.html">Карта обучения</a>
+          <button id="logoutBtn" type="button" class="btn btn-secondary nav-logout">Выйти</button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section profile-section">
+        <div class="section-heading">
+          <p class="eyebrow">Личный кабинет</p>
+          <h2>Твой герой</h2>
+        </div>
+
+        <div class="panel hero-preview-panel">
+          <div class="creator-preview-frame">
+            <img id="profileCharacterImg" class="creator-preview-image" src="" alt="" />
+          </div>
+          <div class="creator-preview-text">
+            <div class="creator-preview-name" id="profileName">Герой</div>
+            <div class="creator-preview-subtitle" id="profileSubtitle"></div>
+          </div>
+          <a href="index.html" class="btn btn-secondary">Редактировать</a>
+        </div>
+      </section>
+
+      <section id="natal" class="section natal-section">
+        <div class="section-heading">
+          <p class="eyebrow">Моя натальная карта</p>
+          <h2>Карта и текстовые данные из Telegram</h2>
+        </div>
+
+        <div class="natal-grid">
+          <div class="panel natal-panel">
+            <div class="panel-title">Изображение натальной карты</div>
+            <div class="natal-image-card">
+              <div class="natal-image-preview" id="natalImagePreview">Загрузите изображение</div>
+              <label class="file-label">
+                <input id="natalImageInput" type="file" accept="image/*" />
+                Загрузить изображение
+              </label>
+              <button id="removeNatalImage" class="btn btn-secondary">Удалить</button>
+            </div>
+          </div>
+
+          <div class="panel natal-panel">
+            <div class="panel-title">Астрологические данные</div>
+            <p class="natal-hint">
+              Скопируйте полностью сообщение с Telegram-бота и вставьте его сюда.
+            </p>
+            <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
+
+Солнце
+15°43'
+Лев
+Пурвапхалгуни
+2 пада
+
+..." rows="12"></textarea>
+            <div class="natal-actions">
+              <button id="saveNatalText" class="btn btn-primary">Сохранить</button>
+              <button id="clearNatalText" class="btn btn-secondary">Очистить</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section roadmap-cta">
+        <a href="roadmap.html" class="btn btn-primary">Перейти к дорожной карте</a>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>© MOKSHA Quest. Доброе обучение как игра.</p>
+    </footer>
+
+    <script src="characters.js"></script>
+    <script src="profile.js"></script>
+    <script src="nav.js"></script>
+  </body>
+</html>

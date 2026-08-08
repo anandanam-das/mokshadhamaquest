@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MOKSHA Quest</title>
+    <title>Регистрация — MOKSHA Quest</title>
     <meta
       name="description"
-      content="Игровая образовательная платформа MOKSHA Quest с персонажем, опытом, квестами и игровым полем."
+      content="Регистрация героя MOKSHA Quest: имя и выбор одной из девяти грах."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,251 +19,62 @@
   <body>
     <div class="pixel-overlay"></div>
 
-    <header class="hero">
-      <nav class="nav">
-        <div class="brand">MOKSHA QUEST</div>
-        <div class="nav-links">
-          <a href="#create">Регистрация</a>
-          <a href="#map">Карта</a>
-          <a href="#quests">Блоки</a>
-        </div>
-      </nav>
-
-      <div class="hero-content">
-        <div class="hero-copy">
-          <p class="eyebrow">Волшебный учебный мир</p>
-          <h1>Добро пожаловать в MOKSHA Quest</h1>
-          <p class="lead">
-            Зарегистрируй героя, введи дату, время и место рождения, и отправляйся по
-            пиксельной карте в мир планетных квестов.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#create">Начать регистрацию</a>
-            <a class="btn btn-secondary" href="#map">Посмотреть карту</a>
-          </div>
-        </div>
-
-        <div class="hero-card hero-welcome">
-          <div class="card-label">Начальное задание</div>
-          <h3>Создай своего героя</h3>
-          <p>Заполни базу: имя, дата, время, место рождения.</p>
-          <div class="hero-avatar" id="heroAvatar">☀</div>
-          <div class="stats">
-            <div>
-              <span class="stat-label">Уровень</span>
-              <strong id="levelValue">1</strong>
-            </div>
-            <div>
-              <span class="stat-label">Опыт</span>
-              <strong id="xpValue">0 / 200</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <main>
-      <section id="create" class="section registration-section">
+    <main class="auth-main">
+      <section id="registerView" class="section registration-section">
         <div class="section-heading">
           <p class="eyebrow">Регистрация</p>
-          <h2>Создай героя и начни своё путешествие</h2>
+          <h2>MOKSHA DHAMA QUEST</h2>
+          <p class="section-subheading">Выбери героя и начинай приключение</p>
         </div>
 
         <div class="create-grid">
           <div class="panel creator-panel">
-            <div class="creator-layout">
-              <div class="creator-preview-block">
-                <div class="creator-preview-frame">
-                  <div class="creator-layer creator-body" id="creatorBodyLayer">Тело — мужское</div>
-                  <div class="creator-layer creator-outfit" id="creatorOutfitLayer">Одежда 1</div>
-                  <div class="creator-layer creator-hair" id="creatorHairLayer">Причёска 1</div>
-                  <div class="creator-layer creator-accessory" id="creatorAccessoryLayer">Без аксессуара</div>
+            <div class="character-picker">
+              <div class="character-showcase">
+                <button id="charPrevBtn" type="button" class="char-arrow" aria-label="Предыдущий персонаж">‹</button>
+
+                <div class="character-stage">
+                  <div class="creator-preview-frame">
+                    <img id="creatorPreviewImg" class="creator-preview-image" src="" alt="" />
+                  </div>
+                  <div class="character-name-pixel" id="creatorPreviewName"></div>
+                  <button id="createHeroBtn" type="button" class="btn btn-primary">Выбрать героя</button>
                 </div>
-                <div class="creator-preview-text">
-                  <h3>Живое превью</h3>
-                  <div class="creator-preview-name" id="creatorPreviewName">Герой</div>
-                  <div class="creator-preview-subtitle" id="creatorPreviewSubtitle">Мужской · Одежда 1 · Причёска 1</div>
-                </div>
+
+                <button id="charNextBtn" type="button" class="char-arrow" aria-label="Следующий персонаж">›</button>
               </div>
 
-              <div class="creator-controls">
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Имя героя</div>
-                  <input id="creatorName" type="text" placeholder="Имя героя" class="creator-input" />
-                </div>
-
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Пол</div>
-                  <div class="gender-toggle">
-                    <button type="button" class="creator-option creator-gender active" data-gender="male">Мужской</button>
-                    <button type="button" class="creator-option creator-gender" data-gender="female">Женский</button>
-                  </div>
-                </div>
-
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Причёска</div>
-                  <div class="option-grid" id="hairOptions">
-                    <button type="button" class="creator-option active" data-group="hair" data-value="1">1</button>
-                    <button type="button" class="creator-option" data-group="hair" data-value="2">2</button>
-                    <button type="button" class="creator-option" data-group="hair" data-value="3">3</button>
-                    <button type="button" class="creator-option" data-group="hair" data-value="4">4</button>
-                  </div>
-                </div>
-
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Одежда</div>
-                  <div class="option-grid" id="outfitOptions">
-                    <button type="button" class="creator-option active" data-group="outfit" data-value="1">1</button>
-                    <button type="button" class="creator-option" data-group="outfit" data-value="2">2</button>
-                    <button type="button" class="creator-option" data-group="outfit" data-value="3">3</button>
-                    <button type="button" class="creator-option" data-group="outfit" data-value="4">4</button>
-                  </div>
-                </div>
-
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Аксессуар</div>
-                  <div class="option-grid" id="accessoryOptions">
-                    <button type="button" class="creator-option active" data-group="accessory" data-value="0">Нет</button>
-                    <button type="button" class="creator-option" data-group="accessory" data-value="1">1</button>
-                    <button type="button" class="creator-option" data-group="accessory" data-value="2">2</button>
-                    <button type="button" class="creator-option" data-group="accessory" data-value="3">3</button>
-                  </div>
-                </div>
-
-                <div class="creator-control-block">
-                  <div class="creator-control-title">Цвет кожи</div>
-                  <div class="color-picker" id="skinPicker">
-                    <button type="button" class="creator-color-dot active" data-index="0" style="background:#f7d3b0"></button>
-                    <button type="button" class="creator-color-dot" data-index="1" style="background:#d1b58f"></button>
-                    <button type="button" class="creator-color-dot" data-index="2" style="background:#a68c66"></button>
-                    <button type="button" class="creator-color-dot" data-index="3" style="background:#8c7a5f"></button>
-                    <button type="button" class="creator-color-dot" data-index="4" style="background:#70563d"></button>
-                  </div>
-                </div>
-              </div>
+              <div class="character-dossier" id="characterDossier"></div>
             </div>
           </div>
         </div>
+
+        <p class="auth-switch">Уже есть аккаунт? <button type="button" class="link-btn" id="showLoginBtn">Войти</button></p>
       </section>
 
-      <section id="map" class="section map-section">
-        <div class="map-layout">
-          <div class="course-map left-column" id="courseMap"></div>
-          <aside class="course-detail-panel" id="courseDetail"></aside>
-        </div>
-      </section>
-
-      <section id="natal" class="section natal-section">
+      <section id="loginView" class="section auth-section" hidden>
         <div class="section-heading">
-          <p class="eyebrow">Моя натальная карта</p>
-          <h2>Карта и текстовые данные из Telegram</h2>
+          <p class="eyebrow">Вход</p>
+          <h2>С возвращением, искатель</h2>
         </div>
 
-        <div class="natal-grid">
-          <div class="panel natal-panel">
-            <div class="panel-title">Изображение натальной карты</div>
-            <div class="natal-image-card">
-              <div class="natal-image-preview" id="natalImagePreview">Загрузите изображение</div>
-              <label class="file-label">
-                <input id="natalImageInput" type="file" accept="image/*" />
-                Загрузить изображение
-              </label>
-              <button id="removeNatalImage" class="btn btn-secondary">Удалить</button>
-            </div>
+        <div class="panel login-panel">
+          <div class="creator-control-block">
+            <div class="creator-control-title">Email</div>
+            <input id="loginEmail" type="email" placeholder="you@example.com" class="creator-input" />
           </div>
-
-          <div class="panel natal-panel">
-            <div class="panel-title">Астрологические данные</div>
-            <p class="natal-hint">
-              Скопируйте полностью сообщение с Telegram-бота и вставьте его сюда.
-            </p>
-            <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
-
-Солнце
-15°43'
-Лев
-Пурвапхалгуни
-2 пада
-
-..." rows="12"></textarea>
-            <div class="natal-actions">
-              <button id="saveNatalText" class="btn btn-primary">Сохранить</button>
-              <button id="clearNatalText" class="btn btn-secondary">Очистить</button>
-            </div>
+          <div class="creator-control-block">
+            <div class="creator-control-title">Пароль</div>
+            <input id="loginPassword" type="password" placeholder="••••••••" class="creator-input" />
           </div>
-        </div>
-      </section>
-
-      <section id="quests" class="section quests-section">
-        <div class="section-heading">
-          <p class="eyebrow">Мини-блоки</p>
-          <h2>Каждый блок — как отдельный остров</h2>
+          <button id="loginBtn" type="button" class="btn btn-primary">Войти</button>
         </div>
 
-        <div class="quest-grid">
-          <article class="quest-card active-quest">
-            <div class="quest-title">☀ Солнце</div>
-            <p>Солнечная энергия: яркость, сила и креатив.</p>
-            <div class="quest-meta">Опыт: +120 · Статус: В процессе</div>
-            <button class="btn btn-secondary quest-btn" data-title="Солнце" data-xp="120">Открыть квест</button>
-          </article>
-
-          <article class="quest-card">
-            <div class="quest-title">☾ Луна</div>
-            <p>Лунная энергия: эмоции, интуиция и внутренняя мудрость.</p>
-            <div class="quest-meta">Опыт: +140 · Статус: Новый</div>
-            <button class="btn btn-secondary quest-btn" data-title="Луна" data-xp="140">Открыть квест</button>
-          </article>
-
-          <article class="quest-card">
-            <div class="quest-title">♂ Марс</div>
-            <p>Марсианский квест: действие, воля и мотивация.</p>
-            <div class="quest-meta">Опыт: +160 · Статус: Ожидает</div>
-            <button class="btn btn-secondary quest-btn" data-title="Марс" data-xp="160">Открыть квест</button>
-          </article>
-
-          <article class="quest-card">
-            <div class="quest-title">♀ Венера</div>
-            <p>Венерианский квест: чувства, ценности и гармония.</p>
-            <div class="quest-meta">Опыт: +180 · Статус: Ожидает</div>
-            <button class="btn btn-secondary quest-btn" data-title="Венера" data-xp="180">Открыть квест</button>
-          </article>
-        </div>
-      </section>
-
-      <section class="section quest-panel">
-        <div class="section-heading">
-          <p class="eyebrow">Текущий квест</p>
-          <h2 id="questTitle">Солнце</h2>
-        </div>
-
-        <div class="quest-body">
-          <div class="quest-steps">
-            <div class="step-item">1. Посмотреть видео-урок</div>
-            <div class="step-item">2. Изучить конспект</div>
-            <div class="step-item">3. Сделать мини-задание</div>
-            <div class="step-item">4. Получить опыт и двигаться дальше</div>
-          </div>
-
-          <div class="quest-materials">
-            <h3>Что внутри</h3>
-            <ul>
-              <li>Видео</li>
-              <li>Конспект</li>
-              <li>Материалы</li>
-              <li>Тест</li>
-              <li>Творческое задание</li>
-            </ul>
-            <button id="completeQuest" class="btn btn-primary">Завершить квест</button>
-          </div>
-        </div>
+        <p class="auth-switch">Ещё нет героя? <button type="button" class="link-btn" id="showRegisterBtn">Зарегистрироваться</button></p>
       </section>
     </main>
 
-    <footer class="footer">
-      <p>© <span id="year"></span> MOKSHA Quest. Доброе обучение как игра.</p>
-    </footer>
-
-    <script src="script.js"></script>
+    <script src="characters.js"></script>
+    <script src="creator.js"></script>
   </body>
 </html>
