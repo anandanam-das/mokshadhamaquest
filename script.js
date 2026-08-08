@@ -4,9 +4,6 @@
     year.textContent = new Date().getFullYear();
   }
 
-  const heroName = document.getElementById('heroName');
-  const heroBio = document.getElementById('heroBio');
-  const heroAvatar = document.getElementById('heroAvatar');
   const previewName = document.getElementById('previewName');
   const previewBio = document.getElementById('previewBio');
   const previewAvatar = document.getElementById('previewAvatar');
@@ -29,9 +26,6 @@
     const xpValue = document.getElementById('xpValue');
     if (levelValue) levelValue.textContent = level;
     if (xpValue) xpValue.textContent = `${xp} / ${nextLevelXp}`;
-    if (previewName) previewName.textContent = heroName.textContent;
-    if (previewBio) previewBio.textContent = heroBio.textContent;
-    if (previewAvatar) previewAvatar.textContent = heroAvatar.textContent;
     const percent = Math.min(100, Math.round((xp / nextLevelXp) * 100));
     xpBar.style.width = `${percent}%`;
   };
@@ -41,9 +35,6 @@
       document.querySelectorAll('.character-card').forEach((item) => item.classList.remove('active'));
       card.classList.add('active');
       const { name, bio, avatar } = card.dataset;
-      heroName.textContent = name;
-      heroBio.textContent = bio;
-      heroAvatar.textContent = avatar;
       previewName.textContent = name;
       previewBio.textContent = bio;
       previewAvatar.textContent = avatar;
@@ -69,59 +60,12 @@
     });
   }
 
-  const natalImageInput = document.getElementById('natalImageInput');
-  const natalImagePreview = document.getElementById('natalImagePreview');
-  const removeNatalImage = document.getElementById('removeNatalImage');
   const natalText = document.getElementById('natalText');
-  const saveNatalText = document.getElementById('saveNatalText');
-  const clearNatalText = document.getElementById('clearNatalText');
+  const natalDetails = document.getElementById('natalDetails');
 
-  const showNatalImage = (src) => {
-    if (!natalImagePreview) return;
-    natalImagePreview.style.backgroundImage = `url('${src}')`;
-    natalImagePreview.style.backgroundSize = 'cover';
-    natalImagePreview.style.backgroundPosition = 'center';
-    natalImagePreview.textContent = '';
-  };
-
-  const resetNatalImage = () => {
-    if (!natalImagePreview) return;
-    natalImagePreview.style.backgroundImage = 'none';
-    natalImagePreview.textContent = 'Загрузите изображение';
-  };
-
-  if (natalImageInput) {
-    natalImageInput.addEventListener('change', () => {
-      const file = natalImageInput.files && natalImageInput.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        showNatalImage(event.target.result);
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  if (removeNatalImage) {
-    removeNatalImage.addEventListener('click', () => {
-      if (natalImageInput) natalImageInput.value = '';
-      resetNatalImage();
-    });
-  }
-
-  if (saveNatalText) {
-    saveNatalText.addEventListener('click', () => {
-      if (!natalText) return;
-      localStorage.setItem('mokshaNatalText', natalText.value);
-      alert('Астрологические данные сохранены локально.');
-    });
-  }
-
-  if (clearNatalText) {
-    clearNatalText.addEventListener('click', () => {
-      if (!natalText) return;
-      natalText.value = '';
-      localStorage.removeItem('mokshaNatalText');
+  if (natalDetails) {
+    natalDetails.addEventListener('click', () => {
+      if (natalText) localStorage.setItem('mokshaNatalText', natalText.value);
     });
   }
 
@@ -136,11 +80,9 @@
       const birthDate = birthDateInput.value || '2000-01-01';
       const birthTime = birthTimeInput.value || '12:00';
       const birthPlace = birthPlaceInput.value.trim() || 'Земля';
-      heroName.textContent = playerName;
       previewName.textContent = playerName;
       previewBirth.textContent = `Рождён: ${birthDate} ${birthTime}, ${birthPlace}`;
-      heroBio.textContent = `Путешественник света и тайн.`;
-      previewBio.textContent = heroBio.textContent;
+      previewBio.textContent = `Путешественник света и тайн.`;
       document.querySelector('#map').scrollIntoView({ behavior: 'smooth' });
     });
   }
