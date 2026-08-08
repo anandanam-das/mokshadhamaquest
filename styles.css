@@ -65,11 +65,14 @@ input {
   gap: 16px;
 }
 
-.nav-links a {
+.nav-links a,
+.nav-links button {
   background: rgba(255, 255, 255, 0.7);
   padding: 10px 14px;
   border-radius: 999px;
   color: var(--text);
+  border: none;
+  cursor: pointer;
 }
 
 .hero-content {
@@ -252,18 +255,25 @@ h1 {
   font-size: 1.4rem;
 }
 
-.registration-actions {
-  display: grid;
-  gap: 12px;
+.hidden {
+  display: none !important;
 }
 
-.registration-actions input {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 16px;
-  border: 2px solid #e5e0d1;
-  background: #fffdf4;
-  color: var(--text);
+.auth-guest {
+  max-width: 520px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 40px 32px;
+}
+
+.auth-guest p {
+  color: var(--muted);
+  margin: 12px 0 22px;
+  line-height: 1.6;
+}
+
+.auth-guest .btn {
+  min-width: 240px;
 }
 
 .profile-line {
@@ -490,9 +500,5 @@ h1 {
 
   .nav-links {
     flex-wrap: wrap;
-  }
-
-  .registration-actions input {
-    font-size: 0.95rem;
   }
 }

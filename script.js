@@ -11,11 +11,28 @@
   const questTitle = document.getElementById('questTitle');
   const completeQuestBtn = document.getElementById('completeQuest');
   const previewBirth = document.getElementById('previewBirth');
-  const playerNameInput = document.getElementById('playerName');
-  const birthDateInput = document.getElementById('birthDate');
-  const birthTimeInput = document.getElementById('birthTime');
-  const birthPlaceInput = document.getElementById('birthPlace');
-  const startAdventureBtn = document.getElementById('startAdventure');
+  const previewTelegramName = document.getElementById('previewTelegramName');
+  const authGuest = document.getElementById('authGuest');
+  const charSelect = document.getElementById('charSelect');
+  const charSelectNext = document.getElementById('charSelectNext');
+  const authUser = document.getElementById('authUser');
+  const telegramLoginBtn = document.getElementById('telegramLoginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const navRegister = document.getElementById('navRegister');
+  const heroMapLink = document.getElementById('heroMapLink');
+  const heroContinueLink = document.getElementById('heroContinueLink');
+  const heroLead = document.getElementById('heroLead');
+  const mapSection = document.getElementById('map');
+  const natalSection = document.getElementById('natal');
+  const questsSection = document.getElementById('quests');
+  const questPanelSection = document.getElementById('questPanel');
+
+  const MOCK_TELEGRAM_USER = {
+    name: 'Алекс Иванов',
+    birthDate: '1998-05-12',
+    birthTime: '14:30',
+    birthPlace: 'Москва',
+  };
 
   let level = 1;
   let xp = 0;
@@ -74,18 +91,60 @@
     if (savedText) natalText.value = savedText;
   }
 
-  if (startAdventureBtn) {
-    startAdventureBtn.addEventListener('click', () => {
-      const playerName = playerNameInput.value.trim() || 'Новичок';
-      const birthDate = birthDateInput.value || '2000-01-01';
-      const birthTime = birthTimeInput.value || '12:00';
-      const birthPlace = birthPlaceInput.value.trim() || 'Земля';
-      previewName.textContent = playerName;
-      previewBirth.textContent = `Рождён: ${birthDate} ${birthTime}, ${birthPlace}`;
-      previewBio.textContent = `Путешественник света и тайн.`;
-      document.querySelector('#map').scrollIntoView({ behavior: 'smooth' });
+  const renderAuthState = (user) => {
+    if (!authGuest || !authUser) return;
+    if (user) {
+      authGuest.classList.add('hidden');
+      if (charSelect) charSelect.classList.add('hidden');
+      authUser.classList.remove('hidden');
+      previewTelegramName.textContent = `Имя: ${user.name}`;
+      previewBirth.textContent = `Рождён: ${user.birthDate} ${user.birthTime}, ${user.birthPlace}`;
+    } else {
+      authGuest.classList.remove('hidden');
+      if (charSelect) charSelect.classList.add('hidden');
+      authUser.classList.add('hidden');
+    }
+
+    if (navRegister) navRegister.classList.toggle('hidden', Boolean(user));
+    if (logoutBtn) logoutBtn.classList.toggle('hidden', !user);
+    if (heroMapLink) heroMapLink.classList.toggle('hidden', !user);
+    if (heroContinueLink) heroContinueLink.classList.toggle('hidden', !user);
+    if (heroLead) heroLead.classList.toggle('hidden', Boolean(user));
+    if (mapSection) mapSection.classList.toggle('hidden', !user);
+    if (natalSection) natalSection.classList.toggle('hidden', !user);
+    if (questsSection) questsSection.classList.toggle('hidden', !user);
+    if (questPanelSection) questPanelSection.classList.toggle('hidden', !user);
+  };
+
+  if (telegramLoginBtn) {
+    telegramLoginBtn.addEventListener('click', () => {
+      telegramLoginBtn.disabled = true;
+      telegramLoginBtn.textContent = 'Входим...';
+      setTimeout(() => {
+        authGuest.classList.add('hidden');
+        if (charSelect) charSelect.classList.remove('hidden');
+        telegramLoginBtn.disabled = false;
+        telegramLoginBtn.textContent = 'Войти';
+      }, 600);
     });
   }
+
+  if (charSelectNext) {
+    charSelectNext.addEventListener('click', () => {
+      localStorage.setItem('mokshaTelegramUser', JSON.stringify(MOCK_TELEGRAM_USER));
+      renderAuthState(MOCK_TELEGRAM_USER);
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('mokshaTelegramUser');
+      renderAuthState(null);
+    });
+  }
+
+  const savedUser = localStorage.getItem('mokshaTelegramUser');
+  renderAuthState(savedUser ? JSON.parse(savedUser) : null);
 
   updateXp();
 });

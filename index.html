@@ -23,23 +23,21 @@
       <nav class="nav">
         <div class="brand">MOKSHA QUEST</div>
         <div class="nav-links">
-          <a href="#create">Регистрация</a>
-          <a href="#map">Карта</a>
-          <a href="#quests">Блоки</a>
+          <a href="#create" id="navRegister">Регистрация</a>
+          <button id="logoutBtn" class="hidden">Выйти</button>
         </div>
       </nav>
 
-      <div class="hero-content">
+      <div id="heroContent" class="hero-content">
         <div class="hero-copy">
           <p class="eyebrow">Волшебный учебный мир</p>
           <h1>Добро пожаловать в MOKSHA Quest</h1>
-          <p class="lead">
-            Зарегистрируй героя, введи дату, время и место рождения, и отправляйся по
-            пиксельной карте в мир планетных квестов.
+          <p id="heroLead" class="lead">
+            Зарегистрируй героя и отправляйся по пиксельной карте в мир планетных квестов.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#create">Начать регистрацию</a>
-            <a class="btn btn-secondary" href="#map">Посмотреть карту</a>
+            <a id="heroMapLink" class="btn btn-secondary hidden" href="#map">Посмотреть карту</a>
+            <a id="heroContinueLink" class="btn btn-primary hidden" href="#questPanel">Продолжить обучение</a>
           </div>
         </div>
 
@@ -48,36 +46,33 @@
 
     <main>
       <section id="create" class="section registration-section">
-        <div class="section-heading">
-          <p class="eyebrow">Регистрация</p>
-          <h2>Создай героя и начни своё путешествие</h2>
+        <div id="authGuest" class="panel auth-guest">
+          <div class="panel-title">Авторизация</div>
+          <h3>Войди через Telegram-бота</h3>
+          <p>Данные твоего рождения подтянутся автоматически из бота MOKSHA ASTROVESTNIK.</p>
+          <button id="telegramLoginBtn" class="btn btn-primary">Войти</button>
         </div>
 
-        <div class="create-grid">
-          <div class="panel">
-            <div class="character-list">
-              <button class="character-card active" data-name="Солярис" data-bio="Весёлый исследователь света и тепла." data-avatar="☀">
-                <span class="character-icon">☀</span>
-                <span>Солярис</span>
-              </button>
-              <button class="character-card" data-name="Лунелла" data-bio="Мягкая путеводительница эмоций." data-avatar="☾">
-                <span class="character-icon">☾</span>
-                <span>Лунелла</span>
-              </button>
-              <button class="character-card" data-name="Комета" data-bio="Бодрый искатель приключений." data-avatar="✦">
-                <span class="character-icon">✦</span>
-                <span>Комета</span>
-              </button>
-            </div>
-            <div class="registration-actions">
-              <input id="playerName" type="text" placeholder="Имя героя" />
-              <input id="birthDate" type="date" />
-              <input id="birthTime" type="time" />
-              <input id="birthPlace" type="text" placeholder="Город рождения" />
-              <button id="startAdventure" class="btn btn-primary">Создать героя</button>
-            </div>
+        <div id="charSelect" class="panel auth-guest hidden">
+          <div class="panel-title">Выбери облик героя</div>
+          <div id="charList" class="character-list">
+            <button class="character-card active" data-name="Солярис" data-bio="Весёлый исследователь света и тепла." data-avatar="☀">
+              <span class="character-icon">☀</span>
+              <span>Солярис</span>
+            </button>
+            <button class="character-card" data-name="Лунелла" data-bio="Мягкая путеводительница эмоций." data-avatar="☾">
+              <span class="character-icon">☾</span>
+              <span>Лунелла</span>
+            </button>
+            <button class="character-card" data-name="Комета" data-bio="Бодрый искатель приключений." data-avatar="✦">
+              <span class="character-icon">✦</span>
+              <span>Комета</span>
+            </button>
           </div>
+          <button id="charSelectNext" class="btn btn-primary">Далее</button>
+        </div>
 
+        <div id="authUser" class="hidden">
           <div class="panel panel-highlight">
             <div class="panel-title">Профиль героя</div>
             <div class="hero-preview">
@@ -97,6 +92,7 @@
               <h3 id="previewName">Солярис</h3>
               <p id="previewBio">Весёлый исследователь света и тепла.</p>
               <div class="profile-line">
+                <span id="previewTelegramName">Имя: -</span><br />
                 <span id="previewBirth">Рождён: -</span>
               </div>
               <div class="xp-bar"><span id="xpBar"></span></div>
@@ -106,9 +102,39 @@
         </div>
       </section>
 
-      <section id="map" class="section map-section">
+      <section id="natal" class="section natal-section hidden">
         <div class="section-heading">
-          <p class="eyebrow">Кампания</p>
+          <h2>Моя натальная карта</h2>
+        </div>
+
+        <div class="natal-grid">
+          <div class="panel natal-panel">
+            <div class="panel-title">Изображение натальной карты</div>
+            <div class="natal-image-card">
+              <div class="natal-image-preview" id="natalImagePreview">Изображение</div>
+            </div>
+          </div>
+
+          <div class="panel natal-panel">
+            <div class="panel-title">Астрологические данные</div>
+            <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
+
+Солнце
+15°43'
+Лев
+Пурвапхалгуни
+2 пада
+
+..." rows="12"></textarea>
+            <div class="natal-actions">
+              <button id="natalDetails" class="btn btn-primary">Подробнее</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="map" class="section map-section hidden">
+        <div class="section-heading">
           <h2>Путь ученика как RPG-маршрут</h2>
           <p class="lead">
             Главная точка — «Семя», за ней десять шагов-планет, затем следующая большая точка «Небо».
@@ -194,39 +220,7 @@
         </div>
       </section>
 
-      <section id="natal" class="section natal-section">
-        <div class="section-heading">
-          <p class="eyebrow">Моя натальная карта</p>
-          <h2>Карта и текстовые данные из Telegram</h2>
-        </div>
-
-        <div class="natal-grid">
-          <div class="panel natal-panel">
-            <div class="panel-title">Изображение натальной карты</div>
-            <div class="natal-image-card">
-              <div class="natal-image-preview" id="natalImagePreview">Изображение</div>
-            </div>
-          </div>
-
-          <div class="panel natal-panel">
-            <div class="panel-title">Астрологические данные</div>
-            <textarea id="natalText" class="natal-textarea" placeholder="Лагна — Телец
-
-Солнце
-15°43'
-Лев
-Пурвапхалгуни
-2 пада
-
-..." rows="12"></textarea>
-            <div class="natal-actions">
-              <button id="natalDetails" class="btn btn-primary">Подробнее</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="quests" class="section quests-section">
+      <section id="quests" class="section quests-section hidden">
         <div class="section-heading">
           <p class="eyebrow">Мини-блоки</p>
           <h2>Каждый блок — как отдельный остров</h2>
@@ -263,7 +257,7 @@
         </div>
       </section>
 
-      <section class="section quest-panel">
+      <section id="questPanel" class="section quest-panel hidden">
         <div class="section-heading">
           <p class="eyebrow">Текущий квест</p>
           <h2 id="questTitle">Солнце</h2>
