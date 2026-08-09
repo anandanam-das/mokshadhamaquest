@@ -99,10 +99,23 @@ document.addEventListener('DOMContentLoaded', () => {
     patronReopenBtn.hidden = true;
   };
 
+  const SPEECH_AUTO_HIDE_MS = 6000;
+  let speechHideTimer = null;
+
+  const hidePatronSpeech = () => {
+    clearTimeout(speechHideTimer);
+    patronSpeechBubble.classList.remove('speech-bubble-visible');
+    patronSpeechBubble.hidden = true;
+  };
+
   const showPatronSpeech = (message) => {
     showPatronWidget();
     patronSpeechBubble.textContent = message;
     patronSpeechBubble.hidden = false;
+    patronSpeechBubble.classList.add('speech-bubble-visible');
+
+    clearTimeout(speechHideTimer);
+    speechHideTimer = setTimeout(hidePatronSpeech, SPEECH_AUTO_HIDE_MS);
 
     const img = document.getElementById('patronWidgetImage');
     img.classList.remove('patron-react');
@@ -112,12 +125,82 @@ document.addEventListener('DOMContentLoaded', () => {
     img.addEventListener('animationend', () => img.classList.remove('patron-react'), { once: true });
   };
 
+  patronSpeechBubble.addEventListener('click', hidePatronSpeech);
+
   patronHideBtn.addEventListener('click', () => {
-    patronSpeechBubble.hidden = true;
+    hidePatronSpeech();
     hidePatronWidget();
   });
 
   patronReopenBtn.addEventListener('click', showPatronWidget);
+
+  const patronId = state.character.patronPlanet;
+
+  // Строгий контроль повторов: "мешок без повторов" на каждую пару
+  // покровитель+категория — тасуем весь пул, выдаём по одной, и только
+  // когда мешок опустел, тасуем заново. Реплика не повторится, пока не
+  // прозвучат все остальные варианты из пула (минимум 6-10 разных подряд).
+  const reactionBags = {};
+  const lastPicked = {};
+
+  const shuffle = (array) => {
+    const copy = array.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+    return copy;
+  };
+
+  const pickNoRepeat = (bagKey, pool) => {
+    if (!reactionBags[bagKey] || reactionBags[bagKey].length === 0) {
+      const bag = shuffle(pool);
+      // Не дать новому мешку начаться с той же реплики, что закончила
+      // предыдущий — иначе на стыке двух мешков возможен повтор подряд.
+      const nextUp = bag.length - 1;
+      if (bag.length > 1 && bag[nextUp] === lastPicked[bagKey]) {
+        const swapWith = Math.floor(Math.random() * nextUp);
+        const tmp = bag[nextUp];
+        bag[nextUp] = bag[swapWith];
+        bag[swapWith] = tmp;
+      }
+      reactionBags[bagKey] = bag;
+    }
+    const picked = reactionBags[bagKey].pop();
+    lastPicked[bagKey] = picked;
+    return picked;
+  };
+
+  // taskComplete/idleTap объединяют базовый пул (patronExtraReactions,
+  // 4 варианта) и расширенный (patronReactionsExpanded, 6 вариантов) —
+  // итого 10 вариантов на категорию.
+  const pickPooledReaction = (category) => {
+    const pool = [
+      ...patronExtraReactions[patronId][category],
+      ...patronReactionsExpanded[patronId][category],
+    ];
+    return pickNoRepeat(`${patronId}:${category}`, pool);
+  };
+
+  const pickExpandedOnly = (category) => {
+    return pickNoRepeat(`${patronId}:${category}`, patronReactionsExpanded[patronId][category]);
+  };
+
+  const LORE_DROP_CHANCE = 0.2;
+
+  document.getElementById('patronWidgetImage').addEventListener('click', () => {
+    if (Math.random() < LORE_DROP_CHANCE) {
+      showPatronSpeech(pickExpandedOnly('loreDrop'));
+    } else {
+      showPatronSpeech(pickPooledReaction('idleTap'));
+    }
+  });
+
+  const reactToTaskComplete = () => {
+    showPatronSpeech(pickPooledReaction('taskComplete'));
+  };
 
   const setupPatronWidget = () => {
     const character = MOKSHA_CHARACTERS.find((item) => item.id === state.character.patronPlanet);
@@ -158,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Я посмотрел лекцию, готов приступать к практике';
       btn.addEventListener('click', () => {
         completeTask(lessonKey, task.id);
+        reactToTaskComplete();
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
@@ -169,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Отметить выполненным';
       btn.addEventListener('click', () => {
         completeTask(lessonKey, task.id);
+        reactToTaskComplete();
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
@@ -283,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stage.querySelectorAll('.village-building').forEach((node) => {
           node.classList.toggle('selected', node.dataset.buildingId === selectedBuildingId);
         });
+        showPatronSpeech(getReaction(patronId, character.id));
         openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
       });
     }
@@ -316,5 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
     renderTaskContentPanel(null, null);
+    // Деревня уже открыта — это не первый заход, а возвращение.
+    // welcomeBack есть только в расширенном пуле, базового аналога нет.
+    showPatronSpeech(pickExpandedOnly('welcomeBack'));
   }
 });
