@@ -6,7 +6,8 @@ function getDefaultUserState() {
     character: null, // { patronPlanet }
     hasSeenPrologue: false,
     hasCompletedOnboarding: false,
-    unlockedLocations: [],
+    introCompleted: false,
+    taskProgress: {}, // { [lessonKey]: { [taskId]: true } }
   };
 }
 
@@ -28,4 +29,14 @@ function setUserState(patch) {
 
 function clearUserState() {
   localStorage.removeItem(USER_STATE_KEY);
+}
+
+function getTaskProgress(lessonKey) {
+  return getUserState().taskProgress[lessonKey] || {};
+}
+
+function completeTask(lessonKey, taskId) {
+  const state = getUserState();
+  const lessonProgress = { ...(state.taskProgress[lessonKey] || {}), [taskId]: true };
+  return setUserState({ taskProgress: { ...state.taskProgress, [lessonKey]: lessonProgress } });
 }

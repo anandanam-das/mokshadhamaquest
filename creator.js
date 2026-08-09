@@ -45,11 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const createHeroBtn = document.getElementById('createHeroBtn');
   createHeroBtn.addEventListener('click', () => {
     const character = getCharacter();
-    const previous = getUserState();
-    const unlockedLocations = previous.unlockedLocations.includes(character.id)
-      ? previous.unlockedLocations
-      : [...previous.unlockedLocations, character.id];
-    const state = setUserState({ character: { patronPlanet: character.id }, unlockedLocations });
+    const state = setUserState({ character: { patronPlanet: character.id } });
     window.location.href = state.hasSeenPrologue ? 'village.html' : 'prologue.html';
   });
 });

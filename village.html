@@ -35,6 +35,10 @@
           <div class="village-stage" id="villageStage"></div>
           <aside class="course-detail-panel" id="villageDetail"></aside>
         </div>
+
+        <div class="task-content-row">
+          <div class="task-content-panel" id="taskContentPanel"></div>
+        </div>
       </section>
     </main>
 
@@ -42,12 +46,15 @@
       <p>© MOKSHA Quest. Доброе обучение как игра.</p>
     </footer>
 
-    <div class="onboarding-overlay" id="onboardingOverlay" hidden>
-      <div class="onboarding-tooltip" id="onboardingTooltip">
-        <p class="onboarding-text" id="onboardingText"></p>
-        <button type="button" class="btn btn-primary onboarding-next" id="onboardingNextBtn">Далее</button>
-      </div>
+    <div class="patron-widget" id="patronWidget">
+      <button type="button" class="patron-widget-hide" id="patronWidgetHideBtn" aria-label="Скрыть помощника">×</button>
+      <div class="speech-bubble" id="patronSpeechBubble" hidden></div>
+      <img id="patronWidgetImage" class="patron-widget-image" src="" alt="" />
     </div>
+
+    <button type="button" class="patron-widget-reopen" id="patronWidgetReopenBtn" hidden aria-label="Показать помощника">
+      <img id="patronReopenImage" class="patron-widget-reopen-image" src="" alt="" />
+    </button>
 
     <script src="state.js"></script>
     <script src="characters.js"></script>
