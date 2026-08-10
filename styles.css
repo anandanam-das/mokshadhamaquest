@@ -779,6 +779,338 @@ h3 {
   line-height: 1.6;
 }
 
+.task-content-feedback {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.matching-task {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.matching-game {
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.matching-stage {
+  position: relative;
+  width: fit-content;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+/* Пиксельная река: вода в центре, песок и трава по обе стороны — каждый
+   материал свой бесшовный тайл 16×16 (assets/terrain), без склейки
+   текстур внутри одной картинки. Течение — сдвиг тайла воды по вертикали.
+   Обычный ряд во flex-строке стейджа — колонки карточек прижимаются к
+   ней вплотную, без разрыва. */
+
+.matching-waterway {
+  display: flex;
+  align-self: stretch;
+}
+
+.matching-strip {
+  height: 100%;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+}
+
+.matching-strip-grass {
+  width: 24px;
+  background-image: url('assets/terrain/grass-tile.png');
+  background-size: 64px 64px;
+}
+
+.matching-strip-sand {
+  width: 20px;
+  background-image: url('assets/terrain/sand-tile.png');
+  background-size: 64px 64px;
+}
+
+/* Ширина полосы перехода равна ширине самой картинки (не тайлится) —
+   весь градиент трава→песок сжимается ровно в эту полосу, поэтому края
+   всегда попадают в цвет соседних полос травы/песка, при любой ширине. */
+
+.matching-strip-transition {
+  width: 28px;
+  background-image: url('assets/terrain/river-bank-transition.png');
+  background-size: 28px 64px;
+  background-repeat: repeat-y;
+}
+
+.matching-strip-transition-flip {
+  transform: scaleX(-1);
+}
+
+.matching-strip-water {
+  width: 112px;
+  background-image: url('assets/terrain/river-water.png');
+  background-size: 64px 64px;
+  animation: matching-river-flow 1.6s linear infinite;
+}
+
+@keyframes matching-river-flow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 64px;
+  }
+}
+
+.matching-bridges {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.matching-bridge {
+  position: absolute;
+  height: 22px;
+  transform-origin: left center;
+  transform: rotate(var(--bridge-angle)) scaleX(0);
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.3, 1.1);
+  background-image: url('assets/terrain/bridge-plank.png');
+  background-size: 44px 22px;
+  background-repeat: repeat-x;
+  image-rendering: pixelated;
+  box-shadow: 0 2px 3px rgba(58, 38, 15, 0.3);
+}
+
+.matching-bridge-build {
+  transform: rotate(var(--bridge-angle)) scaleX(1);
+}
+
+.matching-bridge-no-transition {
+  transition: none;
+}
+
+.matching-magic-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.matching-magic-glow {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 191, 0.95) 0%, rgba(94, 209, 158, 0.55) 45%, rgba(94, 209, 158, 0) 72%);
+  animation: matching-magic-glow 0.75s ease forwards;
+}
+
+@keyframes matching-magic-glow {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  60% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(14);
+    opacity: 0;
+  }
+}
+
+.matching-magic-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffe9a8;
+  box-shadow: 0 0 8px 2px rgba(255, 233, 168, 0.85);
+  transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0);
+  animation: matching-magic-spark 0.75s ease forwards;
+}
+
+@keyframes matching-magic-spark {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--angle)) translateX(180px);
+    opacity: 0;
+  }
+}
+
+.matching-item-correct-pop {
+  animation: matching-correct-pop 0.4s ease;
+}
+
+@keyframes matching-correct-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.matching-column {
+  display: grid;
+  gap: 12px;
+  align-content: center;
+  padding: 8px 18px;
+}
+
+/* Карточки прижаты к берегу: левая колонка — правым краем к реке,
+   правая — левым, а не к внешним краям панели. */
+
+.matching-column-term {
+  justify-items: end;
+}
+
+.matching-column-image {
+  justify-items: start;
+}
+
+.matching-sidebar {
+  flex: 1 1 240px;
+  min-width: 220px;
+  padding-top: 8px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.62rem;
+  line-height: 2;
+  color: var(--muted);
+}
+
+.matching-sidebar-text {
+  margin: 0 0 16px;
+}
+
+.matching-sidebar-instruction {
+  margin: 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(95, 209, 158, 0.12);
+  border: 1px solid rgba(95, 209, 158, 0.3);
+  color: #2f6f44;
+}
+
+.matching-item {
+  font: inherit;
+  font-size: 1.05rem;
+  text-align: left;
+  padding: 13px 22px;
+  border-radius: 14px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+  cursor: pointer;
+  width: fit-content;
+  max-width: 100%;
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.matching-item-image {
+  background: #e6f4ea;
+  border-color: #bde0c9;
+}
+
+.matching-item:hover:not(.matching-item-correct) {
+  border-color: #a8c8e6;
+}
+
+.matching-item-image:hover:not(.matching-item-correct) {
+  border-color: #93cca8;
+}
+
+.matching-item-selected {
+  border-color: #5bd1a0;
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.18);
+}
+
+.matching-item-correct {
+  border-color: #89d5a9;
+  background: rgba(145, 226, 178, 0.28);
+  color: #2f6f44;
+  font-weight: 600;
+  cursor: default;
+  pointer-events: none;
+}
+
+.matching-item-wrong {
+  animation: matching-flash-wrong 0.6s ease;
+}
+
+@keyframes matching-flash-wrong {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    border-color: #e2685f;
+    background: rgba(226, 104, 95, 0.18);
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@media (max-width: 640px) {
+  .matching-task {
+    flex-direction: column;
+  }
+
+  .matching-strip-grass,
+  .matching-strip-sand,
+  .matching-strip-water {
+    background-size: 40px 40px;
+  }
+
+  .matching-strip-grass {
+    width: 16px;
+  }
+
+  .matching-strip-sand {
+    width: 14px;
+  }
+
+  .matching-strip-transition {
+    width: 18px;
+    background-size: 18px 40px;
+  }
+
+  .matching-strip-water {
+    width: 36px;
+  }
+
+  .matching-column {
+    padding: 8px 10px;
+  }
+
+  .matching-item {
+    font-size: 0.9rem;
+    padding: 10px 16px;
+  }
+}
+
 .task-icon {
   width: 34px;
   height: 34px;
@@ -1296,6 +1628,15 @@ h3 {
   color: var(--muted);
 }
 
+.dev-bypass-btn {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
+.dev-bypass-btn:hover {
+  opacity: 1;
+}
+
 /* Checking / subscription gate */
 
 .checking-section {
@@ -1597,7 +1938,13 @@ h3 {
   .task-content-panel-enter,
   .speech-bubble,
   .patron-widget,
-  .patron-widget-image {
+  .patron-widget-image,
+  .matching-item-wrong,
+  .matching-item-correct-pop,
+  .matching-strip-water,
+  .matching-bridge,
+  .matching-magic-glow,
+  .matching-magic-spark {
     animation: none;
     transition: none;
   }

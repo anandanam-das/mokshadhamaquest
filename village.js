@@ -213,6 +213,217 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupPatronWidget();
 
+  // --- Задание 1 "Собери пять слоёв": тап-сопоставление термина (слева)
+  // с образом (справа). Обе колонки перемешиваются заново при каждом
+  // заходе на задание. Неверная пара — секундная красная вспышка и
+  // возврат в несоединённое состояние, повторная попытка не блокируется.
+
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const renderMatchingTask = (lessonKey, task) => {
+    const pairs = task1Pairs;
+    const byId = {};
+    pairs.forEach((pair) => { byId[pair.id] = pair; });
+    const ids = pairs.map((pair) => pair.id);
+
+    // Тасуем обе колонки независимо, но гарантируем, что ни одна пара не
+    // осталась на совпадающей позиции — иначе при случайном перемешивании
+    // правильный ответ иногда оказывается прямо напротив термина.
+    const termOrder = shuffle(ids);
+    let imageOrder = shuffle(ids);
+    let guard = 0;
+    while (imageOrder.some((id, i) => id === termOrder[i]) && guard < 50) {
+      imageOrder = shuffle(ids);
+      guard += 1;
+    }
+
+    const matched = new Set();
+    let selected = null; // { id, el, side: 'term' | 'image' } — клик может начаться с любой стороны
+
+    const wrap = document.createElement('div');
+    wrap.className = 'matching-task';
+
+    const stageEl = document.createElement('div');
+    stageEl.className = 'matching-stage';
+
+    // Река посередине поля: полоса воды в центре плюс песок и трава по
+    // обе стороны от неё, каждый материал — свой бесшовный тайл, никакого
+    // "сшивания" разных текстур внутри одной картинки.
+    const riverEl = document.createElement('div');
+    riverEl.className = 'matching-waterway';
+    ['grass', 'transition', 'sand', 'water', 'sand', 'transition', 'grass'].forEach((kind, i) => {
+      const strip = document.createElement('div');
+      strip.className = `matching-strip matching-strip-${kind}`;
+      // Вторая (правая) полоса перехода — зеркалим, тайл нарисован с
+      // травой слева и песком справа, а справа от реки нужно наоборот.
+      if (kind === 'transition' && i > 3) strip.classList.add('matching-strip-transition-flip');
+      riverEl.appendChild(strip);
+    });
+
+    const bridgesLayer = document.createElement('div');
+    bridgesLayer.className = 'matching-bridges';
+
+    const termCol = document.createElement('div');
+    termCol.className = 'matching-column matching-column-term';
+    const imageCol = document.createElement('div');
+    imageCol.className = 'matching-column matching-column-image';
+
+    const clearWrongFlash = (a, b) => {
+      a.classList.remove('matching-item-wrong');
+      b.classList.remove('matching-item-wrong');
+    };
+
+    const popCorrect = (el) => {
+      if (prefersReducedMotion) return;
+      el.classList.add('matching-item-correct-pop');
+      el.addEventListener('animationend', () => el.classList.remove('matching-item-correct-pop'), { once: true });
+    };
+
+    // Мостик через реку между угаданной парой — тянется от термина к
+    // образу под тем углом, под которым они реально стоят друг напротив
+    // друга (шафл почти никогда не даёт им оказаться на одной высоте).
+    const buildBridge = (termEl, imageEl) => {
+      const stageRect = stageEl.getBoundingClientRect();
+      const a = termEl.getBoundingClientRect();
+      const b = imageEl.getBoundingClientRect();
+      const x1 = a.right - stageRect.left;
+      const y1 = a.top + a.height / 2 - stageRect.top;
+      const x2 = b.left - stageRect.left;
+      const y2 = b.top + b.height / 2 - stageRect.top;
+      const length = Math.hypot(x2 - x1, y2 - y1);
+      const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+
+      const BRIDGE_HEIGHT = 22;
+      const bridge = document.createElement('div');
+      bridge.className = 'matching-bridge';
+      bridge.style.left = `${x1}px`;
+      bridge.style.top = `${y1 - BRIDGE_HEIGHT / 2}px`;
+      bridge.style.width = `${length}px`;
+      bridge.style.setProperty('--bridge-angle', `${angle}deg`);
+      bridgesLayer.appendChild(bridge);
+
+      if (prefersReducedMotion) {
+        bridge.classList.add('matching-bridge-build', 'matching-bridge-no-transition');
+        return;
+      }
+
+      // eslint-disable-next-line no-void
+      void bridge.offsetWidth;
+      bridge.classList.add('matching-bridge-build');
+    };
+
+    // Финальная вспышка на всё поле, когда собраны все пять пар — свет
+    // пробегает по реке, путь открыт.
+    const playMagicCompletionEffect = (onDone) => {
+      if (prefersReducedMotion) {
+        onDone();
+        return;
+      }
+
+      const overlay = document.createElement('div');
+      overlay.className = 'matching-magic-overlay';
+
+      const glow = document.createElement('div');
+      glow.className = 'matching-magic-glow';
+      overlay.appendChild(glow);
+
+      const sparkCount = 14;
+      for (let i = 0; i < sparkCount; i += 1) {
+        const spark = document.createElement('span');
+        spark.className = 'matching-magic-spark';
+        spark.style.setProperty('--angle', `${(360 / sparkCount) * i}deg`);
+        spark.style.animationDelay = `${i * 0.02}s`;
+        overlay.appendChild(spark);
+      }
+
+      stageEl.appendChild(overlay);
+      setTimeout(onDone, 750);
+    };
+
+    // Клик может начаться с любой стороны — термина или образа. Первый
+    // клик просто выделяет карточку; второй клик по ПРОТИВОПОЛОЖНОЙ
+    // стороне пытается собрать пару. Повторный клик по той же стороне
+    // просто переключает выделение на новую карточку.
+    const trySelect = (side, id, el) => {
+      if (!selected) {
+        selected = { id, el, side };
+        el.classList.add('matching-item-selected');
+        return;
+      }
+
+      if (selected.side === side) {
+        selected.el.classList.remove('matching-item-selected');
+        selected = { id, el, side };
+        el.classList.add('matching-item-selected');
+        return;
+      }
+
+      const termSel = side === 'term' ? { id, el } : selected;
+      const imageSel = side === 'image' ? { id, el } : selected;
+      selected.el.classList.remove('matching-item-selected');
+      selected = null;
+
+      if (termSel.id === imageSel.id) {
+        matched.add(termSel.id);
+        termSel.el.classList.add('matching-item-correct');
+        imageSel.el.classList.add('matching-item-correct');
+        popCorrect(termSel.el);
+        popCorrect(imageSel.el);
+        buildBridge(termSel.el, imageSel.el);
+
+        if (matched.size === pairs.length) {
+          completeTask(lessonKey, task.id);
+          reactToTaskComplete();
+          playMagicCompletionEffect(rerenderCurrentLesson);
+        }
+      } else {
+        termSel.el.classList.add('matching-item-wrong');
+        imageSel.el.classList.add('matching-item-wrong');
+        setTimeout(() => clearWrongFlash(termSel.el, imageSel.el), 600);
+      }
+    };
+
+    termOrder.forEach((id) => {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'matching-item matching-item-term';
+      el.textContent = byId[id].term;
+      el.addEventListener('click', () => {
+        if (matched.has(id)) return;
+        trySelect('term', id, el);
+      });
+      termCol.appendChild(el);
+    });
+
+    imageOrder.forEach((id) => {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'matching-item matching-item-image';
+      el.textContent = byId[id].image;
+      el.addEventListener('click', () => {
+        if (matched.has(id)) return;
+        trySelect('image', id, el);
+      });
+      imageCol.appendChild(el);
+    });
+
+    stageEl.append(termCol, riverEl, imageCol, bridgesLayer);
+
+    const gameEl = document.createElement('div');
+    gameEl.className = 'matching-game';
+    gameEl.appendChild(stageEl);
+
+    const sidebar = document.createElement('div');
+    sidebar.className = 'matching-sidebar';
+    sidebar.innerHTML = `
+      ${TASK1_INTRO_TEXT.split('\n\n').map((p) => `<p class="matching-sidebar-text">${p}</p>`).join('')}
+      <p class="matching-sidebar-instruction">${TASK1_INSTRUCTION_TEXT}</p>
+    `;
+
+    wrap.append(gameEl, sidebar);
+    taskContentPanel.appendChild(wrap);
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -230,7 +441,11 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.innerHTML = '';
 
     if (task.status === 'completed') {
-      taskContentPanel.innerHTML = `<p class="task-content-done">✓ «${task.title}» выполнено</p>`;
+      const feedback = TASK_COMPLETED_FEEDBACK[task.id];
+      taskContentPanel.innerHTML = `
+        <p class="task-content-done">✓ «${task.title}» выполнено</p>
+        ${feedback ? `<p class="task-content-feedback">${feedback}</p>` : ''}
+      `;
     } else if (task.type === 'lecture_checkbox') {
       taskContentPanel.innerHTML = `
         <p class="task-content-text">Лекция пока доступна в Telegram-канале курса, здесь появится позже.</p>
@@ -245,6 +460,8 @@ document.addEventListener('DOMContentLoaded', () => {
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
+    } else if (task.id === 'task_1' && task.type === 'matching') {
+      renderMatchingTask(lessonKey, task);
     } else {
       taskContentPanel.innerHTML = `<p class="task-content-text">Материал скоро появится здесь.</p>`;
       const btn = document.createElement('button');
