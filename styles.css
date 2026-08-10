@@ -1690,7 +1690,7 @@ h3 {
   background: rgba(255, 255, 255, 0.92);
   border: 2px solid var(--border);
   border-radius: 28px;
-  padding: 40px 32px;
+  padding: 32px;
   display: grid;
   gap: 24px;
   justify-items: center;
@@ -1698,16 +1698,434 @@ h3 {
   box-shadow: 0 15px 30px rgba(36, 71, 120, 0.08);
 }
 
-.prologue-illustration {
-  font-size: 4rem;
-  line-height: 1;
-}
-
 .prologue-text {
   font-size: 1.1rem;
   line-height: 1.7;
   color: var(--text);
   margin: 0;
+}
+
+.prologue-text-enter {
+  animation: prologue-text-fade 0.4s ease both;
+}
+
+@keyframes prologue-text-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Сцена пролога: 5 фаз (battle/center-glow/pinning/center-still/
+   zoom-out-to-map), переключаются через data-phase на .prologue-scene.
+   Фон и земля — CSS/тайл, без отдельных иллюстраций-декораций (см. ТЗ):
+   фон битвы — космический градиент + точки-звёзды, земля — переиспользует
+   уже готовый assets/terrain/grass-tile.png, свечение рождения — тот же
+   приём, что и magic-эффект в задании на сопоставление. */
+
+.prologue-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  box-shadow: 0 15px 30px rgba(36, 71, 120, 0.08);
+  transition: transform 1s ease;
+}
+
+.prologue-backdrop {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, #352a6e 0%, #1a1440 65%, #0a0722 100%);
+  transition: background 0.8s ease;
+}
+
+.prologue-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.9;
+  transition: opacity 0.6s ease;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255, 255, 255, 0.7) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 70% 18%, rgba(255, 255, 255, 0.55) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 55%, rgba(255, 255, 255, 0.45) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 38% 72%, rgba(255, 255, 255, 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 58% 42%, rgba(255, 255, 255, 0.4) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 12% 82%, rgba(255, 255, 255, 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 25%, rgba(255, 255, 255, 0.4) 50%, transparent 51%);
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-backdrop,
+.prologue-scene[data-phase='center-still'] .prologue-backdrop,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-backdrop {
+  background: linear-gradient(180deg, #79c1e0 0%, #cfe8d6 62%, #e6dba8 100%);
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-backdrop::before,
+.prologue-scene[data-phase='center-still'] .prologue-backdrop::before,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-backdrop::before {
+  opacity: 0;
+}
+
+/* Солнце и облака — только для дневных фаз (после того, как существо
+   придавили к земле), CSS-фигуры без отдельных иллюстраций. */
+
+.prologue-sun {
+  position: absolute;
+  top: 8%;
+  right: 10%;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6d0 0%, #ffd873 45%, #ffb347 80%);
+  box-shadow: 0 0 26px 8px rgba(255, 199, 110, 0.45);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* Лучи — вращающийся conic-gradient за диском солнца, замаскированный в
+   кольцо (mask-image), чтобы не перекрывать сам диск. */
+
+.prologue-sun::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255, 214, 130, 0.55) 0deg 6deg, transparent 6deg 24deg);
+  -webkit-mask-image: radial-gradient(circle, black 42%, transparent 74%);
+  mask-image: radial-gradient(circle, black 42%, transparent 74%);
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-sun::before,
+.prologue-scene[data-phase='center-still'] .prologue-sun::before,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-sun::before {
+  animation: prologue-sun-rotate 30s linear infinite;
+}
+
+@keyframes prologue-sun-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.prologue-cloud {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 50px;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.prologue-cloud::before,
+.prologue-cloud::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 50%;
+}
+
+.prologue-cloud-1 {
+  top: 12%;
+  left: 6%;
+  width: 72px;
+  height: 26px;
+}
+.prologue-cloud-1::before { width: 36px; height: 36px; top: -17px; left: 10px; }
+.prologue-cloud-1::after { width: 28px; height: 28px; top: -12px; left: 38px; }
+
+.prologue-cloud-2 {
+  top: 28%;
+  left: 46%;
+  width: 30px;
+  height: 11px;
+}
+.prologue-cloud-2::before { width: 16px; height: 16px; top: -7px; left: 4px; }
+.prologue-cloud-2::after { width: 12px; height: 12px; top: -5px; left: 16px; }
+
+.prologue-cloud-3 {
+  top: 4%;
+  left: 34%;
+  width: 20px;
+  height: 7px;
+}
+.prologue-cloud-3::before { width: 11px; height: 11px; top: -5px; left: 2px; }
+.prologue-cloud-3::after { width: 8px; height: 8px; top: -3px; left: 11px; }
+
+.prologue-cloud-4 {
+  top: 32%;
+  left: 74%;
+  width: 60px;
+  height: 22px;
+}
+.prologue-cloud-4::before { width: 30px; height: 30px; top: -14px; left: 8px; }
+.prologue-cloud-4::after { width: 24px; height: 24px; top: -10px; left: 32px; }
+
+.prologue-cloud-5 {
+  top: 15%;
+  left: 60%;
+  width: 18px;
+  height: 6px;
+}
+.prologue-cloud-5::before { width: 10px; height: 10px; top: -4px; left: 2px; }
+.prologue-cloud-5::after { width: 8px; height: 8px; top: -3px; left: 10px; }
+
+.prologue-scene[data-phase='pinning'] .prologue-sun,
+.prologue-scene[data-phase='center-still'] .prologue-sun,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-sun,
+.prologue-scene[data-phase='pinning'] .prologue-cloud,
+.prologue-scene[data-phase='center-still'] .prologue-cloud,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud {
+  opacity: 1;
+}
+
+/* Облака дрейфуют непрерывно, пока видны — это и есть "живая" часть
+   дневных сцен, а не лежащий Васту Пуруша (его больше не покачиваем). */
+
+.prologue-scene[data-phase='pinning'] .prologue-cloud-1,
+.prologue-scene[data-phase='center-still'] .prologue-cloud-1,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud-1 {
+  animation: prologue-cloud-drift 18s ease-in-out infinite;
+  --drift: 20px;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-cloud-2,
+.prologue-scene[data-phase='center-still'] .prologue-cloud-2,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud-2 {
+  animation: prologue-cloud-drift 22s ease-in-out infinite;
+  animation-delay: -6s;
+  --drift: -16px;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-cloud-3,
+.prologue-scene[data-phase='center-still'] .prologue-cloud-3,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud-3 {
+  animation: prologue-cloud-drift 15s ease-in-out infinite;
+  animation-delay: -3s;
+  --drift: 12px;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-cloud-4,
+.prologue-scene[data-phase='center-still'] .prologue-cloud-4,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud-4 {
+  animation: prologue-cloud-drift 24s ease-in-out infinite;
+  animation-delay: -10s;
+  --drift: -14px;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-cloud-5,
+.prologue-scene[data-phase='center-still'] .prologue-cloud-5,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-cloud-5 {
+  animation: prologue-cloud-drift 19s ease-in-out infinite;
+  animation-delay: -8s;
+  --drift: 10px;
+}
+
+@keyframes prologue-cloud-drift {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(var(--drift, 16px));
+  }
+}
+
+.prologue-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 24%;
+  background-image: url('assets/terrain/grass-tile.png');
+  background-size: 64px 64px;
+  background-repeat: repeat;
+  image-rendering: pixelated;
+  border-top: 3px solid rgba(20, 40, 20, 0.25);
+  transform: translateY(100%);
+  transition: transform 0.7s ease;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-ground,
+.prologue-scene[data-phase='center-still'] .prologue-ground,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-ground {
+  transform: translateY(0);
+}
+
+.prologue-glow {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 191, 0.95) 0%, rgba(255, 197, 120, 0.5) 45%, rgba(255, 197, 120, 0) 75%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.prologue-scene[data-phase='center-glow'] .prologue-glow {
+  opacity: 1;
+  animation: prologue-glow-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes prologue-glow-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.7);
+  }
+}
+
+.prologue-character {
+  position: absolute;
+  bottom: 6%;
+  height: 55%;
+  width: auto;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, left 0.6s ease, transform 0.6s ease;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.28));
+}
+
+.prologue-character.is-visible {
+  opacity: 1;
+}
+
+.prologue-character-shiva {
+  left: 16%;
+}
+
+.prologue-character-demon {
+  right: 16%;
+  left: auto;
+  transform: scaleX(-1);
+}
+
+.prologue-scene[data-phase='battle'] .prologue-character-shiva.is-visible,
+.prologue-scene[data-phase='battle'] .prologue-character-demon.is-visible {
+  animation: prologue-clash-shake 0.5s ease 0.2s;
+}
+
+@keyframes prologue-clash-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+.prologue-scene[data-phase='battle'] .prologue-character-demon.is-visible {
+  animation-name: prologue-clash-shake-flip;
+}
+
+@keyframes prologue-clash-shake-flip {
+  0%, 100% {
+    transform: scaleX(-1) translateX(0);
+  }
+  25% {
+    transform: scaleX(-1) translateX(6px);
+  }
+  75% {
+    transform: scaleX(-1) translateX(-6px);
+  }
+}
+
+/* Вспышка в точке столкновения — короткая искра между бойцами, вместо
+   одной только тряски. Совпадает по времени с shake (задержка 0.2s). */
+
+.prologue-clash-spark {
+  position: absolute;
+  top: 36%;
+  left: 46%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(255, 214, 140, 0.75) 40%, rgba(255, 214, 140, 0) 75%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.prologue-scene[data-phase='battle'] .prologue-clash-spark {
+  animation: prologue-clash-flash 0.5s ease 0.2s;
+}
+
+@keyframes prologue-clash-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(2.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+.prologue-scene[data-phase='center-glow'] .prologue-character-shiva {
+  left: 50%;
+  transform: translateX(-50%) scale(0.7);
+  opacity: 0.35;
+}
+
+.prologue-character-vastu {
+  left: 50%;
+  /* Лежачая фигура — базовые bottom/height рассчитаны на стоящих Шиву и
+     демона, для Васту Пуруши ниже и площе, чтобы он лежал НА земле, а не
+     парил на её фоне наполовину в воздухе. */
+  bottom: 2%;
+  height: 32%;
+  transform: translateX(-50%);
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-character-vastu.is-visible {
+  animation: prologue-pin-down 0.9s ease forwards;
+}
+
+@keyframes prologue-pin-down {
+  0% {
+    transform: translateX(-50%) translateY(-28%) scaleY(1.1);
+    opacity: 0;
+  }
+  70% {
+    transform: translateX(-50%) translateY(3%) scaleY(0.93);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+
+.prologue-scene[data-phase='zoom-out-to-map'] {
+  animation: prologue-zoom-out 1s ease forwards;
+}
+
+@keyframes prologue-zoom-out {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.88);
+  }
 }
 
 .prologue-controls {
@@ -1944,7 +2362,26 @@ h3 {
   .matching-strip-water,
   .matching-bridge,
   .matching-magic-glow,
-  .matching-magic-spark {
+  .matching-magic-spark,
+  .prologue-text-enter,
+  .prologue-scene,
+  .prologue-backdrop,
+  .prologue-backdrop::before,
+  .prologue-ground,
+  .prologue-glow,
+  .prologue-character,
+  .prologue-character-shiva.is-visible,
+  .prologue-character-demon.is-visible,
+  .prologue-character-vastu.is-visible,
+  .prologue-clash-spark,
+  .prologue-sun,
+  .prologue-sun::before,
+  .prologue-cloud,
+  .prologue-cloud-1,
+  .prologue-cloud-2,
+  .prologue-cloud-3,
+  .prologue-cloud-4,
+  .prologue-cloud-5 {
     animation: none;
     transition: none;
   }
