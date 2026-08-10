@@ -9,7 +9,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const checkingView = document.getElementById('checkingView');
   const noAccessView = document.getElementById('noAccessView');
 
-  const access = await fakeCheckSubscription(state.telegramId);
+  let access;
+  try {
+    access = await checkSubscription(state.telegramId);
+  } catch (error) {
+    checkingView.querySelector('.checking-text').textContent =
+      'Не удалось проверить доступ. Обновите страницу или попробуйте позже.';
+    return;
+  }
 
   setUserState({
     hasPlanetsAccess: access.hasPlanetsAccess,
