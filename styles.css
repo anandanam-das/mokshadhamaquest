@@ -165,6 +165,12 @@ h3 {
   color: #315023;
 }
 
+.btn-warning {
+  background: linear-gradient(135deg, #f9ae38, #f77f3d);
+  color: #ffffff;
+  box-shadow: 0 10px 0 rgba(199, 100, 40, 0.35);
+}
+
 .creator-panel {
   background: rgba(221, 236, 199, 0.92);
   border-color: rgba(112, 150, 87, 0.24);
