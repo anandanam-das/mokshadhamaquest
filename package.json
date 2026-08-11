@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "jose": "^5.9.6",
     "jsonwebtoken": "^9.0.2"
   }
 }
