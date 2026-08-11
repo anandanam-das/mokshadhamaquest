@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     'vastu-purusha': document.getElementById('prologueCharVastu'),
   };
 
+  document.getElementById('prologueRuin1').src = 'assets/prologue/ruin-1.png';
+  document.getElementById('prologueRuin2').src = 'assets/prologue/ruin-2.png';
+  document.getElementById('prologueRuin3').src = 'assets/prologue/ruin-3.png';
+
   Object.entries(CHARACTER_FILES).forEach(([key, src]) => {
     characterEls[key].src = src;
   });

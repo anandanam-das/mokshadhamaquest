@@ -1938,6 +1938,47 @@ h3 {
   }
 }
 
+/* Руины на горизонте — реальные пиксель-арт спрайты (assets/prologue/
+   ruin-1.png, ruin-2.png), а не CSS-фигуры. Появляются вместе с землёй,
+   чтобы сцена не читалась как голое поле. */
+
+.prologue-ruin {
+  position: absolute;
+  width: auto;
+  object-fit: contain;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* Справа кластер из двух (1 — на переднем плане у земли, 3 — чуть выше и
+   дальше вглубь), слева одна (2), для ощущения глубины кадра. */
+
+.prologue-ruin-1 {
+  right: 2%;
+  bottom: 2%;
+  height: 15%;
+}
+
+.prologue-ruin-2 {
+  left: 7%;
+  bottom: 5%;
+  height: 22%;
+}
+
+.prologue-ruin-3 {
+  right: 18%;
+  bottom: 20%;
+  height: 27%;
+}
+
+.prologue-scene[data-phase='pinning'] .prologue-ruin,
+.prologue-scene[data-phase='center-still'] .prologue-ruin,
+.prologue-scene[data-phase='zoom-out-to-map'] .prologue-ruin {
+  opacity: 1;
+}
+
 .prologue-ground {
   position: absolute;
   left: 0;
@@ -2381,7 +2422,8 @@ h3 {
   .prologue-cloud-2,
   .prologue-cloud-3,
   .prologue-cloud-4,
-  .prologue-cloud-5 {
+  .prologue-cloud-5,
+  .prologue-ruin {
     animation: none;
     transition: none;
   }
