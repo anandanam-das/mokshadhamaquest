@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   const checkingView = document.getElementById('checkingView');
   const noAccessView = document.getElementById('noAccessView');
 
+  const recheckBtn = document.getElementById('recheckBtn');
+  if (recheckBtn) {
+    recheckBtn.addEventListener('click', () => {
+      window.location.href = `https://t.me/${MOKSHA_CONFIG.telegramBotUsername}?start=auth`;
+    });
+  }
+
   // Локальная разработка: бэкенд может быть не запущен (нужны реальные
   // Telegram credentials, см. server/README.md) — на localhost доступ
   // считается всегда выданным, без обращения к серверу. На проде

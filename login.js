@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   loginBtn.addEventListener('click', () => {
-    statusEl.textContent =
-      'Открываем Telegram… Нажмите Start в чате с ботом, затем перейдите по ссылке, которую он пришлёт.';
     window.location.href = `https://t.me/${MOKSHA_CONFIG.telegramBotUsername}?start=auth`;
   });
 });

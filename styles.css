@@ -138,6 +138,10 @@ h3 {
   margin-top: 22px;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -163,6 +167,12 @@ h3 {
 .btn-secondary {
   background: rgba(238, 250, 226, 0.95);
   color: #315023;
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #f9ae38, #f77f3d);
+  color: #ffffff;
+  box-shadow: 0 10px 0 rgba(199, 100, 40, 0.35);
 }
 
 .creator-panel {
@@ -1608,6 +1618,13 @@ h3 {
   gap: 16px;
   justify-items: center;
   text-align: center;
+}
+
+.checking-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .btn-telegram {
