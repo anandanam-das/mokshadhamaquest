@@ -1224,6 +1224,149 @@ h3 {
   }
 }
 
+/* "Гений кулинарии" (task_3) — лоток карточек-образов сверху, подписанные
+   ёмкости снизу, drag-and-drop (+ тап-фолбэк). */
+
+.cook-task {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.cook-game {
+  flex: 1 1 460px;
+  display: grid;
+  gap: 24px;
+}
+
+.cook-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(96, 197, 255, 0.06);
+  border: 1px dashed rgba(96, 197, 255, 0.3);
+  min-height: 56px;
+}
+
+.cook-card {
+  font: inherit;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 12px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+  color: #1a2130;
+  cursor: grab;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cook-card-icon {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+}
+
+.cook-card-label {
+  text-align: left;
+}
+
+.cook-card:active {
+  cursor: grabbing;
+}
+
+.cook-card-selected {
+  border-color: #5bd1a0;
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+  transform: translateY(-2px);
+}
+
+.cook-containers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.cook-container {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border-radius: 16px;
+  border: 1px solid #e3ece8;
+  background: #fbfdfa;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.cook-container-hover {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.1);
+}
+
+.cook-container-filled {
+  border-color: #89d5a9;
+  background: rgba(145, 226, 178, 0.16);
+}
+
+.cook-vessel {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  font-size: 1.8rem;
+}
+
+.cook-vessel-filled {
+  filter: drop-shadow(0 0 6px rgba(145, 226, 178, 0.6));
+}
+
+.cook-vessel-icon,
+.cook-vessel-img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.cook-vessel-fill {
+  position: absolute;
+  font-size: 0.6rem;
+}
+
+.cook-container-label {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cook-container-shake {
+  animation: cook-container-shake 0.4s ease;
+}
+
+@keyframes cook-container-shake {
+  0%, 100% {
+    transform: translateX(0);
+    border-color: #e3ece8;
+  }
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+  40% {
+    border-color: #e2685f;
+    background: rgba(226, 104, 95, 0.14);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
 .matching-task {
   width: 100%;
   display: flex;

@@ -41,16 +41,17 @@ const genitiveCase = {
   Кету: 'Кету',
 };
 
-// "Я посмотрел лекцию" — гейт. Открыт всегда первым, вручную подтверждается
-// (заглушка), остальные задания урока заблокированы, пока он не пройден.
-const LECTURE_TASK = { id: 'watch_lecture', type: 'lecture_checkbox', title: 'Я посмотрел лекцию' };
+// "Свиток учения" (лекция) — гейт. Открыт всегда первым, вручную
+// подтверждается (заглушка), остальные задания урока заблокированы,
+// пока он не пройден.
+const LECTURE_TASK = { id: 'watch_lecture', type: 'lecture_checkbox', title: 'Свиток учения' };
 
 const INTRO_TASKS = [
   LECTURE_TASK,
-  { id: 'task_1', type: 'matching', title: 'Собери пять слоёв' },
-  { id: 'task_2', type: 'find_error', title: 'Отличи Знак от Дома' },
-  { id: 'task_3', type: 'matching_transfer', title: 'Придумай свою метафору' },
-  { id: 'task_4', type: 'case_quiz', title: 'Прочитай одним взглядом' },
+  { id: 'task_1', type: 'matching', title: 'Пять мостов' },
+  { id: 'task_2', type: 'find_error', title: 'Сад двух миров' },
+  { id: 'task_3', type: 'drag_to_container', title: 'Гений кулинарии' },
+  { id: 'task_4', type: 'case_quiz', title: 'Взгляд астролога' },
   { id: 'village_intro', type: 'guided_tour', title: 'Знакомство с обителью' },
 ];
 

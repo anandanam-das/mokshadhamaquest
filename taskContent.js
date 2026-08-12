@@ -74,3 +74,32 @@ const TASK_COMPLETED_FEEDBACK = {
 
 const TASK2_FINAL_TEXT =
   'Шесть лжей сорваны, истины расцвели. Знак задаёт стиль действия планеты, Дом — сферу его проявления. Два разных мира, и ты научился узнавать их в лицо, не путая ни с Накшатрой, ни друг с другом.';
+
+const task3Data = {
+  pairs: [
+    { id: 'planet', image: 'Повар', term: 'Планета' },
+    { id: 'nakshatra', image: 'Бабушкин рецепт', term: 'Накшатра' },
+    { id: 'sign', image: 'Жар плиты', term: 'Знак' },
+    { id: 'house', image: 'Ресторан, где подают блюдо', term: 'Дом' },
+    { id: 'navamsha', image: 'Вкус готового блюда', term: 'Навамша' },
+  ],
+};
+
+const TASK3_INTRO_TEXT =
+  'Пять уровней однажды объяснились через семя. Сегодня перед тобой другая форма для той же сути — повар и его блюдо. Раскидай образы по нужным местам, и урок оживёт заново, в новом обличье.';
+
+const TASK3_INSTRUCTION_TEXT =
+  'Перетащи каждый образ в подписанную ёмкость. Верное место — и блюдо на шаг ближе к готовности.';
+
+const TASK3_ICONS = {
+  planet: 'assets/icons/task3-chef.png',
+  nakshatra: 'assets/icons/task3-recipe.png',
+  sign: 'assets/icons/task3-stove.png',
+  house: 'assets/icons/task3-cafe.png',
+  navamsha: 'assets/icons/task3-cup.png',
+};
+
+const TASK3_FINAL_TEXT =
+  'Жар плиты — снова свет и тепло, как было с семенем. Один и тот же принцип проявляется одинаково в разных декорациях. Это и есть анумана: закономерность, которую ты увидел сам.';
+
+TASK_COMPLETED_FEEDBACK.task_3 = TASK3_FINAL_TEXT;

@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     matching: '🔗',
     find_error: '🔍',
     matching_transfer: '🔁',
+    drag_to_container: '🍲',
     case_quiz: '📐',
     guided_tour: '🗺️',
   };
@@ -627,6 +628,178 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.appendChild(wrap);
   };
 
+  // --- "Гений кулинарии" (task_3): лоток с карточками-образами сверху,
+  // подписанные ёмкости снизу. Перетащи (или тапни карточку, затем
+  // ёмкость — для устройств без drag) образ в верную ёмкость. Поддержаны
+  // и настоящий HTML5 drag-and-drop, и тап-фолбэк одним и тем же кодом.
+  const renderDragTask = (lessonKey, task, data) => {
+    const pairs = data.pairs;
+    const byId = {};
+    pairs.forEach((pair) => { byId[pair.id] = pair; });
+    const ids = pairs.map((pair) => pair.id);
+
+    const imageOrder = shuffle(ids);
+    let termOrder = shuffle(ids);
+    let guard = 0;
+    while (imageOrder.some((id, i) => id === termOrder[i]) && guard < 50) {
+      termOrder = shuffle(ids);
+      guard += 1;
+    }
+
+    const filled = new Set();
+    let selectedId = null;
+    const cardEls = {};
+    const containerEls = {};
+    const vesselEls = {};
+    const vesselIconEls = {};
+    const vesselImgEls = {};
+    const containerFillEls = {};
+
+    const wrap = document.createElement('div');
+    wrap.className = 'cook-task';
+
+    const introEl = document.createElement('p');
+    introEl.className = 'quiz-intro';
+    introEl.textContent = TASK3_INTRO_TEXT;
+
+    const instructionEl = document.createElement('p');
+    instructionEl.className = 'flower-instruction';
+    instructionEl.textContent = TASK3_INSTRUCTION_TEXT;
+
+    const tray = document.createElement('div');
+    tray.className = 'cook-tray';
+
+    const containersGrid = document.createElement('div');
+    containersGrid.className = 'cook-containers';
+
+    const clearSelection = () => {
+      selectedId = null;
+      Object.values(cardEls).forEach((el) => el.classList.remove('cook-card-selected'));
+    };
+
+    const attemptPlace = (cardId, containerId) => {
+      if (!cardId || filled.has(containerId) || !cardEls[cardId]) return;
+
+      if (cardId === containerId) {
+        filled.add(containerId);
+        vesselEls[containerId].classList.add('cook-vessel-filled');
+        vesselIconEls[containerId].hidden = true;
+        vesselImgEls[containerId].src = TASK3_ICONS[cardId];
+        vesselImgEls[containerId].hidden = false;
+        containerFillEls[containerId].textContent = byId[cardId].image;
+        containerFillEls[containerId].hidden = false;
+        containerEls[containerId].classList.add('cook-container-filled');
+        cardEls[cardId].remove();
+        delete cardEls[cardId];
+        clearSelection();
+
+        if (filled.size === pairs.length) {
+          completeTask(lessonKey, task.id);
+          reactToTaskComplete();
+          rerenderCurrentLesson();
+        }
+      } else {
+        const containerEl = containerEls[containerId];
+        containerEl.classList.remove('cook-container-shake');
+        // eslint-disable-next-line no-void
+        void containerEl.offsetWidth;
+        containerEl.classList.add('cook-container-shake');
+        clearSelection();
+      }
+    };
+
+    imageOrder.forEach((id) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'cook-card';
+      const cardIcon = document.createElement('img');
+      cardIcon.className = 'cook-card-icon';
+      cardIcon.src = TASK3_ICONS[id];
+      cardIcon.alt = '';
+      const cardLabel = document.createElement('span');
+      cardLabel.className = 'cook-card-label';
+      cardLabel.textContent = byId[id].image;
+      card.append(cardIcon, cardLabel);
+      card.draggable = true;
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', id);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      card.addEventListener('click', () => {
+        if (selectedId === id) {
+          clearSelection();
+          return;
+        }
+        clearSelection();
+        selectedId = id;
+        card.classList.add('cook-card-selected');
+      });
+      cardEls[id] = card;
+      tray.appendChild(card);
+    });
+
+    termOrder.forEach((id) => {
+      const containerEl = document.createElement('div');
+      containerEl.className = 'cook-container';
+
+      const vessel = document.createElement('div');
+      vessel.className = 'cook-vessel';
+      const vesselIcon = document.createElement('img');
+      vesselIcon.className = 'cook-vessel-icon';
+      vesselIcon.src = 'assets/icons/task3-vessel-empty.png';
+      vesselIcon.alt = '';
+      const vesselImg = document.createElement('img');
+      vesselImg.className = 'cook-vessel-img';
+      vesselImg.alt = '';
+      vesselImg.hidden = true;
+      const fillText = document.createElement('span');
+      fillText.className = 'cook-vessel-fill';
+      fillText.hidden = true;
+      vessel.append(vesselIcon, vesselImg, fillText);
+
+      const label = document.createElement('div');
+      label.className = 'cook-container-label';
+      label.textContent = byId[id].term;
+
+      containerEl.append(vessel, label);
+
+      containerEl.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!filled.has(id)) containerEl.classList.add('cook-container-hover');
+      });
+      containerEl.addEventListener('dragleave', () => {
+        containerEl.classList.remove('cook-container-hover');
+      });
+      containerEl.addEventListener('drop', (e) => {
+        e.preventDefault();
+        containerEl.classList.remove('cook-container-hover');
+        attemptPlace(e.dataTransfer.getData('text/plain'), id);
+      });
+      containerEl.addEventListener('click', () => {
+        if (filled.has(id) || !selectedId) return;
+        attemptPlace(selectedId, id);
+      });
+
+      containerEls[id] = containerEl;
+      vesselEls[id] = vessel;
+      vesselIconEls[id] = vesselIcon;
+      vesselImgEls[id] = vesselImg;
+      containerFillEls[id] = fillText;
+      containersGrid.appendChild(containerEl);
+    });
+
+    const gameEl = document.createElement('div');
+    gameEl.className = 'cook-game';
+    gameEl.append(tray, containersGrid);
+
+    const sidebar = document.createElement('div');
+    sidebar.className = 'flower-sidebar';
+    sidebar.append(introEl, instructionEl);
+
+    wrap.append(gameEl, sidebar);
+    taskContentPanel.appendChild(wrap);
+  };
+
   // Финальная сцена после третьего цветка: три расцветших цветка рядом
   // (лепесток-ложь у каждого уже "улетел", показаны только 3 правдивых)
   // плюс общая вспышка света.
@@ -713,6 +886,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMatchingTask(lessonKey, task);
     } else if (task.id === 'task_2' && task.type === 'find_error') {
       renderFlowerTask(lessonKey, task, task2Data);
+    } else if (task.id === 'task_3' && task.type === 'drag_to_container') {
+      renderDragTask(lessonKey, task, task3Data);
     } else {
       taskContentPanel.innerHTML = `<p class="task-content-text">Материал скоро появится здесь.</p>`;
       const btn = document.createElement('button');
