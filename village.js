@@ -596,11 +596,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
               } else {
                 showFlowerFeedback(TASK2_WARNING_TEXT, true);
-                if (!prefersReducedMotion) {
-                  petal.classList.remove('flower-petal-warn-shake');
-                  // eslint-disable-next-line no-void
-                  void petal.offsetWidth;
-                  petal.classList.add('flower-petal-warn-shake');
+                if (prefersReducedMotion) {
+                  orbit.style.display = 'none';
+                } else {
+                  petal.classList.add('flower-petal-wrong-plucked');
                 }
               }
             }
@@ -844,6 +843,45 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.appendChild(wrap);
   };
 
+  // Финальная сцена после задания 3: все пять образов блюда — уже в виде
+  // готовых "тарелок" — выстраиваются в ряд с плавным появлением по очереди,
+  // плюс общая вспышка света (переиспользуем .flower-garden-flash).
+  const renderCookCompletionScene = (task) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'flower-garden';
+
+    const flash = document.createElement('div');
+    flash.className = 'flower-garden-flash';
+    wrap.appendChild(flash);
+
+    const row = document.createElement('div');
+    row.className = 'flower-garden-row';
+
+    task3Data.pairs.forEach((pair, i) => {
+      const dish = document.createElement('div');
+      dish.className = 'cook-garden-dish';
+      dish.style.animationDelay = `${i * 0.12}s`;
+      const img = document.createElement('img');
+      img.src = TASK3_ICONS[pair.id];
+      img.alt = '';
+      dish.appendChild(img);
+      row.appendChild(dish);
+    });
+    wrap.appendChild(row);
+
+    const text = document.createElement('p');
+    text.className = 'task-content-done';
+    text.textContent = `✓ «${task.title}» выполнено`;
+    wrap.appendChild(text);
+
+    const finalText = document.createElement('p');
+    finalText.className = 'task-content-feedback';
+    finalText.textContent = TASK3_FINAL_TEXT;
+    wrap.appendChild(finalText);
+
+    taskContentPanel.appendChild(wrap);
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -862,6 +900,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (task.status === 'completed' && task.id === 'task_2') {
       renderFlowerCompletionScene(task);
+    } else if (task.status === 'completed' && task.id === 'task_3') {
+      renderCookCompletionScene(task);
     } else if (task.status === 'completed') {
       const feedback = TASK_COMPLETED_FEEDBACK[task.id];
       taskContentPanel.innerHTML = `
