@@ -795,6 +795,435 @@ h3 {
   line-height: 1.6;
 }
 
+/* "Цветок трёх истин" (task_2) — тап-игра вместо обычного квиза: 4
+   лепестка вокруг центра, один лепесток лжёт (find_error), остальные три
+   расцветают, когда его срывают. */
+
+.flower-task {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 32px;
+}
+
+.flower-game {
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.flower-sidebar {
+  flex: 1 1 360px;
+  max-width: 50%;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+}
+
+.quiz-intro {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  font-size: 1.16rem;
+}
+
+.quiz-intro strong {
+  font-weight: 800;
+  color: var(--text);
+}
+
+.flower-instruction {
+  margin: 0;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.78rem;
+  line-height: 2;
+  color: var(--accent-2);
+}
+
+/* Номер цветка — теперь в сайдбаре, а не над самим цветком, и стоит
+   ровно посередине правой половины (см. justify-content:center выше на
+   .flower-sidebar), между вступительным текстом и фидбеком. */
+
+.quiz-progress {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-2);
+}
+
+.quiz-progress:empty {
+  display: none;
+}
+
+.flower-stage {
+  /* Раньше был 3D-наклон камеры (perspective+rotateX) — визуально сжимал
+     и утягивал всё содержимое к нижней точке опоры, отсюда были и
+     гигантский пустой отступ сверху, и потерявшийся стебель. Плоско
+     проще и надёжнее. */
+}
+
+/* Двухслойная конструкция вместо одного повёрнутого элемента:
+   .flower-petal-orbit — невидимая точка ровно в центре цветка (0×0),
+   крутится на свой угол и ничего больше не делает; .flower-petal —
+   настоящий видимый лепесток внутри неё, сдвинут от (0,0) на фиксированный
+   радиус круга в ЛОКАЛЬНЫХ (ещё не повёрнутых) координатах орбиты. После
+   поворота лепесток всегда стартует ровно от края круга, а не перекрывает
+   его, и не важно, что творится с анимациями внутри .flower-petal — угол
+   орбиты они не трогают вообще. 6 позиций через 60° вместо 4 через 90°.
+   Круг радиусом 45 (90×90), центр (300,300), размер сцены 600×600. */
+
+.flower-container {
+  position: relative;
+  width: 600px;
+  max-width: 100%;
+  height: 600px;
+  margin: 0 auto;
+}
+
+.flower-petal-orbit {
+  position: absolute;
+  top: 300px;
+  left: 300px;
+  width: 0;
+  height: 0;
+}
+
+.flower-petal-orbit-n {
+  transform: rotate(-90deg);
+}
+
+.flower-petal-orbit-ne {
+  transform: rotate(-30deg);
+}
+
+.flower-petal-orbit-se {
+  transform: rotate(30deg);
+}
+
+.flower-petal-orbit-s {
+  transform: rotate(90deg);
+}
+
+.flower-petal-orbit-sw {
+  transform: rotate(150deg);
+}
+
+.flower-petal-orbit-nw {
+  transform: rotate(-150deg);
+}
+
+.flower-petal {
+  position: absolute;
+  top: -50px;
+  left: 45px;
+  width: 220px;
+  height: 100px;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 1px solid #f0c9d9;
+  background: linear-gradient(160deg, #fdeef3, #fbdce8);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: filter 0.2s ease;
+}
+
+.flower-petal:hover {
+  filter: brightness(1.05);
+}
+
+/* .flower-petal-text — внешний слой, просто центрирует flex'ом, сам
+   никогда не поворачивается. .flower-petal-text-inner — сам текст,
+   поворот и (для north/south) фиксированная ширина живут тут. */
+
+.flower-petal-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18%;
+  text-align: center;
+  color: #5c2f42;
+  line-height: 1.25;
+  font-size: 0.86rem;
+}
+
+.flower-petal-text-inner {
+  display: block;
+}
+
+/* Боковые (наискось): текст идёт вдоль самого лепестка, не поперёк.
+   sw/nw довёрнуты на 180°, иначе читались бы наискось не в ту сторону —
+   у симметричного эллипса это та же ось наклона, так что текст всё
+   равно точно вдоль лепестка. */
+
+.flower-petal-orbit-sw .flower-petal-text-inner { transform: rotate(180deg); }
+.flower-petal-orbit-nw .flower-petal-text-inner { transform: rotate(180deg); }
+
+/* North/south — исключение: текст остаётся обычным горизонтальным
+   (компенсируем поворот орбиты встречным поворотом на тот же угол), но
+   с явной узкой шириной — иначе перенос строк считался бы по ширине
+   лепестка (220px), а не по видимой узкой стороне, и текст выходил бы
+   за пределы лепестка. Внешний .flower-petal-text по-прежнему
+   flex-центрирует его и по горизонтали, и по вертикали, независимо от
+   того, на сколько строк текст перенёсся. */
+
+.flower-petal-orbit-n .flower-petal-text-inner,
+.flower-petal-orbit-s .flower-petal-text-inner {
+  width: 84px;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.flower-petal-orbit-n .flower-petal-text-inner { transform: rotate(90deg); }
+.flower-petal-orbit-s .flower-petal-text-inner { transform: rotate(-90deg); }
+
+.flower-center {
+  position: absolute;
+  top: 255px;
+  left: 255px;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3b0, #f4c542 70%, #e0a52a 100%);
+  box-shadow: 0 0 0 5px rgba(255, 220, 130, 0.35);
+}
+
+/* Обе ошибки найдены — короткая вспышка у ядра, отмечает момент. */
+.flower-center-pulse {
+  animation: flower-center-pulse 0.9s ease;
+}
+
+@keyframes flower-center-pulse {
+  0% {
+    box-shadow: 0 0 0 5px rgba(255, 220, 130, 0.35);
+  }
+  35% {
+    box-shadow: 0 0 0 22px rgba(255, 220, 130, 0.28), 0 0 40px 14px rgba(255, 244, 191, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 5px rgba(255, 220, 130, 0.35);
+  }
+}
+
+/* Анимации ниже трогают только .flower-petal (простые локальные
+   transform'ы) — угол самой орбиты живёт на родителе и их не касается,
+   так что лепесток не может "забыть" свой угол на время анимации. */
+
+/* Срыв верного лепестка по ошибке — предупреждение (первый раз): та же
+   тряска, что и раньше, плюс лепесток на миг тускнеет/увядает чуть
+   сильнее обычного, давая понять, что цветок "запомнил" промах. */
+
+.flower-petal-warn-shake {
+  animation: flower-petal-warn-shake 0.4s ease;
+}
+
+@keyframes flower-petal-warn-shake {
+  0%, 100% {
+    transform: translateX(0);
+    filter: brightness(1) saturate(1);
+  }
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+  40%, 80% {
+    transform: translateX(6px);
+  }
+  50% {
+    filter: brightness(0.82) saturate(0.6);
+  }
+}
+
+/* Второй промах — реролл: весь цветок разом увядает (темнеет, схлопы-
+   вается), затем пересобирается заново с чистого листа. */
+
+.flower-petal-wilt {
+  animation: flower-petal-wilt 0.6s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes flower-petal-wilt {
+  from {
+    transform: scale(1);
+    opacity: 1;
+    filter: brightness(1) saturate(1);
+  }
+  to {
+    transform: scale(0.72);
+    opacity: 0.12;
+    filter: brightness(0.55) saturate(0.25);
+  }
+}
+
+.flower-petal-plucked {
+  animation: flower-petal-pluck 0.8s ease-in forwards;
+  pointer-events: none;
+}
+
+/* Увядает на месте (сжимается/скручивается/темнеет), а не улетает от
+   центра — раньше точка поворота лепестка совпадала с жёлтым ядром, и
+   он выглядел как оторвавшийся от ядра кусок. */
+@keyframes flower-petal-pluck {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+    filter: saturate(1) brightness(1);
+  }
+  55% {
+    transform: scale(0.85) rotate(-6deg);
+    filter: saturate(0.6) brightness(0.85);
+  }
+  100% {
+    transform: scale(0.5) rotate(18deg);
+    opacity: 0;
+    filter: saturate(0.25) brightness(0.65);
+  }
+}
+
+.flower-petal-bloomed {
+  animation: flower-petal-bloom 0.8s ease 0.3s forwards;
+  pointer-events: none;
+}
+
+/* Просто исчезают и остаются исчезнувшими — opacity на .flower-petal
+   затрагивает и вложенный текст, так что оба слоя пропадают вместе. */
+@keyframes flower-petal-bloom {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.flower-feedback {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(96, 197, 255, 0.1);
+  border: 1px solid rgba(96, 197, 255, 0.28);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 1.02rem;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.flower-feedback-warning {
+  background: rgba(226, 104, 95, 0.1);
+  border-color: rgba(226, 104, 95, 0.32);
+  color: #8a3a32;
+}
+
+/* Финальная сцена после трёх цветков. */
+
+.flower-garden {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.flower-garden-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.flower-garden-flash {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 191, 0.9) 0%, rgba(255, 200, 120, 0.4) 45%, rgba(255, 200, 120, 0) 75%);
+  opacity: 0;
+  pointer-events: none;
+  animation: flower-garden-flash 1.2s ease forwards;
+}
+
+@keyframes flower-garden-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+.flower-mini {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.flower-mini-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3b0, #f4c542 70%, #e0a52a 100%);
+}
+
+.flower-mini-petal {
+  position: absolute;
+  width: 34px;
+  height: 20px;
+  background: linear-gradient(160deg, #fdeef3, #fbdce8);
+  border: 1px solid #f0c9d9;
+  border-radius: 50%;
+}
+
+.flower-mini-petal-0 {
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.flower-mini-petal-1 {
+  top: 50%;
+  right: 2px;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.flower-mini-petal-2 {
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.flower-mini-petal-3 {
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%) rotate(90deg);
+}
+
+@media (max-width: 560px) {
+  .flower-container {
+    transform: scale(0.46);
+    transform-origin: top center;
+    margin-bottom: -324px;
+  }
+}
+
 .matching-task {
   width: 100%;
   display: flex;
@@ -1084,7 +1513,8 @@ h3 {
 }
 
 @media (max-width: 640px) {
-  .matching-task {
+  .matching-task,
+  .flower-task {
     flex-direction: column;
   }
 
@@ -2440,7 +2870,13 @@ h3 {
   .prologue-cloud-3,
   .prologue-cloud-4,
   .prologue-cloud-5,
-  .prologue-ruin {
+  .prologue-ruin,
+  .flower-petal-warn-shake,
+  .flower-petal-wilt,
+  .flower-petal-plucked,
+  .flower-petal-bloomed,
+  .flower-center-pulse,
+  .flower-garden-flash {
     animation: none;
     transition: none;
   }

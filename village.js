@@ -424,6 +424,253 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.appendChild(wrap);
   };
 
+  // --- "Цветок трёх истин" (task_2): на каждом из 3 цветков 4 лепестка,
+  // один лжёт (isError: true). Верный тап — лепесток срывается и улетает,
+  // оставшиеся три расцветают; неверный — лепесток просто трясётся,
+  // повторный тап не заблокирован. После срыва — пауза на анимацию, потом
+  // либо следующий цветок, либо (после третьего) финальная сцена.
+  const FLOWER_BLOOM_DELAY_MS = 1500;
+
+  const renderFlowerTask = (lessonKey, task, data) => {
+    let flowerIndex = 0;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'flower-task';
+
+    const introEl = document.createElement('p');
+    introEl.className = 'quiz-intro';
+    // Текст задан в taskContent.js, не пользователем — безопасно вставлять
+    // как HTML, просто выделяем "Но берегись" жирным.
+    introEl.innerHTML = (data.intro || '').replace('Но берегись', '<strong>Но берегись</strong>');
+
+    const instructionEl = document.createElement('p');
+    instructionEl.className = 'flower-instruction';
+    instructionEl.textContent = TASK2_INSTRUCTION_TEXT;
+
+    const progressEl = document.createElement('p');
+    progressEl.className = 'quiz-progress';
+
+    const flowerStage = document.createElement('div');
+    flowerStage.className = 'flower-stage';
+
+    const flowerContainer = document.createElement('div');
+    flowerContainer.className = 'flower-container';
+
+    // Круг-центр — постоянный, не пересоздаётся на каждый цветок (только
+    // сами лепестки меняются между loadFlower()).
+    const center = document.createElement('div');
+    center.className = 'flower-center';
+    flowerContainer.appendChild(center);
+
+    flowerStage.appendChild(flowerContainer);
+
+    const feedbackEl = document.createElement('div');
+    feedbackEl.className = 'flower-feedback';
+    feedbackEl.hidden = true;
+
+    // Шесть позиций по кругу, через 60°: N, ЮВ-ССВ и т.д. — метки условные,
+    // важен только равный шаг между ними в CSS.
+    const PETAL_SLOTS = ['n', 'ne', 'se', 's', 'sw', 'nw'];
+    const ERRORS_NEEDED = 2;
+    // Берём из данных (task2Data.maxWrongPlucks), а не хардкодим — на
+    // случай, если для другого набора вопросов лимит окажется другим.
+    const MAX_WRONG_PLUCKS = data.maxWrongPlucks || 2;
+    const FLOWER_WILT_DELAY_MS = 1200;
+
+    const showFlowerFeedback = (text, isWarning) => {
+      feedbackEl.hidden = false;
+      feedbackEl.textContent = text;
+      feedbackEl.classList.toggle('flower-feedback-warning', !!isWarning);
+    };
+
+    const loadFlower = () => {
+      const flower = data.flowers[flowerIndex];
+      let wrongPlucks = 0;
+
+      progressEl.textContent =
+        data.flowers.length > 1 ? `Цветок ${flowerIndex + 1} из ${data.flowers.length}` : '';
+      feedbackEl.hidden = true;
+      feedbackEl.classList.remove('flower-feedback-warning');
+      feedbackEl.textContent = '';
+
+      // Пересобирает сами лепестки (перетасовывая заново) — вызывается и
+      // при первом заходе на цветок, и при реролле после второй ошибки.
+      const renderPetals = () => {
+        flowerContainer.querySelectorAll('.flower-petal-orbit').forEach((el) => el.remove());
+        const options = shuffle(flower.options);
+        const plucked = new Set();
+        let settled = false;
+        const petalEls = {};
+
+        options.forEach((opt, i) => {
+          // orbit — невидимый поворотный слой, закреплён точно в центре
+          // цветка и просто крутится на свой угол. petal — сам видимый
+          // лепесток, сдвинут от центра на фиксированный отступ (радиус
+          // круга) в локальных, ещё не повёрнутых координатах orbit'а —
+          // поэтому после поворота лепесток всегда начинается ровно от
+          // края круга, а не перекрывает его.
+          const orbit = document.createElement('div');
+          orbit.className = `flower-petal-orbit flower-petal-orbit-${PETAL_SLOTS[i]}`;
+
+          const petal = document.createElement('button');
+          petal.type = 'button';
+          petal.className = 'flower-petal';
+          // Обёртка в два слоя: внешний (.flower-petal-text) — просто
+          // flex-центрирование внутри лепестка; внутренний (-inner) несёт
+          // сам текст и его поворот. North/south дают -inner ещё и фикс.
+          // ширину — иначе перенос строк считался бы по ширине лепестка
+          // (220px, широкий), а не по видимой узкой стороне.
+          const textEl = document.createElement('span');
+          textEl.className = 'flower-petal-text';
+          const textInner = document.createElement('span');
+          textInner.className = 'flower-petal-text-inner';
+          textInner.textContent = opt.text;
+          textEl.appendChild(textInner);
+          petal.appendChild(textEl);
+          orbit.appendChild(petal);
+          petalEls[opt.id] = petal;
+
+          petal.addEventListener('click', () => {
+            if (settled || plucked.has(opt.id)) return;
+
+            if (opt.isError) {
+              // Найденная ложь увядает сразу же, не дожидаясь второй —
+              // ощущение прогресса на полпути.
+              plucked.add(opt.id);
+              if (prefersReducedMotion) {
+                orbit.style.display = 'none';
+              } else {
+                petal.classList.add('flower-petal-plucked');
+              }
+
+              if (plucked.size < ERRORS_NEEDED) return;
+
+              // Обе лжи найдены — расцветают все оставшиеся, ядро вспыхивает.
+              settled = true;
+              if (!prefersReducedMotion) {
+                options.forEach((other) => {
+                  if (!plucked.has(other.id)) petalEls[other.id].classList.add('flower-petal-bloomed');
+                });
+                center.classList.remove('flower-center-pulse');
+                // eslint-disable-next-line no-void
+                void center.offsetWidth;
+                center.classList.add('flower-center-pulse');
+              }
+
+              showFlowerFeedback(flower.feedback, false);
+
+              const isLast = flowerIndex === data.flowers.length - 1;
+              setTimeout(() => {
+                if (isLast) {
+                  completeTask(lessonKey, task.id);
+                  reactToTaskComplete();
+                  rerenderCurrentLesson();
+                } else {
+                  flowerIndex += 1;
+                  loadFlower();
+                }
+              }, FLOWER_BLOOM_DELAY_MS);
+            } else {
+              // Сорван верный (не ложный) лепесток — штраф. Первый раз —
+              // только предупреждение, второй — цветок увядает целиком и
+              // пересобирается заново (реролл).
+              wrongPlucks += 1;
+
+              if (wrongPlucks >= MAX_WRONG_PLUCKS) {
+                settled = true;
+                showFlowerFeedback(TASK2_REROLL_TEXT, true);
+                if (prefersReducedMotion) {
+                  setTimeout(() => {
+                    wrongPlucks = 0;
+                    renderPetals();
+                  }, 50);
+                } else {
+                  flowerContainer.querySelectorAll('.flower-petal').forEach((el) => {
+                    el.classList.add('flower-petal-wilt');
+                  });
+                  setTimeout(() => {
+                    wrongPlucks = 0;
+                    renderPetals();
+                  }, FLOWER_WILT_DELAY_MS);
+                }
+              } else {
+                showFlowerFeedback(TASK2_WARNING_TEXT, true);
+                if (!prefersReducedMotion) {
+                  petal.classList.remove('flower-petal-warn-shake');
+                  // eslint-disable-next-line no-void
+                  void petal.offsetWidth;
+                  petal.classList.add('flower-petal-warn-shake');
+                }
+              }
+            }
+          });
+          flowerContainer.appendChild(orbit);
+        });
+      };
+
+      renderPetals();
+    };
+
+    loadFlower();
+
+    // Цветок слева: номер цветка — прямо над ним, по центру.
+    const gameEl = document.createElement('div');
+    gameEl.className = 'flower-game';
+    gameEl.append(progressEl, flowerStage);
+
+    // Описание задания справа.
+    const sidebar = document.createElement('div');
+    sidebar.className = 'flower-sidebar';
+    sidebar.append(introEl, instructionEl, feedbackEl);
+
+    wrap.append(gameEl, sidebar);
+    taskContentPanel.appendChild(wrap);
+  };
+
+  // Финальная сцена после третьего цветка: три расцветших цветка рядом
+  // (лепесток-ложь у каждого уже "улетел", показаны только 3 правдивых)
+  // плюс общая вспышка света.
+  const renderFlowerCompletionScene = (task) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'flower-garden';
+
+    const flash = document.createElement('div');
+    flash.className = 'flower-garden-flash';
+    wrap.appendChild(flash);
+
+    const row = document.createElement('div');
+    row.className = 'flower-garden-row';
+
+    task2Data.flowers.forEach((flower) => {
+      const mini = document.createElement('div');
+      mini.className = 'flower-mini';
+      const center = document.createElement('div');
+      center.className = 'flower-mini-center';
+      mini.appendChild(center);
+      flower.options
+        .filter((opt) => !opt.isError)
+        .forEach((opt, i) => {
+          const petal = document.createElement('div');
+          petal.className = `flower-mini-petal flower-mini-petal-${i}`;
+          mini.appendChild(petal);
+        });
+      row.appendChild(mini);
+    });
+    wrap.appendChild(row);
+
+    const text = document.createElement('p');
+    text.className = 'task-content-done';
+    text.textContent = `✓ «${task.title}» выполнено`;
+    wrap.appendChild(text);
+
+    const finalText = document.createElement('p');
+    finalText.className = 'task-content-feedback';
+    finalText.textContent = TASK2_FINAL_TEXT;
+    wrap.appendChild(finalText);
+
+    taskContentPanel.appendChild(wrap);
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -440,7 +687,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     taskContentPanel.innerHTML = '';
 
-    if (task.status === 'completed') {
+    if (task.status === 'completed' && task.id === 'task_2') {
+      renderFlowerCompletionScene(task);
+    } else if (task.status === 'completed') {
       const feedback = TASK_COMPLETED_FEEDBACK[task.id];
       taskContentPanel.innerHTML = `
         <p class="task-content-done">✓ «${task.title}» выполнено</p>
@@ -462,6 +711,8 @@ document.addEventListener('DOMContentLoaded', () => {
       taskContentPanel.appendChild(btn);
     } else if (task.id === 'task_1' && task.type === 'matching') {
       renderMatchingTask(lessonKey, task);
+    } else if (task.id === 'task_2' && task.type === 'find_error') {
+      renderFlowerTask(lessonKey, task, task2Data);
     } else {
       taskContentPanel.innerHTML = `<p class="task-content-text">Материал скоро появится здесь.</p>`;
       const btn = document.createElement('button');
