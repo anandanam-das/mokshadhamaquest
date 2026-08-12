@@ -52,7 +52,7 @@ const INTRO_TASKS = [
   { id: 'task_2', type: 'find_error', title: 'Сад двух миров' },
   { id: 'task_3', type: 'drag_to_container', title: 'Гений кулинарии' },
   { id: 'task_4', type: 'layered_map', title: 'Взгляд астролога' },
-  { id: 'village_intro', type: 'guided_tour', title: 'Знакомство с обителью' },
+  { id: 'village_intro', type: 'guided_tour', title: 'Знакомство с обителью' },
 ];
 
 const getEngineTasksForPlanet = (planetGrahaTitle) => {
@@ -61,8 +61,8 @@ const getEngineTasksForPlanet = (planetGrahaTitle) => {
     LECTURE_TASK,
     { id: 'engine_1', type: 'video', title: `Три лика ${genitive} (разбор видений)` },
     { id: 'engine_2', type: 'phrase', title: 'Слово гуны (быстрый выбор)' },
-    { id: 'engine_3', type: 'audio', title: 'Голос трёх начал (слушай и различай)' },
-    { id: 'engine_4', type: 'quiz', title: 'Изъян в писании (найди ошибку)' },
+    { id: 'engine_3', type: 'audio', title: 'Голос трёх начал (слушай и различай)' },
+    { id: 'engine_4', type: 'quiz', title: 'Изъян в писании (найди ошибку)' },
     { id: 'engine_5', type: 'image', title: 'Зеркало времён (распознай гуну)' },
     { id: 'engine_6', type: 'match', title: 'Карта звёздного покровителя (собери знания)' },
   ];

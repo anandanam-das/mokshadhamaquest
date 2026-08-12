@@ -13,17 +13,17 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       phase: 'battle',
       characters: ['shiva', 'demon'],
-      text: 'Когда-то Шива сражался с демоном Андхакасурой…',
+      text: 'Когда-то Шива сражался с демоном Андхакасурой…',
     },
     {
       phase: 'center-glow',
       characters: ['shiva'],
-      text: 'Из его пота родилось существо, полное неутолимого голода…',
+      text: 'Из его пота родилось существо, полное неутолимого голода…',
     },
     {
       phase: 'pinning',
       characters: ['vastu-purusha'],
-      text: 'Боги испугались этого голода и придавили существо к земле…',
+      text: 'Боги испугались этого голода и придавили существо к земле…',
     },
     {
       phase: 'center-still',
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       phase: 'zoom-out-to-map',
       characters: ['vastu-purusha'],
-      text: 'Помоги ему — построй деревню знания на его теле, и голод утихнет.',
+      text: 'Помоги ему — построй деревню знания на его теле, и голод утихнет.',
     },
   ];
 
