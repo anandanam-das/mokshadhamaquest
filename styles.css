@@ -1423,6 +1423,233 @@ h3 {
   }
 }
 
+/* "Взгляд астролога" (task_4) — пять концентрических полупрозрачных
+   слоёв, Планета в центре. Каждый .map-layer-N нарисован от внешнего (0,
+   самый большой, лежит сзади) к внутреннему (4, самый маленький, лежит
+   спереди) — так открытый "бублик" каждого кольца остаётся кликабельным
+   поверх соседей. Ширина каждого кольца — ровно 30px, поэтому подпись у
+   всех четырёх колец (кроме центра) сидит на одном и том же отступе от
+   их верхнего края — ровно в середине видимой полосы. */
+
+.map-task {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.map-game {
+  flex: 1 1 380px;
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+}
+
+.map-question {
+  margin: 0;
+  max-width: 360px;
+  font-weight: 700;
+  font-size: 1.08rem;
+  color: var(--text);
+}
+
+.map-case-text {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(249, 174, 56, 0.08);
+  border: 1px solid rgba(249, 174, 56, 0.28);
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.map-stage {
+  position: relative;
+  padding: 12px 0;
+}
+
+.map-diagram {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+}
+
+.map-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease, opacity 0.25s ease;
+}
+
+.map-layer-0,
+.map-layer-1,
+.map-layer-2,
+.map-layer-3 {
+  padding-top: 15px;
+}
+
+.map-layer-4 {
+  align-items: center;
+}
+
+.map-layer-label {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.map-layer-0 {
+  width: 300px;
+  height: 300px;
+  z-index: 1;
+  background: rgba(226, 140, 95, 0.16);
+  border: 1px solid rgba(226, 140, 95, 0.35);
+}
+
+.map-layer-1 {
+  width: 240px;
+  height: 240px;
+  z-index: 2;
+  background: rgba(249, 174, 56, 0.18);
+  border: 1px solid rgba(249, 174, 56, 0.4);
+}
+
+.map-layer-2 {
+  width: 180px;
+  height: 180px;
+  z-index: 3;
+  background: rgba(96, 197, 255, 0.18);
+  border: 1px solid rgba(96, 197, 255, 0.4);
+}
+
+.map-layer-3 {
+  width: 120px;
+  height: 120px;
+  z-index: 4;
+  background: rgba(155, 140, 220, 0.22);
+  border: 1px solid rgba(155, 140, 220, 0.48);
+}
+
+.map-layer-4 {
+  width: 60px;
+  height: 60px;
+  z-index: 5;
+  background: radial-gradient(circle at 35% 35%, #fff3b0, #f4c542 70%, #e0a52a 100%);
+  border: 1px solid rgba(224, 165, 42, 0.6);
+  box-shadow: 0 0 12px rgba(244, 197, 66, 0.5);
+}
+
+.map-layer-correct {
+  z-index: 20;
+  animation: map-layer-correct 1s ease forwards;
+}
+
+@keyframes map-layer-correct {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: none;
+    filter: brightness(1) saturate(1);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1.14);
+    box-shadow: 0 0 0 6px rgba(93, 209, 158, 0.35), 0 0 24px rgba(93, 209, 158, 0.55);
+    filter: brightness(1.08) saturate(1.15);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 0 0 4px rgba(93, 209, 158, 0.3), 0 0 18px rgba(93, 209, 158, 0.45);
+    filter: brightness(1.05) saturate(1.1);
+  }
+}
+
+.map-layer-correct-static {
+  z-index: 20;
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 0 4px rgba(93, 209, 158, 0.3);
+}
+
+.map-layer-wrong {
+  animation: map-layer-wrong 0.5s ease;
+}
+
+@keyframes map-layer-wrong {
+  0%, 100% {
+    transform: translate(-50%, -50%) translateX(0) scale(1);
+    filter: brightness(1) saturate(1);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(-50%, -50%) translateX(-8px) scale(1);
+  }
+  40% {
+    transform: translate(-50%, -50%) translateX(8px) scale(1);
+    filter: brightness(0.75) saturate(0.55);
+    opacity: 0.6;
+  }
+  60% {
+    transform: translate(-50%, -50%) translateX(-6px) scale(1);
+    filter: brightness(0.8) saturate(0.6);
+    opacity: 0.7;
+  }
+  80% {
+    transform: translate(-50%, -50%) translateX(4px) scale(1);
+    filter: brightness(0.85) saturate(0.7);
+    opacity: 0.85;
+  }
+}
+
+.map-layer-collapse {
+  animation: map-layer-collapse 0.5s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes map-layer-collapse {
+  from {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+}
+
+.map-layer-unfold {
+  animation: map-layer-unfold 0.5s ease forwards;
+}
+
+@keyframes map-layer-unfold {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 560px) {
+  .map-diagram {
+    transform: scale(0.72);
+    transform-origin: top center;
+    margin-bottom: -84px;
+  }
+}
+
 .matching-task {
   width: 100%;
   display: flex;
@@ -3077,7 +3304,11 @@ h3 {
   .flower-center-pulse,
   .flower-garden-flash,
   .cook-garden-dish,
-  .cook-container-shake {
+  .cook-container-shake,
+  .map-layer-correct,
+  .map-layer-wrong,
+  .map-layer-collapse,
+  .map-layer-unfold {
     animation: none;
     transition: none;
   }
@@ -3085,6 +3316,12 @@ h3 {
   .cook-garden-dish {
     opacity: 1;
     transform: none;
+  }
+
+  .map-layer-collapse,
+  .map-layer-unfold {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 }
 

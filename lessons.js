@@ -51,7 +51,7 @@ const INTRO_TASKS = [
   { id: 'task_1', type: 'matching', title: 'Пять мостов' },
   { id: 'task_2', type: 'find_error', title: 'Сад двух миров' },
   { id: 'task_3', type: 'drag_to_container', title: 'Гений кулинарии' },
-  { id: 'task_4', type: 'case_quiz', title: 'Взгляд астролога' },
+  { id: 'task_4', type: 'layered_map', title: 'Взгляд астролога' },
   { id: 'village_intro', type: 'guided_tour', title: 'Знакомство с обителью' },
 ];
 

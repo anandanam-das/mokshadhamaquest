@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     find_error: '🔍',
     matching_transfer: '🔁',
     drag_to_container: '🍲',
-    case_quiz: '📐',
+    layered_map: '🎯',
     guided_tour: '🗺️',
   };
 
@@ -657,9 +657,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const wrap = document.createElement('div');
     wrap.className = 'cook-task';
 
-    const introEl = document.createElement('p');
-    introEl.className = 'quiz-intro';
-    introEl.textContent = TASK3_INTRO_TEXT;
+    const introEls = TASK3_INTRO_TEXT.split('\n\n').map((paragraph) => {
+      const p = document.createElement('p');
+      p.className = 'quiz-intro';
+      p.textContent = paragraph;
+      return p;
+    });
 
     const instructionEl = document.createElement('p');
     instructionEl.className = 'flower-instruction';
@@ -793,7 +796,166 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sidebar = document.createElement('div');
     sidebar.className = 'flower-sidebar';
-    sidebar.append(introEl, instructionEl);
+    sidebar.append(...introEls, instructionEl);
+
+    wrap.append(gameEl, sidebar);
+    taskContentPanel.appendChild(wrap);
+  };
+
+  // --- "Взгляд астролога" (task_4): пять полупрозрачных концентрических
+  // слоёв (Планета в центре, вокруг — Накшатра/Знак/Дом/Навамша), на
+  // каждый из трёх вопросов свой верный слой. Ошибка — слой трясётся и
+  // тускнеет, но остаётся; две ошибки подряд (по всей карте, не по
+  // вопросу) — вся карта схлопывается и разворачивается заново с первого
+  // (перемешанного) вопроса.
+  const MAP_ADVANCE_DELAY_MS = 1200;
+  const MAP_COLLAPSE_DELAY_MS = 1100;
+
+  const renderLayeredMapTask = (lessonKey, task, data) => {
+    // Слои рисуются от внешнего к внутреннему — так меньшие кольца лежат
+    // поверх больших и открывают их "бублик" под собой, кликабельным.
+    const layerNames = [...data.layers].reverse();
+    const MAX_WRONG_TAPS = data.maxWrongTaps || 2;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'map-task';
+
+    const introEl = document.createElement('p');
+    introEl.className = 'quiz-intro';
+    introEl.textContent = data.intro;
+
+    const caseEl = document.createElement('p');
+    caseEl.className = 'map-case-text';
+    caseEl.textContent = data.caseText;
+
+    const feedbackEl = document.createElement('div');
+    feedbackEl.className = 'flower-feedback';
+    feedbackEl.hidden = true;
+
+    const showMapFeedback = (text, isWarning) => {
+      feedbackEl.hidden = false;
+      feedbackEl.textContent = text;
+      feedbackEl.classList.toggle('flower-feedback-warning', !!isWarning);
+    };
+
+    const progressEl = document.createElement('p');
+    progressEl.className = 'quiz-progress';
+
+    const questionEl = document.createElement('p');
+    questionEl.className = 'map-question';
+
+    const diagram = document.createElement('div');
+    diagram.className = 'map-diagram';
+
+    const mapStage = document.createElement('div');
+    mapStage.className = 'map-stage';
+    mapStage.appendChild(diagram);
+
+    let questionOrder = shuffle(data.questions);
+    let questionIndex = 0;
+    let wrongTaps = 0;
+    let settled = false;
+
+    const showQuestion = () => {
+      const q = questionOrder[questionIndex];
+      progressEl.textContent = `Вопрос ${questionIndex + 1} из ${questionOrder.length}`;
+      questionEl.textContent = q.question;
+      feedbackEl.hidden = true;
+      feedbackEl.classList.remove('flower-feedback-warning');
+    };
+
+    // eslint-disable-next-line no-use-before-define
+    const buildLayers = (isReroll) => {
+      diagram.innerHTML = '';
+      settled = false;
+
+      layerNames.forEach((term, i) => {
+        const layer = document.createElement('button');
+        layer.type = 'button';
+        layer.className = `map-layer map-layer-${i}`;
+        if (isReroll && !prefersReducedMotion) layer.classList.add('map-layer-unfold');
+
+        const label = document.createElement('span');
+        label.className = 'map-layer-label';
+        label.textContent = term;
+        layer.appendChild(label);
+
+        // eslint-disable-next-line no-use-before-define
+        layer.addEventListener('click', () => handleLayerTap(term, layer));
+        diagram.appendChild(layer);
+      });
+    };
+
+    const resetMap = () => {
+      showMapFeedback(TASK4_REROLL_TEXT, true);
+      settled = true;
+
+      const rebuild = () => {
+        questionOrder = shuffle(data.questions);
+        questionIndex = 0;
+        wrongTaps = 0;
+        buildLayers(true);
+        showQuestion();
+      };
+
+      if (prefersReducedMotion) {
+        setTimeout(rebuild, 50);
+      } else {
+        Array.from(diagram.querySelectorAll('.map-layer')).forEach((el) => {
+          el.classList.add('map-layer-collapse');
+        });
+        setTimeout(rebuild, MAP_COLLAPSE_DELAY_MS);
+      }
+    };
+
+    const handleLayerTap = (term, layerEl) => {
+      if (settled) return;
+      const q = questionOrder[questionIndex];
+
+      if (term === q.correctAnswer) {
+        settled = true;
+        feedbackEl.hidden = true;
+        layerEl.classList.add(prefersReducedMotion ? 'map-layer-correct-static' : 'map-layer-correct');
+
+        const isLast = questionIndex === questionOrder.length - 1;
+        setTimeout(() => {
+          if (isLast) {
+            completeTask(lessonKey, task.id);
+            reactToTaskComplete();
+            rerenderCurrentLesson();
+          } else {
+            questionIndex += 1;
+            buildLayers(false);
+            showQuestion();
+          }
+        }, MAP_ADVANCE_DELAY_MS);
+      } else {
+        wrongTaps += 1;
+        if (!prefersReducedMotion) {
+          layerEl.classList.remove('map-layer-wrong');
+          // eslint-disable-next-line no-void
+          void layerEl.offsetWidth;
+          layerEl.classList.add('map-layer-wrong');
+        }
+
+        if (wrongTaps >= MAX_WRONG_TAPS) {
+          resetMap();
+        } else {
+          showMapFeedback(TASK4_WARNING_TEXT, true);
+        }
+      }
+    };
+
+    buildLayers(false);
+    showQuestion();
+
+    const gameEl = document.createElement('div');
+    gameEl.className = 'map-game';
+    gameEl.append(progressEl, questionEl, mapStage);
+
+    const sidebar = document.createElement('div');
+    sidebar.className = 'flower-sidebar';
+    sidebar.append(introEl, caseEl, feedbackEl);
 
     wrap.append(gameEl, sidebar);
     taskContentPanel.appendChild(wrap);
@@ -928,6 +1090,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderFlowerTask(lessonKey, task, task2Data);
     } else if (task.id === 'task_3' && task.type === 'drag_to_container') {
       renderDragTask(lessonKey, task, task3Data);
+    } else if (task.id === 'task_4' && task.type === 'layered_map') {
+      renderLayeredMapTask(lessonKey, task, task4Data);
     } else {
       taskContentPanel.innerHTML = `<p class="task-content-text">Материал скоро появится здесь.</p>`;
       const btn = document.createElement('button');
