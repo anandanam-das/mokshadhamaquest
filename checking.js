@@ -8,11 +8,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const state = getUserState();
 
-  if (!state.telegramId) {
-    window.location.href = 'login.html';
-    return;
-  }
-
   const checkingView = document.getElementById('checkingView');
   const noAccessView = document.getElementById('noAccessView');
 
@@ -48,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   setUserState({
+    telegramId: access.telegramId ? String(access.telegramId) : state.telegramId,
     hasPlanetsAccess: access.hasPlanetsAccess,
     hasSignsAccess: access.hasSignsAccess,
     hasNakshatrasAccess: access.hasNakshatrasAccess,
