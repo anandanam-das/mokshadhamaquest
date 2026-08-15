@@ -21,11 +21,12 @@ module.exports = (req, res) => {
 
   const sessionToken = jwt.sign(
     { id: payload.id, first_name: payload.first_name, username: payload.username },
-    SESSION_SECRET,
-    { expiresIn: '30d' }
+    SESSION_SECRET
   );
 
-  const maxAgeSeconds = 30 * 24 * 60 * 60;
+  // Browsers cap cookie lifetime at ~400 days regardless of what we send;
+  // this is the practical maximum, not a deliberate expiry on our side.
+  const maxAgeSeconds = 400 * 24 * 60 * 60;
   res.setHeader(
     'Set-Cookie',
     `${COOKIE_NAME}=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSeconds}`

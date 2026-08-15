@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   if (!getUserState().telegramId) {
-    window.location.href = 'login.html';
+    window.location.href = 'checking.html';
     return;
   }
 

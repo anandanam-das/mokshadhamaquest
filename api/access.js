@@ -3,7 +3,9 @@ const { getChatMemberStatus, isActiveMember } = require('./_lib/telegram');
 
 const COOKIE_NAME = 'moksha_session';
 const ACCESS_COOKIE_NAME = 'moksha_access';
-const ACCESS_TTL_SECONDS = 30 * 60;
+// Browsers cap cookie lifetime at ~400 days regardless of what we send;
+// this is the practical maximum, not a deliberate expiry on our side.
+const ACCESS_COOKIE_MAX_AGE_SECONDS = 400 * 24 * 60 * 60;
 
 function readSession(req) {
   const token = req.cookies && req.cookies[COOKIE_NAME];
@@ -38,16 +40,17 @@ module.exports = async (req, res) => {
     const hasAccess = isActiveMember(status);
 
     if (hasAccess) {
-      const accessToken = jwt.sign({ id: telegramId }, SESSION_SECRET, { expiresIn: ACCESS_TTL_SECONDS });
+      const accessToken = jwt.sign({ id: telegramId }, SESSION_SECRET);
       res.setHeader(
         'Set-Cookie',
-        `${ACCESS_COOKIE_NAME}=${accessToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${ACCESS_TTL_SECONDS}`
+        `${ACCESS_COOKIE_NAME}=${accessToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${ACCESS_COOKIE_MAX_AGE_SECONDS}`
       );
     } else {
       res.setHeader('Set-Cookie', `${ACCESS_COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
     }
 
     res.status(200).json({
+      telegramId,
       hasPlanetsAccess: hasAccess,
       hasSignsAccess: false,
       hasNakshatrasAccess: false,
