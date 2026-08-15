@@ -31,16 +31,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailRoot = document.getElementById('villageDetail');
   const taskContentPanel = document.getElementById('taskContentPanel');
 
+  // Координаты — % от квадратного landscape.png (assets/village/landscape.png,
+  // 1256×1256), не пиксели: так здания масштабируются вместе с картой на
+  // любом экране и остаются привязанными к своей точке на рисунке.
+  // Направления — по мандале, которую задал пользователь. У Раху и Кету
+  // своего здания нет (planetBuildings[...].file === null) — они просто
+  // побережье и гора на самом ландшафте, координаты — где эти детали на
+  // картинке. Первый черновик, точки уточняем по месту.
   const villageLayout = {
-    surya:   { row: 1, col: 1 }, // центр
-    chandra: { row: 0, col: 0 }, // северо-запад
-    budha:   { row: 0, col: 1 }, // север
-    guru:    { row: 0, col: 2 }, // северо-восток
-    shani:   { row: 1, col: 0 }, // запад
-    ketu:    { row: 1, col: 2 }, // восток
-    rahu:    { row: 2, col: 0 }, // юго-запад
-    mangala: { row: 2, col: 1 }, // юг
-    shukra:  { row: 2, col: 2 }, // юго-восток
+    surya:   { x: 50, y: 50 }, // центр (Брахмастхана)
+    chandra: { x: 15, y: 22 }, // северо-запад
+    mangala: { x: 50, y: 86 }, // юг
+    budha:   { x: 50, y: 14 }, // север
+    guru:    { x: 82, y: 22 }, // северо-восток
+    shukra:  { x: 78, y: 78 }, // юго-восток
+    shani:   { x: 14, y: 50 }, // запад
+    rahu:    { x: 19, y: 70 }, // юго-запад — побережье, без здания
+    ketu:    { x: 92, y: 50 }, // восток, по центру правого края — Гималаи, без здания
   };
 
   // Порядок разблокировки зданий деревни: Ратуша первая, дальше по цепочке.
@@ -64,10 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const STAGE_SIZE = 560;
-  const GRID_SIZE = 3;
-  const CELL = STAGE_SIZE / GRID_SIZE;
-  const BUILDING_SIZE = 96;
-  const RATUSHA_SIZE = 120;
+  // % от ширины сцены — не px, чтобы здание масштабировалось вместе с
+  // landscape.png на любом экране.
+  const BUILDING_SIZE_PCT = 24;
+  const RATUSHA_SIZE_PCT = 30;
 
   stage.style.width = '100%';
   stage.style.maxWidth = `${STAGE_SIZE}px`;
@@ -1190,7 +1197,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Карта деревни.
 
-  const placeBuilding = (character, x, y, size) => {
+  const placeBuilding = (character, pos, sizePct) => {
     const status = getBuildingStatus(character.id);
     const building = planetBuildings[character.id];
 
@@ -1199,14 +1206,26 @@ document.addEventListener('DOMContentLoaded', () => {
     el.dataset.buildingId = character.id;
     el.dataset.buildingName = building.name;
     el.className = `village-building status-${status}`;
-    el.style.width = `${size}px`;
-    el.style.height = `${size}px`;
-    el.style.left = `${x - size / 2}px`;
-    el.style.top = `${y - size / 2}px`;
+    el.style.width = `${sizePct}%`;
+    el.style.left = `${pos.x}%`;
+    el.style.top = `${pos.y}%`;
+    // У Раху и Кету нет своего здания (building.file === null) — это
+    // просто побережье и гора на самом ландшафте, картинку/завал не рисуем.
+    const art = building.file
+      ? `
+        <span class="village-building-art">
+          <img src="assets/village/buildings/${building.file}.png" alt="${building.name}" class="village-building-image" />
+          ${status !== 'unlocked' ? `<img src="assets/village/rubble/${character.id}.png" alt="" class="village-building-rubble" />` : ''}
+        </span>
+      `
+      : '';
+
     el.innerHTML = `
-      <img src="${character.file}" alt="${building.name}" class="village-building-image" />
-      <span class="village-building-label">${building.name}</span>
-      ${status === 'pending' ? '<span class="village-building-lock">🔒</span>' : ''}
+      ${art}
+      <span class="village-building-footer">
+        <span class="village-building-label">${building.name}</span>
+        ${status === 'pending' ? '<span class="village-building-lock">🔒</span>' : ''}
+      </span>
     `;
 
     if (status !== 'pending') {
@@ -1223,23 +1242,78 @@ document.addEventListener('DOMContentLoaded', () => {
     stage.appendChild(el);
   };
 
+  // Ландшафт — один квадратный слой на всю сцену (Васту Пуруша уже
+  // вклеен под ландшафтом в самой картинке). Рисуется всегда, даже до
+  // открытия деревни.
+  const renderGroundLayers = () => {
+    const ground = document.createElement('img');
+    ground.className = 'village-ground';
+    ground.src = 'assets/village/landscape.png';
+    ground.alt = '';
+    stage.appendChild(ground);
+  };
+
+  // Карта открывается не по флагу "весь урок Введение завершён", а как
+  // только становится доступным сам гайд-тур "Знакомство с обителью" —
+  // то есть сразу после последнего реального задания (Взгляд астролога).
+  // Так тучи рассеиваются и карта открыта уже во время самого тура, а не
+  // только после того, как его отметят пройденным.
+  const isVillageMapUnlocked = () => {
+    const progress = getTaskProgress('intro');
+    const others = INTRO_TASKS.filter((t) => t.id !== 'watch_lecture' && t.id !== 'village_intro');
+    return others.every((t) => progress[t.id]);
+  };
+
+  const CLOUDS_DISPERSE_MS = 1200;
+  let cloudsDispersed = false;
+
+  // Пока карта не открыта — сплошная облачность. В момент открытия —
+  // разовая анимация "тучи расходятся, сквозь них пробивается свет"
+  // (как flower-garden-flash), дальше тучи больше не рисуются.
+  const renderClouds = (unlocked) => {
+    if (unlocked && cloudsDispersed) return;
+
+    const clouds = document.createElement('div');
+    clouds.className = 'village-clouds';
+    stage.appendChild(clouds);
+
+    if (!unlocked) return;
+
+    cloudsDispersed = true;
+    if (prefersReducedMotion) {
+      clouds.remove();
+      return;
+    }
+    // eslint-disable-next-line no-void
+    void clouds.offsetWidth;
+    clouds.classList.add('village-clouds-disperse');
+    setTimeout(() => clouds.remove(), CLOUDS_DISPERSE_MS);
+  };
+
   const buildVillageStage = () => {
     stage.innerHTML = '';
     stage.classList.remove('village-stage-empty');
+    renderGroundLayers();
 
-    if (!getUserState().introCompleted) {
+    const mapUnlocked = isVillageMapUnlocked();
+
+    if (!mapUnlocked) {
       stage.classList.add('village-stage-empty');
-      stage.innerHTML = '<p class="village-stage-empty-text">Обитель появится здесь после «Введения»</p>';
+      const emptyText = document.createElement('p');
+      emptyText.className = 'village-stage-empty-text';
+      emptyText.textContent = 'Обитель появится здесь после «Введения»';
+      stage.appendChild(emptyText);
+      renderClouds(false);
       return;
     }
 
     MOKSHA_CHARACTERS.forEach((character) => {
       const pos = villageLayout[character.id];
-      const x = (pos.col + 0.5) * CELL;
-      const y = (pos.row + 0.5) * CELL;
-      const size = character.id === 'surya' ? RATUSHA_SIZE : BUILDING_SIZE;
-      placeBuilding(character, x, y, size);
+      const sizePct = character.id === 'surya' ? RATUSHA_SIZE_PCT : BUILDING_SIZE_PCT;
+      placeBuilding(character, pos, sizePct);
     });
+
+    renderClouds(true);
   };
 
   buildVillageStage();

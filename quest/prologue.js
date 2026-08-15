@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       phase: 'zoom-out-to-map',
       characters: ['vastu-purusha'],
-      text: 'Помоги ему — построй деревню знания на его теле, и голод утихнет.',
+      text: 'Помоги ему — построй обитель богов на его теле, и голод утихнет.',
     },
   ];
 

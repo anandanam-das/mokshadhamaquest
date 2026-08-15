@@ -3,24 +3,295 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MOKSHA Quest</title>
-    <script src="state.js"></script>
-    <script>
-      (function redirectToCurrentStep() {
-        var state = getUserState();
-        var next = 'login.html';
-        if (state.telegramId) {
-          if (!state.character) {
-            next = 'create-character.html';
-          } else if (!state.hasSeenPrologue) {
-            next = 'prologue.html';
-          } else {
-            next = 'village.html';
-          }
-        }
-        window.location.replace(next);
-      })();
-    </script>
+    <title>MOKSHA EDUCATION — Джйотиш, который не нужно заучивать</title>
+    <meta
+      name="description"
+      content="Последовательная система обучения джйотиш: от планет и знаков до самостоятельного чтения натальной карты. Обучение проходит внутри пиксельной игры MOKSHA Quest."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="landing.css" />
   </head>
-  <body></body>
+  <body>
+    <div class="pixel-overlay" aria-hidden="true"></div>
+
+    <header class="site-header">
+      <div class="site-header-inner">
+        <span class="brand">MOKSHA EDUCATION</span>
+        <a href="/quest/" class="btn btn-primary btn-compact">Начать обучение</a>
+      </div>
+    </header>
+
+    <main>
+      <!-- 1. Первый экран -->
+      <section class="hero">
+        <div class="hero-inner">
+          <p class="eyebrow">MOKSHA EDUCATION</p>
+          <h1>Джйотиш, который не нужно заучивать</h1>
+          <p class="hero-lead">
+            Мы создали последовательную систему обучения, в которой вы не запоминаете тысячи готовых
+            трактовок, а учитесь понимать, как устроена карта и почему она говорит именно это.
+          </p>
+
+          <ol class="path-chain" aria-label="Путь обучения">
+            <li>Планеты</li>
+            <li>Знаки</li>
+            <li>Дома</li>
+            <li>Связи</li>
+            <li>Накшатры</li>
+            <li>Навамша</li>
+            <li>Практика</li>
+          </ol>
+
+          <p class="hero-sub">От первых принципов до самостоятельного глубокого чтения натальной карты.</p>
+
+          <a href="/quest/" class="btn btn-primary btn-large">Начать обучение</a>
+        </div>
+      </section>
+
+      <!-- 2. Главное отличие -->
+      <section class="section">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">Главное отличие</p>
+          <h2>Не набор лекций. Система мышления астролога.</h2>
+          <p class="section-lead">
+            Большинство сложностей в джйотиш начинается тогда, когда нужно соединить сотни отдельных
+            значений в одну трактовку. Поэтому мы идём от простого к сложному, и каждый новый уровень
+            накладывается на предыдущий:
+          </p>
+
+          <div class="layer-grid">
+            <div class="layer-card">
+              <span class="layer-index">01</span>
+              <h3>Планета</h3>
+              <p>Что за сила?</p>
+            </div>
+            <div class="layer-card">
+              <span class="layer-index">02</span>
+              <h3>Знак</h3>
+              <p>Как она проявляется?</p>
+            </div>
+            <div class="layer-card">
+              <span class="layer-index">03</span>
+              <h3>Дом</h3>
+              <p>Где она реализуется?</p>
+            </div>
+            <div class="layer-card">
+              <span class="layer-index">04</span>
+              <h3>Связи</h3>
+              <p>Как взаимодействует с остальной картой?</p>
+            </div>
+          </div>
+
+          <p class="section-closing">
+            Уже после первых этапов вы начинаете самостоятельно собирать трактовки, а не искать готовые
+            значения сочетаний.
+          </p>
+        </div>
+      </section>
+
+      <!-- 2.5. Второй слой глубины -->
+      <section class="section section-depth">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">Глубина</p>
+          <h2>Но это только первый слой</h2>
+          <p class="section-lead">
+            Сначала вы учитесь видеть основу карты: какая сила действует, как она проявляется, где
+            реализуется и с чем взаимодействует.
+          </p>
+          <p class="section-lead">А затем мы увеличиваем глубину восприятия.</p>
+
+          <div class="layer-grid layer-grid-3">
+            <div class="layer-card">
+              <span class="layer-index">05</span>
+              <h3>Накшатры</h3>
+              <p>
+                Исследуем более тонкую природу планетарной энергии — её импульс, развитие и внутреннее
+                содержание.
+              </p>
+            </div>
+            <div class="layer-card">
+              <span class="layer-index">06</span>
+              <h3>Пады и Навамша</h3>
+              <p>Идём ещё глубже и учимся различать более точные оттенки и результаты проявления каждой энергии.</p>
+            </div>
+            <div class="layer-card">
+              <span class="layer-index">07</span>
+              <h3>Глубокая практика</h3>
+              <p>
+                Возвращаемся к карте уже с новым уровнем видения — снова учимся связывать всё воедино, но
+                теперь значительно глубже и точнее.
+              </p>
+            </div>
+          </div>
+
+          <p class="section-closing section-closing-large">
+            С каждым этапом карта не становится сложнее — она становится глубже.
+          </p>
+
+          <div class="depth-diagram">
+            <div class="depth-row">
+              <ol class="path-chain">
+                <li>Планеты</li>
+                <li>Знаки</li>
+                <li>Дома</li>
+                <li>Связи</li>
+              </ol>
+              <span class="depth-caption">учимся видеть структуру</span>
+            </div>
+            <div class="depth-arrow" aria-hidden="true">↓</div>
+            <div class="depth-row">
+              <ol class="path-chain">
+                <li>Накшатры</li>
+                <li>Пады и Навамша</li>
+                <li>Практика</li>
+              </ol>
+              <span class="depth-caption">учимся видеть глубину</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Игра -->
+      <section class="section section-game">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">И да — это ещё и настоящая игра</p>
+          <h2>Изучайте джйотиш внутри собственного мира</h2>
+          <p class="section-lead">
+            В обучение встроена полноценная пиксельная игра. Вы выбираете одного из девяти
+            персонажей-планет, исследуете мир, взаимодействуете с ним, открываете здания и новые
+            территории.
+          </p>
+
+          <div class="character-grid" role="list" aria-label="Персонажи-планеты">
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/surya.png" alt="Сурья, Солнце" loading="lazy" />
+              <span>Сурья</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/chandra.png" alt="Чандра, Луна" loading="lazy" />
+              <span>Чандра</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/mangal.png" alt="Мангала, Марс" loading="lazy" />
+              <span>Мангала</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/budha.png" alt="Буддха, Меркурий" loading="lazy" />
+              <span>Буддха</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/guru.png" alt="Гуру, Юпитер" loading="lazy" />
+              <span>Гуру</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/shukra.png" alt="Шукра, Венера" loading="lazy" />
+              <span>Шукра</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/shani.png" alt="Шани, Сатурн" loading="lazy" />
+              <span>Шани</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/rahu.png" alt="Раху" loading="lazy" />
+              <span>Раху</span>
+            </div>
+            <div class="character-tile" role="listitem">
+              <img src="/quest/assets/characters/ketu.png" alt="Кету" loading="lazy" />
+              <span>Кету</span>
+            </div>
+          </div>
+
+          <p class="section-lead">
+            Это не баллы и значки поверх курса. Игра существует как отдельный мир и развивается вместе с
+            вашим обучением.
+          </p>
+          <p class="section-lead">
+            Сначала перед вами Обитель Богов, затем открывается Город Знания с Обсерваторией, Академией
+            Законов и Цитаделью Перемен. По мере продвижения знакомые места меняются, а ранее недоступные
+            области становятся частью вашего путешествия.
+          </p>
+
+          <p class="section-closing">Ваш прогресс в джйотиш буквально открывает игровой мир.</p>
+        </div>
+      </section>
+
+      <!-- 4. Практика -->
+      <section class="section">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">Смотреть недостаточно</p>
+          <h2>После каждой лекции знания сразу закрепляются на практике</h2>
+
+          <div class="practice-grid">
+            <div class="practice-card">
+              <h3>Кинофрагменты</h3>
+              <p>Распознать проявление планеты и гуны.</p>
+            </div>
+            <div class="practice-card">
+              <h3>Интерактивные задания</h3>
+              <p>Найти связи и закономерности.</p>
+            </div>
+            <div class="practice-card">
+              <h3>Реальные ситуации</h3>
+              <p>Самостоятельно вывести трактовку.</p>
+            </div>
+            <div class="practice-card">
+              <h3>Натальные карты</h3>
+              <p>Постепенно перейти к настоящему чтению.</p>
+            </div>
+          </div>
+
+          <p class="section-closing">
+            Минимум длинных письменных работ. Основной акцент — увидеть, распознать, сопоставить и
+            применить.
+          </p>
+        </div>
+      </section>
+
+      <!-- 5. Путь обучения -->
+      <section class="section section-roadmap">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">Путь обучения</p>
+
+          <ol class="roadmap">
+            <li class="roadmap-stage">
+              <span class="roadmap-name">Обитель Богов</span>
+              <span class="roadmap-detail">Планеты → Знаки</span>
+            </li>
+            <li class="roadmap-stage">
+              <span class="roadmap-name">Город Знания</span>
+              <span class="roadmap-detail">Дома → Законы → Практика</span>
+            </li>
+            <li class="roadmap-stage">
+              <span class="roadmap-name">Возвращение в Обитель Богов</span>
+              <span class="roadmap-detail">Накшатры</span>
+            </li>
+            <li class="roadmap-stage">
+              <span class="roadmap-name">Храм Истоков</span>
+              <span class="roadmap-detail">Пады → Навамша</span>
+            </li>
+            <li class="roadmap-stage">
+              <span class="roadmap-name">Цитадель Перемен II</span>
+              <span class="roadmap-detail">Глубокая практика</span>
+            </li>
+          </ol>
+
+          <p class="section-closing">
+            Каждый этап углубляет предыдущий: от понимания отдельных элементов карты — к способности
+            видеть их как единую систему и самостоятельно читать судьбу человека.
+          </p>
+
+          <a href="/quest/" class="btn btn-primary btn-large">Начать обучение</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>MOKSHA EDUCATION</span>
+    </footer>
+  </body>
 </html>

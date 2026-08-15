@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOKSHA Quest</title>
+    <script src="state.js"></script>
+    <script>
+      (function redirectToCurrentStep() {
+        var state = getUserState();
+        var next = 'login.html';
+        if (state.telegramId) {
+          if (!state.character) {
+            next = 'create-character.html';
+          } else if (!state.hasSeenPrologue) {
+            next = 'prologue.html';
+          } else {
+            next = 'village.html';
+          }
+        }
+        window.location.replace(next);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -26,15 +26,15 @@ export default async function middleware(request) {
 
   const session = await verify(getCookie(request, SESSION_COOKIE), secret);
   if (!session) {
-    return Response.redirect(new URL('/login.html', url), 302);
+    return Response.redirect(new URL('/quest/login.html', url), 302);
   }
 
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
   if (!access || String(access.id) !== String(session.id)) {
-    return Response.redirect(new URL('/checking.html', url), 302);
+    return Response.redirect(new URL('/quest/checking.html', url), 302);
   }
 }
 
 export const config = {
-  matcher: ['/village.html', '/prologue.html', '/create-character.html'],
+  matcher: ['/quest/village.html', '/quest/prologue.html', '/quest/create-character.html'],
 };

@@ -7,7 +7,7 @@ module.exports = (req, res) => {
   const { token } = req.query;
 
   if (!token || !SESSION_SECRET) {
-    res.writeHead(302, { Location: '/login.html?error=missing_token' });
+    res.writeHead(302, { Location: '/quest/login.html?error=missing_token' });
     return res.end();
   }
 
@@ -15,7 +15,7 @@ module.exports = (req, res) => {
   try {
     payload = jwt.verify(token, SESSION_SECRET);
   } catch (error) {
-    res.writeHead(302, { Location: '/login.html?error=expired' });
+    res.writeHead(302, { Location: '/quest/login.html?error=expired' });
     return res.end();
   }
 
@@ -31,6 +31,6 @@ module.exports = (req, res) => {
     `${COOKIE_NAME}=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAgeSeconds}`
   );
 
-  res.writeHead(302, { Location: `/checking.html?telegramId=${encodeURIComponent(payload.id)}` });
+  res.writeHead(302, { Location: `/quest/checking.html?telegramId=${encodeURIComponent(payload.id)}` });
   res.end();
 };

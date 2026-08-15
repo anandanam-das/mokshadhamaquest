@@ -3308,7 +3308,8 @@ h3 {
   .map-layer-correct,
   .map-layer-wrong,
   .map-layer-collapse,
-  .map-layer-unfold {
+  .map-layer-unfold,
+  .village-clouds-disperse {
     animation: none;
     transition: none;
   }
@@ -3339,17 +3340,75 @@ h3 {
   max-width: 26ch;
 }
 
+/* Ландшафт обители: один готовый квадратный слой на всю сцену — Васту
+   Пуруша уже вклеен под ландшафтом в самой картинке. */
 .village-stage {
-  background: radial-gradient(circle at 50% 50%, rgba(234, 250, 235, 0.9), rgba(200, 234, 205, 0.75));
+  position: relative;
+  overflow: hidden;
+  background-color: #8ab26c;
   border: 2px solid rgba(106, 162, 130, 0.24);
   border-radius: 28px;
 }
 
+.village-ground {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Сплошная облачность поверх карты, пока "Знакомство с обителью" не
+   стало доступным. village-clouds-disperse — разовая анимация в момент
+   открытия: тучи вспыхивают светом и расходятся, а не просто исчезают. */
+.village-clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 18% 22%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72) 40%, transparent 70%),
+    radial-gradient(ellipse at 72% 14%, rgba(255, 255, 255, 0.92), rgba(240, 241, 245, 0.68) 45%, transparent 72%),
+    radial-gradient(ellipse at 44% 54%, rgba(255, 255, 255, 0.94), rgba(230, 232, 238, 0.7) 42%, transparent 75%),
+    radial-gradient(ellipse at 82% 68%, rgba(255, 255, 255, 0.9), rgba(235, 236, 240, 0.64) 40%, transparent 70%),
+    radial-gradient(ellipse at 14% 78%, rgba(255, 255, 255, 0.92), rgba(230, 232, 238, 0.68) 42%, transparent 72%),
+    linear-gradient(rgba(214, 222, 226, 0.94), rgba(214, 222, 226, 0.94));
+}
+
+.village-clouds-disperse {
+  animation: village-clouds-disperse 1.2s ease forwards;
+}
+
+@keyframes village-clouds-disperse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.04);
+    filter: brightness(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.16);
+    filter: brightness(1.7);
+  }
+}
+
+/* Здание — просто рисунок постройки (assets/village/buildings/{id}.png),
+   без белой рамки-портрета: он должен визуально стоять прямо на своём
+   golden-фундаменте на landscape.png. left/top/width — проценты от
+   сцены (см. villageLayout в village.js), поэтому масштабируется вместе
+   с картой на любом экране. Завал (rubble) — картинка того же размера
+   поверх, закрывающая здание, пока планета не пройдена полностью. */
 .village-building {
   position: absolute;
+  transform: translate(-50%, -50%);
   display: grid;
   justify-items: center;
-  align-content: center;
   gap: 4px;
   border: none;
   background: transparent;
@@ -3357,22 +3416,25 @@ h3 {
   padding: 0;
 }
 
-.village-building-image {
-  width: 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 2px solid rgba(89, 124, 74, 0.28);
-  object-fit: contain;
-  padding: 6px;
-  box-sizing: border-box;
+.village-building-art {
+  position: relative;
+  display: block;
+  width: 100%;
 }
 
-.village-building[data-building-id="surya"] .village-building-image {
-  background: linear-gradient(135deg, #fff7dc, #ffe4a2);
-  border-color: #f0c876;
+.village-building-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.village-building-rubble {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .village-building-label {
@@ -3416,11 +3478,15 @@ h3 {
   }
 }
 
+.village-building-footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .village-building-lock {
-  position: absolute;
-  top: -4px;
-  right: -2px;
   font-size: 0.9rem;
+  line-height: 1;
 }
 
 .village-building.selected .village-building-image {
