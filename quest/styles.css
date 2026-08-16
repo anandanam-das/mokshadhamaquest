@@ -3309,7 +3309,11 @@ h3 {
   .map-layer-wrong,
   .map-layer-collapse,
   .map-layer-unfold,
-  .village-clouds-disperse,
+  .village-cloud-puff-1,
+  .village-cloud-puff-2,
+  .village-cloud-puff-3,
+  .village-cloud-puff-4,
+  .village-cloud-puff-5,
   .village-building-rubble-clear,
   .village-building-reveal {
     animation: none;
@@ -3361,43 +3365,84 @@ h3 {
   pointer-events: none;
 }
 
-/* Сплошная облачность поверх карты, пока "Знакомство с обителью" не
-   стало доступным. village-clouds-disperse — разовая анимация в момент
-   открытия: тучи вспыхивают светом и расходятся, а не просто исчезают. */
+/* Облачность поверх карты (лежит на cloud-cover.png — см. renderGroundLayers
+   в village.js), пока "Знакомство с обителью" не стало доступным: пять
+   клочков тучи (cloud-puff-1..5.png), каждый тихо дрейфует туда-сюда по
+   своей траектории (village-cloud-drift-N), чтобы облачность казалась
+   живой. village-clouds-disperse — разовая анимация в момент открытия:
+   у каждого клочка своё направление разлёта (village-cloud-fly-N). */
 .village-clouds {
   position: absolute;
   inset: 0;
   z-index: 5;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse at 18% 22%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.72) 40%, transparent 70%),
-    radial-gradient(ellipse at 72% 14%, rgba(255, 255, 255, 0.92), rgba(240, 241, 245, 0.68) 45%, transparent 72%),
-    radial-gradient(ellipse at 44% 54%, rgba(255, 255, 255, 0.94), rgba(230, 232, 238, 0.7) 42%, transparent 75%),
-    radial-gradient(ellipse at 82% 68%, rgba(255, 255, 255, 0.9), rgba(235, 236, 240, 0.64) 40%, transparent 70%),
-    radial-gradient(ellipse at 14% 78%, rgba(255, 255, 255, 0.92), rgba(230, 232, 238, 0.68) 42%, transparent 72%),
-    linear-gradient(rgba(214, 222, 226, 0.94), rgba(214, 222, 226, 0.94));
 }
 
-.village-clouds-disperse {
-  animation: village-clouds-disperse 1.2s ease forwards;
+.village-cloud-puff {
+  position: absolute;
+  display: block;
 }
 
-@keyframes village-clouds-disperse {
-  0% {
-    opacity: 1;
-    transform: scale(1);
-    filter: brightness(1);
-  }
-  35% {
-    opacity: 1;
-    transform: scale(1.04);
-    filter: brightness(1.4);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.16);
-    filter: brightness(1.7);
-  }
+.village-cloud-puff-1 { animation: village-cloud-drift-1 20s ease-in-out infinite; }
+.village-cloud-puff-2 { animation: village-cloud-drift-2 24s ease-in-out infinite; }
+.village-cloud-puff-3 { animation: village-cloud-drift-3 27s ease-in-out infinite; }
+.village-cloud-puff-4 { animation: village-cloud-drift-4 22s ease-in-out infinite; }
+.village-cloud-puff-5 { animation: village-cloud-drift-5 25s ease-in-out infinite; }
+
+@keyframes village-cloud-drift-1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0%, 0%); }
+  50% { transform: translate(-50%, -50%) translate(6%, -3%); }
+}
+
+@keyframes village-cloud-drift-2 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0%, 0%); }
+  50% { transform: translate(-50%, -50%) translate(-5%, 3%); }
+}
+
+@keyframes village-cloud-drift-3 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0%, 0%); }
+  50% { transform: translate(-50%, -50%) translate(4%, 4%); }
+}
+
+@keyframes village-cloud-drift-4 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0%, 0%); }
+  50% { transform: translate(-50%, -50%) translate(-6%, -2%); }
+}
+
+@keyframes village-cloud-drift-5 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0%, 0%); }
+  50% { transform: translate(-50%, -50%) translate(5%, -4%); }
+}
+
+.village-clouds-disperse .village-cloud-puff-1 { animation: village-cloud-fly-1 1.6s ease-in forwards; }
+.village-clouds-disperse .village-cloud-puff-2 { animation: village-cloud-fly-2 1.6s ease-in forwards; }
+.village-clouds-disperse .village-cloud-puff-3 { animation: village-cloud-fly-3 1.6s ease-in forwards; }
+.village-clouds-disperse .village-cloud-puff-4 { animation: village-cloud-fly-4 1.6s ease-in forwards; }
+.village-clouds-disperse .village-cloud-puff-5 { animation: village-cloud-fly-5 1.6s ease-in forwards; }
+
+@keyframes village-cloud-fly-1 {
+  from { transform: translate(-50%, -50%) translate(0%, 0%); opacity: 1; }
+  to { transform: translate(-50%, -50%) translate(-70%, -60%); opacity: 0; }
+}
+
+@keyframes village-cloud-fly-2 {
+  from { transform: translate(-50%, -50%) translate(0%, 0%); opacity: 1; }
+  to { transform: translate(-50%, -50%) translate(70%, -60%); opacity: 0; }
+}
+
+@keyframes village-cloud-fly-3 {
+  from { transform: translate(-50%, -50%) translate(0%, 0%); opacity: 1; }
+  to { transform: translate(-50%, -50%) translate(0%, 90%); opacity: 0; }
+}
+
+@keyframes village-cloud-fly-4 {
+  from { transform: translate(-50%, -50%) translate(0%, 0%); opacity: 1; }
+  to { transform: translate(-50%, -50%) translate(-70%, 60%); opacity: 0; }
+}
+
+@keyframes village-cloud-fly-5 {
+  from { transform: translate(-50%, -50%) translate(0%, 0%); opacity: 1; }
+  to { transform: translate(-50%, -50%) translate(70%, 60%); opacity: 0; }
 }
 
 /* Здание — просто рисунок постройки (assets/village/buildings/{id}.png),

@@ -1379,11 +1379,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Ландшафт — один квадратный слой на всю сцену (Васту Пуруша уже
   // вклеен под ландшафтом в самой картинке). Рисуется всегда, даже до
-  // открытия деревни.
-  const renderGroundLayers = () => {
+  // открытия деревни. Пока карта не открыта, показываем не сам landscape,
+  // а его туманную версию (cloud-cover.png), поверх которой плывут тучки.
+  const renderGroundLayers = (unlocked) => {
     const ground = document.createElement('img');
     ground.className = 'village-ground';
-    ground.src = 'assets/village/landscape.png';
+    ground.src = unlocked ? 'assets/village/landscape.png' : 'assets/village/clouds/cloud-cover.png';
     ground.alt = '';
     stage.appendChild(ground);
   };
@@ -1399,30 +1400,54 @@ document.addEventListener('DOMContentLoaded', () => {
     return others.every((t) => progress[t.id]);
   };
 
-  const CLOUDS_DISPERSE_MS = 1200;
+  const CLOUDS_DISPERSE_MS = 1600;
   let cloudsDispersed = false;
 
-  // Пока карта не открыта — сплошная облачность. В момент открытия —
-  // разовая анимация "тучи расходятся, сквозь них пробивается свет"
-  // (как flower-garden-flash), дальше тучи больше не рисуются.
+  // Пять клочков тучи (assets/village/clouds/cloud-puff-N.png), раскиданных
+  // по сцене поверх cloud-cover.png — у каждого свой размер/точка/скорость
+  // дрейфа (village-cloud-drift-N в CSS), чтобы облачность казалась живой,
+  // а не статичной картинкой.
+  const CLOUD_PUFFS = [
+    { n: 1, x: 22, y: 24, size: 55 },
+    { n: 2, x: 74, y: 20, size: 48 },
+    { n: 3, x: 50, y: 50, size: 62 },
+    { n: 4, x: 20, y: 76, size: 50 },
+    { n: 5, x: 78, y: 74, size: 46 },
+  ];
+
+  // Пока карта не открыта — облака дрейфуют на месте (см. CLOUD_PUFFS).
+  // В момент открытия — разовая анимация: каждый клочок разъезжается в
+  // свою сторону и тает, дальше тучи больше не рисуются.
   const renderClouds = (unlocked) => {
     if (unlocked && cloudsDispersed) return;
 
-    const clouds = document.createElement('div');
-    clouds.className = 'village-clouds';
-    stage.appendChild(clouds);
+    const layer = document.createElement('div');
+    layer.className = 'village-clouds';
+
+    CLOUD_PUFFS.forEach(({ n, x, y, size }) => {
+      const puff = document.createElement('img');
+      puff.src = `assets/village/clouds/cloud-puff-${n}.png`;
+      puff.alt = '';
+      puff.className = `village-cloud-puff village-cloud-puff-${n}`;
+      puff.style.left = `${x}%`;
+      puff.style.top = `${y}%`;
+      puff.style.width = `${size}%`;
+      layer.appendChild(puff);
+    });
+
+    stage.appendChild(layer);
 
     if (!unlocked) return;
 
     cloudsDispersed = true;
     if (prefersReducedMotion) {
-      clouds.remove();
+      layer.remove();
       return;
     }
     // eslint-disable-next-line no-void
-    void clouds.offsetWidth;
-    clouds.classList.add('village-clouds-disperse');
-    setTimeout(() => clouds.remove(), CLOUDS_DISPERSE_MS);
+    void layer.offsetWidth;
+    layer.classList.add('village-clouds-disperse');
+    setTimeout(() => layer.remove(), CLOUDS_DISPERSE_MS);
   };
 
   // null до первого рендера — на нём baseline снимается молча (без
@@ -1434,9 +1459,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const buildVillageStage = () => {
     stage.innerHTML = '';
     stage.classList.remove('village-stage-empty');
-    renderGroundLayers();
 
     const mapUnlocked = isVillageMapUnlocked();
+    renderGroundLayers(mapUnlocked);
 
     if (!mapUnlocked) {
       stage.classList.add('village-stage-empty');
