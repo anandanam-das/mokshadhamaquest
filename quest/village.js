@@ -40,14 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // картинке. Первый черновик, точки уточняем по месту.
   const villageLayout = {
     surya:   { x: 50, y: 50 }, // центр (Брахмастхана)
-    chandra: { x: 15, y: 22 }, // северо-запад
+    chandra: { x: 12, y: 25 }, // северо-запад
     mangala: { x: 50, y: 86 }, // юг
     budha:   { x: 50, y: 14 }, // север
-    guru:    { x: 82, y: 22 }, // северо-восток
-    shukra:  { x: 78, y: 78 }, // юго-восток
-    shani:   { x: 14, y: 50 }, // запад
-    rahu:    { x: 19, y: 70 }, // юго-запад — побережье, без здания
-    ketu:    { x: 92, y: 50 }, // восток, по центру правого края — Гималаи, без здания
+    guru:    { x: 89, y: 25 }, // северо-восток
+    shukra:  { x: 79, y: 75 }, // юго-восток
+    shani:   { x: 12, y: 50 }, // запад
+    rahu:    { x: 19, y: 78 }, // юго-запад — побережье, без здания
+    ketu:    { x: 104, y: 47 }, // восток, по центру правого края — Гималаи, без здания
   };
 
   // Порядок разблокировки зданий деревни: Ратуша первая, дальше по цепочке.
@@ -75,6 +75,30 @@ document.addEventListener('DOMContentLoaded', () => {
   // landscape.png на любом экране.
   const BUILDING_SIZE_PCT = 24;
   const RATUSHA_SIZE_PCT = 30;
+  // У Кету завал — не типовая иконка, а кольцо камней вокруг Гималаев,
+  // ему нужен размер побольше, чем у обычного здания.
+  const SIZE_OVERRIDES_PCT = { ketu: 74, rahu: 48 };
+  // Когда визуальный размер (выше) намного больше нормального клик-таргета,
+  // сама картинка становится некликабельной (pointer-events: none через
+  // класс .visual-only), а наведение/клик обрабатывает отдельная кнопка
+  // такого же размера, как у обычного здания — иначе гигантский
+  // прямоугольник кнопки перехватывает наведение у соседей даже там, где
+  // на самой картинке всё прозрачно.
+  const HIT_SIZE_OVERRIDES_PCT = { ketu: 32 };
+  // Точка самого здания (villageLayout.ketu) прижата к правому краю
+  // (x:104) и наполовину обрезана сценой (overflow: hidden) — картинка
+  // от этого только выигрывает (видна её левая часть), а вот отдельная
+  // кнопка-хитбокс того же размера, что у обычного здания, там почти
+  // целиком уезжала бы за пределы экрана. Поэтому у неё своя, полностью
+  // видимая точка — там, где кольцо реально видно на экране.
+  const HIT_POS_OVERRIDES_PCT = { ketu: { x: 86, y: 50 } };
+  // Точечный сдвиг подписи (в % от сцены) относительно её обычного места
+  // "под картинкой" — когда для конкретного здания этого недостаточно.
+  const LABEL_OFFSET_PCT = {
+    rahu: { dx: -6, dy: -8 },
+    ketu: { dx: -11, dy: -9 },
+    chandra: { dx: 1, dy: 1.5 },
+  };
 
   stage.style.width = '100%';
   stage.style.maxWidth = `${STAGE_SIZE}px`;
@@ -1197,7 +1221,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Карта деревни.
 
-  const placeBuilding = (character, pos, sizePct) => {
+  const REVEAL_MS = 900;
+
+  // Пока планета не пройдена — на её точке лежит завал (у всех 9,
+  // включая Раху/Кету). Здание под завалом не рисуется вообще — оно
+  // появляется только когда завал убран, и то лишь если оно вообще
+  // существует (у Раху/Кету building.file === null: там просто
+  // открывается сам ландшафт — побережье/Гималаи, без отдельной картинки).
+  // justUnlocked — true ровно на том рендере, где статус впервые стал
+  // "unlocked": тогда завал убирается анимацией, а не просто исчезает.
+  const selectBuilding = (characterId) => {
+    selectedBuildingId = characterId;
+    stage.querySelectorAll('.village-building').forEach((node) => {
+      node.classList.toggle('selected', node.dataset.buildingId === selectedBuildingId);
+    });
+  };
+
+  const openBuildingLesson = (character) => {
+    selectBuilding(character.id);
+    showPatronSpeech(getReaction(patronId, character.id));
+    openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
+  };
+
+  // Только рисунок (завал/здание) — сама карточка-кнопка. Подпись
+  // рисуется отдельным элементом, вторым проходом (см. placeBuildingLabel),
+  // чтобы гарантированно лежать поверх ЛЮБОГО завала на карте, а не
+  // только своего собственного — соседний завал может быть крупнее и
+  // визуально перекрывать чужую подпись, если она нарисована в тот же
+  // проход, что и картинки.
+  const placeBuildingArt = (character, pos, sizePct, justUnlocked) => {
     const status = getBuildingStatus(character.id);
     const building = planetBuildings[character.id];
 
@@ -1209,35 +1261,118 @@ document.addEventListener('DOMContentLoaded', () => {
     el.style.width = `${sizePct}%`;
     el.style.left = `${pos.x}%`;
     el.style.top = `${pos.y}%`;
-    // У Раху и Кету нет своего здания (building.file === null) — это
-    // просто побережье и гора на самом ландшафте, картинку/завал не рисуем.
-    const art = building.file
-      ? `
-        <span class="village-building-art">
-          <img src="assets/village/buildings/${building.file}.png" alt="${building.name}" class="village-building-image" />
-          ${status !== 'unlocked' ? `<img src="assets/village/rubble/${character.id}.png" alt="" class="village-building-rubble" />` : ''}
-        </span>
-      `
-      : '';
 
+    const art = document.createElement('span');
+    art.className = 'village-building-art';
+
+    if (status === 'unlocked') {
+      if (building.file) {
+        const img = document.createElement('img');
+        img.src = `assets/village/buildings/${building.file}.png`;
+        img.alt = building.name;
+        img.className = 'village-building-image';
+        if (justUnlocked && !prefersReducedMotion) img.classList.add('village-building-reveal');
+        art.appendChild(img);
+      }
+      if (justUnlocked) {
+        const rubble = document.createElement('img');
+        rubble.src = `assets/village/rubble/${character.id}-zaval.png`;
+        rubble.alt = '';
+        rubble.className = 'village-building-rubble';
+        if (prefersReducedMotion) {
+          // не рендерим совсем — эквивалент мгновенного снятия завала
+        } else {
+          rubble.classList.add('village-building-rubble-clear');
+          art.appendChild(rubble);
+          setTimeout(() => rubble.remove(), REVEAL_MS);
+        }
+      }
+    } else {
+      const rubble = document.createElement('img');
+      rubble.src = `assets/village/rubble/${character.id}-zaval.png`;
+      rubble.alt = '';
+      rubble.className = 'village-building-rubble';
+      art.appendChild(rubble);
+    }
+
+    el.appendChild(art);
+
+    const hitSizePct = HIT_SIZE_OVERRIDES_PCT[character.id];
+    const interactive = hitSizePct ? document.createElement('button') : el;
+
+    if (hitSizePct) {
+      // Картинка большая, но кликабельная/наводимая зона — отдельная
+      // кнопка нормального размера, обычно поверх той же точки (но может
+      // быть сдвинута через HIT_POS_OVERRIDES_PCT, если сама точка здания
+      // уезжает за край экрана); сама картинка становится чисто визуальной
+      // (см. .visual-only в CSS).
+      const hitPos = HIT_POS_OVERRIDES_PCT[character.id] || pos;
+      el.classList.add('visual-only');
+      interactive.type = 'button';
+      interactive.dataset.buildingId = character.id;
+      interactive.className = `village-building-hit status-${status}`;
+      interactive.style.width = `${hitSizePct}%`;
+      interactive.style.left = `${hitPos.x}%`;
+      interactive.style.top = `${hitPos.y}%`;
+    }
+
+    if (status !== 'pending') {
+      interactive.addEventListener('click', () => openBuildingLesson(character));
+    }
+
+    // Подпись по умолчанию скрыта (см. placeBuildingLabel) и появляется
+    // только при наведении/тапе на само здание — или на саму подпись,
+    // чтобы не пропадала, пока курсор ещё над ней.
+    interactive.addEventListener('mouseenter', () => showBuildingLabel(character.id));
+    interactive.addEventListener('mouseleave', () => hideBuildingLabel(character.id));
+    interactive.addEventListener('touchstart', () => showBuildingLabel(character.id), { passive: true });
+    interactive.addEventListener('focus', () => showBuildingLabel(character.id));
+    interactive.addEventListener('blur', () => hideBuildingLabel(character.id));
+
+    stage.appendChild(el);
+    if (hitSizePct) stage.appendChild(interactive);
+  };
+
+  const findLabelEl = (characterId) =>
+    stage.querySelector(`.village-building-label-layer[data-building-id="${characterId}"]`);
+
+  const showBuildingLabel = (characterId) => {
+    const label = findLabelEl(characterId);
+    if (label) label.classList.add('label-visible');
+  };
+
+  const hideBuildingLabel = (characterId) => {
+    const label = findLabelEl(characterId);
+    if (label) label.classList.remove('label-visible');
+  };
+
+  // Подпись (плашка с именем + замочек) — отдельная кнопка поверх той же
+  // точки, добавляется в DOM позже всех village-building, поэтому всегда
+  // рисуется выше любого завала на карте. Видна только при наведении/тапе
+  // (см. showBuildingLabel/hideBuildingLabel, вешаются на само здание).
+  const placeBuildingLabel = (character, pos, sizePct, status) => {
+    const building = planetBuildings[character.id];
+
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.dataset.buildingId = character.id;
+    el.className = `village-building-label-layer status-${status}`;
+    const offset = LABEL_OFFSET_PCT[character.id] || { dx: 0, dy: 1.5 };
+    el.style.left = `${pos.x + offset.dx}%`;
+    // Подпись цепляется к низу картинки здания/завала с небольшим
+    // нахлёстом (12% от её размера), а не к жёстко заданной точке.
+    el.style.top = `${pos.y + sizePct / 2 - sizePct * 0.12 + offset.dy}%`;
     el.innerHTML = `
-      ${art}
-      <span class="village-building-footer">
-        <span class="village-building-label">${building.name}</span>
-        ${status === 'pending' ? '<span class="village-building-lock">🔒</span>' : ''}
-      </span>
+      <span class="village-building-label">${building.name}</span>
+      ${status === 'pending' ? '<span class="village-building-lock">🔒</span>' : ''}
     `;
 
     if (status !== 'pending') {
-      el.addEventListener('click', () => {
-        selectedBuildingId = character.id;
-        stage.querySelectorAll('.village-building').forEach((node) => {
-          node.classList.toggle('selected', node.dataset.buildingId === selectedBuildingId);
-        });
-        showPatronSpeech(getReaction(patronId, character.id));
-        openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
-      });
+      el.addEventListener('click', () => openBuildingLesson(character));
     }
+
+    el.addEventListener('mouseenter', () => showBuildingLabel(character.id));
+    el.addEventListener('mouseleave', () => hideBuildingLabel(character.id));
 
     stage.appendChild(el);
   };
@@ -1290,6 +1425,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => clouds.remove(), CLOUDS_DISPERSE_MS);
   };
 
+  // null до первого рендера — на нём baseline снимается молча (без
+  // анимации завала), даже если что-то уже было пройдено в прошлой
+  // сессии. Дальше justUnlocked истинно только на том рендере, где
+  // статус конкретной планеты впервые стал 'unlocked'.
+  let lastBuildingStatus = null;
+
   const buildVillageStage = () => {
     stage.innerHTML = '';
     stage.classList.remove('village-stage-empty');
@@ -1307,11 +1448,32 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    MOKSHA_CHARACTERS.forEach((character) => {
+    const isInitialRender = lastBuildingStatus === null;
+    const newStatus = {};
+
+    // Два прохода: сначала все картинки (завалы/здания), потом все
+    // подписи — так подпись любого здания гарантированно ложится поверх
+    // завала любого другого, а не только своего собственного.
+    const layout = MOKSHA_CHARACTERS.map((character) => {
       const pos = villageLayout[character.id];
-      const sizePct = character.id === 'surya' ? RATUSHA_SIZE_PCT : BUILDING_SIZE_PCT;
-      placeBuilding(character, pos, sizePct);
+      const sizePct =
+        SIZE_OVERRIDES_PCT[character.id] ??
+        (character.id === 'surya' ? RATUSHA_SIZE_PCT : BUILDING_SIZE_PCT);
+      const status = getBuildingStatus(character.id);
+      newStatus[character.id] = status;
+      const justUnlocked =
+        !isInitialRender && status === 'unlocked' && lastBuildingStatus[character.id] !== 'unlocked';
+      return { character, pos, sizePct, status, justUnlocked };
     });
+
+    layout.forEach(({ character, pos, sizePct, justUnlocked }) => {
+      placeBuildingArt(character, pos, sizePct, justUnlocked);
+    });
+    layout.forEach(({ character, pos, sizePct, status }) => {
+      placeBuildingLabel(character, pos, sizePct, status);
+    });
+
+    lastBuildingStatus = newStatus;
 
     renderClouds(true);
   };

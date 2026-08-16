@@ -3309,7 +3309,9 @@ h3 {
   .map-layer-wrong,
   .map-layer-collapse,
   .map-layer-unfold,
-  .village-clouds-disperse {
+  .village-clouds-disperse,
+  .village-building-rubble-clear,
+  .village-building-reveal {
     animation: none;
     transition: none;
   }
@@ -3402,49 +3404,118 @@ h3 {
    без белой рамки-портрета: он должен визуально стоять прямо на своём
    golden-фундаменте на landscape.png. left/top/width — проценты от
    сцены (см. villageLayout в village.js), поэтому масштабируется вместе
-   с картой на любом экране. Завал (rubble) — картинка того же размера
-   поверх, закрывающая здание, пока планета не пройдена полностью. */
+   с картой на любом экране. Пока планета не пройдена, на точке лежит
+   завал (rubble) — здание под ним не рисуется вовсе. Когда планета
+   только что пройдена, на миг возникают оба слоя разом (rubble поверх
+   image), и rubble анимированно "рассыпается" — .village-building-rubble-clear
+   выставляется JS только в этот момент, поэтому нужна абсолютная
+   позиция; во всех остальных случаях rubble/image — единственный
+   ребёнок в потоке и просто задаёт высоту сам. */
 .village-building {
   position: absolute;
   transform: translate(-50%, -50%);
   display: grid;
   justify-items: center;
-  gap: 4px;
   border: none;
   background: transparent;
   cursor: default;
   padding: 0;
 }
 
+/* Когда картинка здания/завала намного больше "нормального" клик-таргета
+   (например, у Кету — кольцо камней вокруг горы), clip-path обрезал бы и
+   видимую картинку тоже. Поэтому вместо этого сама .village-building тут
+   чисто визуальная (pointer-events: none), а наведение/клик обрабатывает
+   отдельный небольшой .village-building-hit поверх неё (см. village.js). */
+.village-building.visual-only {
+  pointer-events: none;
+}
+
+.village-building-hit {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1 / 1;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: default;
+}
+
+.village-building-hit.status-active_pulse,
+.village-building-hit.status-unlocked {
+  cursor: pointer;
+}
+
 .village-building-art {
   position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
 }
 
-.village-building-image {
+.village-building-image,
+.village-building-rubble {
   width: 100%;
   height: auto;
   object-fit: contain;
   display: block;
 }
 
-.village-building-rubble {
+.village-building-rubble-clear {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  animation: village-building-rubble-clear 0.9s ease forwards;
+}
+
+.village-building-reveal {
+  animation: village-building-reveal 0.9s ease both;
+}
+
+@keyframes village-building-rubble-clear {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.7) translateY(10%);
+  }
+}
+
+@keyframes village-building-reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  45% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .village-building-label {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 700;
   color: #2d4625;
   text-align: center;
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.7);
   padding: 2px 8px;
   border-radius: 999px;
+}
+
+/* Длинное имя — в две строки, а не одной широкой лентой через полкарты. */
+.village-building-label-layer[data-building-id="chandra"] .village-building-label {
+  max-width: 100px;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.15;
+  border-radius: 12px;
 }
 
 .village-building.status-active_pulse,
@@ -3478,10 +3549,33 @@ h3 {
   }
 }
 
-.village-building-footer {
+/* Отдельный слой подписи: добавляется в DOM позже всех village-building
+   (см. placeBuildingLabel в village.js), поэтому лежит поверх завала
+   любого здания на карте, а не только своего собственного. */
+.village-building-label-layer {
+  position: absolute;
+  z-index: 50;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   gap: 4px;
+  border: none;
+  background: transparent;
+  cursor: default;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.village-building-label-layer.label-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.village-building-label-layer.status-active_pulse,
+.village-building-label-layer.status-unlocked {
+  cursor: pointer;
 }
 
 .village-building-lock {

@@ -271,6 +271,17 @@ h3 {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.layer-grid-icons .layer-card {
+  text-align: center;
+}
+
+.layer-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  margin: 0 auto 14px;
+}
+
 .layer-card {
   background: var(--panel);
   border: 1px solid var(--border);
