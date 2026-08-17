@@ -3372,12 +3372,10 @@ h3 {
    тает, новая одновременно проявляется из белого света. z-index держит
    новую сверху, чтобы через прозрачные края старой не проглядывали швы. */
 .village-ground-whiteout {
-  z-index: 1;
   animation: village-ground-whiteout 1.8s ease-in forwards;
 }
 
 .village-ground-reveal {
-  z-index: 2;
   animation: village-ground-reveal 1.8s ease-out forwards;
 }
 
@@ -3542,6 +3540,11 @@ h3 {
   z-index: 1;
   display: block;
   width: 100%;
+  /* У Раху (и вообще у зданий без своей картинки — building.file === null)
+     тут после снятия завала не остаётся вообще никакого содержимого —
+     без фиксированного соотношения сторон блок схлопывался бы в 0
+     высоты, и наводить/тапать было бы не на что. */
+  aspect-ratio: 1 / 1;
 }
 
 .village-building-image,
@@ -3619,12 +3622,17 @@ h3 {
   transform: translateY(-2px);
 }
 
-.village-building.status-pending .village-building-image {
+/* image — когда здание уже открыто (status-unlocked, готовая картинка);
+   rubble — пока не пройдено, на точке лежит завал. Оба статуса ниже
+   должны действовать на что бы из этого сейчас ни было в DOM. */
+.village-building.status-pending .village-building-image,
+.village-building.status-pending .village-building-rubble {
   filter: grayscale(1) brightness(0.75);
   opacity: 0.75;
 }
 
-.village-building.status-active_pulse .village-building-image {
+.village-building.status-active_pulse .village-building-image,
+.village-building.status-active_pulse .village-building-rubble {
   filter: grayscale(1) brightness(0.8);
   animation: pulse-glow 2s ease-in-out infinite;
 }
@@ -3721,4 +3729,12 @@ h3 {
   z-index: 1001;
   border-radius: 999px;
   box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.9), 0 0 0 10px rgba(96, 197, 255, 0.6);
+}
+
+/* Здания карты уже position: absolute (left/top в %) — общий
+   .onboarding-highlight выше сбил бы это на position: relative и
+   сломал координаты. Возвращаем нужный position, остальное берём
+   из .onboarding-highlight как есть. */
+.village-building.onboarding-highlight {
+  position: absolute;
 }

@@ -1123,6 +1123,9 @@ document.addEventListener('DOMContentLoaded', () => {
       renderDragTask(lessonKey, task, task3Data);
     } else if (task.id === 'task_4' && task.type === 'layered_map') {
       renderLayeredMapTask(lessonKey, task, task4Data);
+    } else if (task.type === 'guided_tour') {
+      taskContentPanel.innerHTML = `<p class="task-content-text">Обзор обители идёт прямо на карте слева.</p>`;
+      startVillageTour(lessonKey, task);
     } else {
       taskContentPanel.innerHTML = `<p class="task-content-text">Материал скоро появится здесь.</p>`;
       const btn = document.createElement('button');
@@ -1241,6 +1244,95 @@ document.addEventListener('DOMContentLoaded', () => {
     selectBuilding(character.id);
     showPatronSpeech(getReaction(patronId, character.id));
     openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
+  };
+
+  // "Знакомство с обителью" — гайд-тур по карте: тёмная подложка на весь
+  // экран (.onboarding-overlay), в ней прорезано светящееся кольцо вокруг
+  // одного здания за раз (.onboarding-highlight — сам поднимается выше
+  // подложки через z-index) и рядом плавающая карточка с текстом. Два
+  // шага: сначала общий смысл ("обитель Богов", наполнить знанием —
+  // помочь Васту Пуруше), потом прицельно Ратуша — тыкай сюда, дальше
+  // просто прохождение заданий. Ратуша к этому моменту уже сама
+  // пульсирует (status: active_pulse, она первая в UNLOCK_ORDER).
+  const TOUR_STEPS = [
+    {
+      text: 'Это обитель Богов. Твоя задача — наполнить её знанием и тем самым помочь Васту Пуруше: каждый освоенный храм — часть его тела, возвращённая к жизни.',
+      highlightId: null,
+    },
+    {
+      text: 'Начнём с Ратуши — она уже ждёт тебя. Дальше всё просто: открываешь здание, проходишь задание за заданием, и храм оживает.',
+      highlightId: 'surya',
+    },
+  ];
+
+  let tourActive = false;
+
+  const startVillageTour = (lessonKey, task) => {
+    if (tourActive) return;
+    tourActive = true;
+
+    let stepIndex = 0;
+    let highlightedEl = null;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'onboarding-overlay';
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'onboarding-tooltip';
+
+    const clearHighlight = () => {
+      if (highlightedEl) {
+        highlightedEl.classList.remove('onboarding-highlight');
+        highlightedEl = null;
+      }
+    };
+
+    const finish = () => {
+      clearHighlight();
+      overlay.remove();
+      tooltip.remove();
+      tourActive = false;
+      completeTask(lessonKey, task.id);
+      reactToTaskComplete();
+      rerenderCurrentLesson();
+    };
+
+    const renderStep = () => {
+      clearHighlight();
+      const step = TOUR_STEPS[stepIndex];
+      const isLast = stepIndex === TOUR_STEPS.length - 1;
+
+      tooltip.innerHTML = `
+        <p class="onboarding-text">${step.text}</p>
+        <button type="button" class="btn btn-primary onboarding-next">${isLast ? 'Понятно' : 'Далее'}</button>
+      `;
+      tooltip.style.left = '50%';
+      tooltip.style.top = '50%';
+      tooltip.style.transform = 'translate(-50%, -50%)';
+
+      if (step.highlightId) {
+        highlightedEl = stage.querySelector(`.village-building[data-building-id="${step.highlightId}"]`);
+        if (highlightedEl) {
+          highlightedEl.classList.add('onboarding-highlight');
+          const rect = highlightedEl.getBoundingClientRect();
+          tooltip.style.top = `${rect.bottom + 18}px`;
+          tooltip.style.left = `${rect.left + rect.width / 2}px`;
+          tooltip.style.transform = 'translateX(-50%)';
+        }
+      }
+
+      tooltip.querySelector('.onboarding-next').addEventListener('click', () => {
+        if (isLast) {
+          finish();
+        } else {
+          stepIndex += 1;
+          renderStep();
+        }
+      });
+    };
+
+    document.body.append(overlay, tooltip);
+    renderStep();
   };
 
   // Только рисунок (завал/здание) — сама карточка-кнопка. Подпись

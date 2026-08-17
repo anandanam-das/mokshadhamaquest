@@ -178,8 +178,17 @@ h3 {
   line-height: 1.6;
   color: #ffffff;
   max-width: 680px;
-  margin: 0 auto 30px;
+  margin: 0 auto;
   text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
+}
+
+.hero-roadmap {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  margin: 0 auto 30px;
+  border-radius: 10px;
+  box-shadow: 0 16px 40px rgba(10, 26, 46, 0.35);
 }
 
 .path-chain {
@@ -220,6 +229,18 @@ h3 {
 
 .section-inner {
   text-align: center;
+}
+
+.section-heading-quote {
+  font-family: 'Inter', sans-serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
+  line-height: 1.55;
+  max-width: 720px;
+  margin: 0 auto 20px;
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.3);
 }
 
 .section h2 {
