@@ -1377,16 +1377,41 @@ document.addEventListener('DOMContentLoaded', () => {
     stage.appendChild(el);
   };
 
+  const GROUND_TRANSITION_MS = 1800;
+
   // Ландшафт — один квадратный слой на всю сцену (Васту Пуруша уже
   // вклеен под ландшафтом в самой картинке). Рисуется всегда, даже до
   // открытия деревни. Пока карта не открыта, показываем не сам landscape,
   // а его туманную версию (cloud-cover.png), поверх которой плывут тучки.
-  const renderGroundLayers = (unlocked) => {
-    const ground = document.createElement('img');
-    ground.className = 'village-ground';
-    ground.src = unlocked ? 'assets/village/landscape.png' : 'assets/village/clouds/cloud-cover.png';
-    ground.alt = '';
-    stage.appendChild(ground);
+  //
+  // В момент самого открытия (justUnlocked) — не резкая подмена картинки,
+  // а кроссфейд через белый свет: старая (в тучах) высветляется и тает,
+  // новая (чистый landscape) одновременно проявляется из белого — задник
+  // для того, как тучи на внешнем слое (см. renderClouds) в это же время
+  // разлетаются в стороны.
+  const renderGroundLayers = (unlocked, justUnlocked) => {
+    if (!justUnlocked || prefersReducedMotion) {
+      const ground = document.createElement('img');
+      ground.className = 'village-ground';
+      ground.src = unlocked ? 'assets/village/landscape.png' : 'assets/village/clouds/cloud-cover.png';
+      ground.alt = '';
+      stage.appendChild(ground);
+      return;
+    }
+
+    const oldGround = document.createElement('img');
+    oldGround.className = 'village-ground village-ground-whiteout';
+    oldGround.src = 'assets/village/clouds/cloud-cover.png';
+    oldGround.alt = '';
+    stage.appendChild(oldGround);
+
+    const newGround = document.createElement('img');
+    newGround.className = 'village-ground village-ground-reveal';
+    newGround.src = 'assets/village/landscape.png';
+    newGround.alt = '';
+    stage.appendChild(newGround);
+
+    setTimeout(() => oldGround.remove(), GROUND_TRANSITION_MS);
   };
 
   // Карта открывается не по флагу "весь урок Введение завершён", а как
@@ -1461,7 +1486,10 @@ document.addEventListener('DOMContentLoaded', () => {
     stage.classList.remove('village-stage-empty');
 
     const mapUnlocked = isVillageMapUnlocked();
-    renderGroundLayers(mapUnlocked);
+    // Читаем cloudsDispersed ДО renderClouds — тот сам его выставит в
+    // true при первом же unlocked-рендере, а нам нужно узнать, что это
+    // именно тот, первый.
+    renderGroundLayers(mapUnlocked, mapUnlocked && !cloudsDispersed);
 
     if (!mapUnlocked) {
       stage.classList.add('village-stage-empty');

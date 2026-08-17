@@ -3314,6 +3314,8 @@ h3 {
   .village-cloud-puff-3,
   .village-cloud-puff-4,
   .village-cloud-puff-5,
+  .village-ground-whiteout,
+  .village-ground-reveal,
   .village-building-rubble-clear,
   .village-building-reveal {
     animation: none;
@@ -3363,6 +3365,50 @@ h3 {
   height: 100%;
   object-fit: cover;
   pointer-events: none;
+}
+
+/* Момент открытия карты: старая (в тучах) и новая (чистый landscape)
+   картинки на миг лежат друг на друге — старая высветляется до белого и
+   тает, новая одновременно проявляется из белого света. z-index держит
+   новую сверху, чтобы через прозрачные края старой не проглядывали швы. */
+.village-ground-whiteout {
+  z-index: 1;
+  animation: village-ground-whiteout 1.8s ease-in forwards;
+}
+
+.village-ground-reveal {
+  z-index: 2;
+  animation: village-ground-reveal 1.8s ease-out forwards;
+}
+
+@keyframes village-ground-whiteout {
+  0% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  55% {
+    opacity: 1;
+    filter: brightness(2.4);
+  }
+  100% {
+    opacity: 0;
+    filter: brightness(2.6);
+  }
+}
+
+@keyframes village-ground-reveal {
+  0% {
+    opacity: 0;
+    filter: brightness(3);
+  }
+  40% {
+    opacity: 0.2;
+    filter: brightness(3);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
 }
 
 /* Облачность поверх карты (лежит на cloud-cover.png — см. renderGroundLayers
