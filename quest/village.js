@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Порядок разблокировки зданий деревни: Ратуша первая, дальше по цепочке.
-  const UNLOCK_ORDER = ['surya', 'chandra', 'budha', 'guru', 'shani', 'ketu', 'rahu', 'mangala', 'shukra'];
+  const UNLOCK_ORDER = ['surya', 'chandra', 'mangala', 'budha', 'guru', 'shukra', 'shani', 'rahu', 'ketu'];
   const PLANET_TASK_IDS = ['watch_lecture', 'engine_1', 'engine_2', 'engine_3', 'engine_4', 'engine_5', 'engine_6'];
 
   const isPlanetFullyDone = (planetId) => {
