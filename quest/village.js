@@ -12,12 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const taskTypeIcons = {
-    video: '🎥',
-    phrase: '🗣️',
-    audio: '🎧',
-    quiz: '🧩',
-    image: '🖼️',
-    match: '🧭',
+    guna_video: '🎥',
+    guna_phrase: '🗣️',
+    guna_audio: '🎧',
+    guna_image: '🖼️',
+    planet_map_matching: '🧭',
     lecture_checkbox: '📺',
     matching: '🔗',
     find_error: '🔍',
@@ -52,7 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Порядок разблокировки зданий деревни: Ратуша первая, дальше по цепочке.
   const UNLOCK_ORDER = ['surya', 'chandra', 'mangala', 'budha', 'guru', 'shukra', 'shani', 'rahu', 'ketu'];
-  const PLANET_TASK_IDS = ['watch_lecture', 'engine_1', 'engine_2', 'engine_3', 'engine_4', 'engine_5', 'engine_6'];
+  const PLANET_TASK_IDS = [
+    'watch_lecture',
+    'engine_video',
+    'engine_phrase',
+    'engine_audio',
+    'engine_error',
+    'engine_image',
+    'engine_map',
+  ];
 
   const isPlanetFullyDone = (planetId) => {
     const progress = getTaskProgress(planetId);
@@ -1075,6 +1082,684 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.appendChild(wrap);
   };
 
+  // --- 6 движков планетного урока (Солнце и далее — та же структура,
+  // меняются только данные в PLANET_TASK_CONTENT). Общие кусочки:
+  // renderChoiceButtons (один вопрос, N кнопок-вариантов, повтор при
+  // ошибке) и renderDetailsReveal (тап открывает пункт: ✓/✗ + пояснение,
+  // без набора очков — это чтение с подсказками, а не тест).
+
+  const renderChoiceButtons = (container, question, options, onCorrect) => {
+    const q = document.createElement('p');
+    q.className = 'engine-step-question';
+    q.textContent = question;
+    container.appendChild(q);
+
+    const list = document.createElement('div');
+    list.className = 'engine-choice-list';
+    container.appendChild(list);
+
+    let settled = false;
+    options.forEach((opt) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'engine-choice-btn';
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => {
+        if (settled) return;
+        if (opt.correct) {
+          settled = true;
+          btn.classList.add('engine-choice-correct');
+          setTimeout(onCorrect, 700);
+        } else {
+          btn.classList.remove('engine-choice-shake');
+          // eslint-disable-next-line no-void
+          void btn.offsetWidth;
+          btn.classList.add('engine-choice-wrong', 'engine-choice-shake');
+        }
+      });
+      list.appendChild(btn);
+    });
+  };
+
+  const renderDetailsReveal = (container, details, onDone) => {
+    const list = document.createElement('div');
+    list.className = 'engine-details-list';
+    container.appendChild(list);
+
+    const shuffled = shuffle(details);
+    const correctTotal = shuffled.filter((d) => d.kind === 'correct').length;
+
+    const hint = document.createElement('p');
+    hint.className = 'engine-details-hint';
+
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'btn btn-primary engine-details-next';
+    nextBtn.textContent = 'Дальше';
+    nextBtn.disabled = true;
+
+    let revealedCorrectCount = 0;
+    const updateHint = () => {
+      hint.textContent =
+        revealedCorrectCount === correctTotal
+          ? ''
+          : `Найди верные признаки среди пунктов (${revealedCorrectCount} из ${correctTotal})`;
+    };
+    updateHint();
+
+    shuffled.forEach((detail) => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'engine-detail-item';
+      const text = document.createElement('span');
+      text.className = 'engine-detail-text';
+      text.textContent = detail.text;
+      item.appendChild(text);
+
+      item.addEventListener('click', () => {
+        if (item.classList.contains('revealed')) return;
+        item.classList.add('revealed', `kind-${detail.kind}`);
+        const mark = document.createElement('span');
+        mark.className = 'engine-detail-mark';
+        mark.textContent = detail.kind === 'correct' ? '✓' : '✗';
+        item.prepend(mark);
+        if (detail.note) {
+          const note = document.createElement('span');
+          note.className = 'engine-detail-note';
+          note.textContent = detail.note;
+          item.appendChild(note);
+        }
+        if (detail.kind === 'correct') revealedCorrectCount += 1;
+        updateHint();
+        if (revealedCorrectCount === correctTotal) nextBtn.disabled = false;
+      });
+      list.appendChild(item);
+    });
+
+    container.append(hint, nextBtn);
+    nextBtn.addEventListener('click', onDone);
+  };
+
+  // Плеер: video — iframe для youtube/vimeo, иначе обычный <video>; audio —
+  // минимальный кастомный плеер (play/pause + прогресс-бар), потому что
+  // голый браузерный <audio controls> визуально чужероден интерфейсу.
+  const renderMediaPlayer = (container, clip, mediaKind) => {
+    if (mediaKind === 'video') {
+      const isEmbed = /youtube\.com|vimeo\.com|mediadelivery\.net/.test(clip.videoUrl);
+      if (isEmbed) {
+        const iframe = document.createElement('iframe');
+        iframe.className = 'engine-video-frame';
+        iframe.src = clip.videoUrl;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
+        iframe.allowFullscreen = true;
+        container.appendChild(iframe);
+      } else {
+        const video = document.createElement('video');
+        video.className = 'engine-video-frame';
+        video.src = clip.videoUrl;
+        video.controls = true;
+        container.appendChild(video);
+      }
+      return;
+    }
+
+    const player = document.createElement('div');
+    player.className = 'audio-player';
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'audio-player-toggle';
+    toggleBtn.textContent = '▶';
+
+    const bar = document.createElement('div');
+    bar.className = 'audio-player-bar';
+    const fill = document.createElement('div');
+    fill.className = 'audio-player-fill';
+    bar.appendChild(fill);
+
+    const time = document.createElement('span');
+    time.className = 'audio-player-time';
+    time.textContent = '0:00';
+
+    player.append(toggleBtn, bar, time);
+    container.appendChild(player);
+
+    const audio = new Audio(clip.audioUrl);
+    const formatTime = (seconds) => {
+      if (!isFinite(seconds) || seconds < 0) return '0:00';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    };
+
+    toggleBtn.addEventListener('click', () => {
+      if (audio.paused) {
+        audio.play();
+        toggleBtn.textContent = '❚❚';
+      } else {
+        audio.pause();
+        toggleBtn.textContent = '▶';
+      }
+    });
+    audio.addEventListener('timeupdate', () => {
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      fill.style.width = `${pct}%`;
+      time.textContent = formatTime(audio.duration - audio.currentTime);
+    });
+    audio.addEventListener('ended', () => {
+      toggleBtn.textContent = '▶';
+      fill.style.width = '0%';
+    });
+    bar.addEventListener('click', (e) => {
+      if (!audio.duration) return;
+      const rect = bar.getBoundingClientRect();
+      const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+      audio.currentTime = ratio * audio.duration;
+    });
+  };
+
+  // "Три лика ..." (guna_video) и "Голос трёх начал" (guna_audio) — одна и
+  // та же 4-шаговая механика (медиа → Гуна → Причина → Детали), три клипа
+  // подряд в перемешанном порядке. mediaKind различает только сам плеер.
+  const renderGunaMediaTask = (lessonKey, task, data, mediaKind) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = data.introText;
+
+    const progress = document.createElement('p');
+    progress.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(intro, progress, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const clips = shuffle(data.clips || data.recordings);
+    let index = 0;
+
+    const showClip = () => {
+      stage.innerHTML = '';
+      progress.textContent = `${index + 1} из ${clips.length}`;
+      const clip = clips[index];
+
+      const media = document.createElement('div');
+      media.className = 'engine-media';
+      renderMediaPlayer(media, clip, mediaKind);
+      stage.appendChild(media);
+
+      const continueBtn = document.createElement('button');
+      continueBtn.type = 'button';
+      continueBtn.className = 'btn btn-primary';
+      continueBtn.textContent = mediaKind === 'video' ? 'Я посмотрел, дальше' : 'Я послушал, дальше';
+      continueBtn.addEventListener('click', () => showStepA(clip));
+      stage.appendChild(continueBtn);
+    };
+
+    const showStepA = (clip) => {
+      stage.innerHTML = '';
+      const step = document.createElement('div');
+      step.className = 'engine-step';
+      stage.appendChild(step);
+      const noun = mediaKind === 'video' ? 'видео' : 'рассказе';
+      renderChoiceButtons(
+        step,
+        `Какая гуна проявлена в этом ${noun}?`,
+        shuffle(GUNA_ORDER.map((g) => ({ text: g, correct: g === clip.guna }))),
+        () => showStepB(clip)
+      );
+    };
+
+    const showStepB = (clip) => {
+      stage.innerHTML = '';
+      const step = document.createElement('div');
+      step.className = 'engine-step';
+      stage.appendChild(step);
+      renderChoiceButtons(
+        step,
+        'Почему именно эта гуна?',
+        shuffle(GUNA_REASON_OPTIONS.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
+        () => showStepC(clip)
+      );
+    };
+
+    const showStepC = (clip) => {
+      stage.innerHTML = '';
+      const label = document.createElement('p');
+      label.className = 'engine-step-question';
+      label.textContent = 'Разбери детали — что подтверждает эту гуну, а что нет:';
+      stage.appendChild(label);
+
+      const refText = clip.transcript ? `«${clip.transcript}»` : clip.source;
+      if (refText) {
+        const ref = document.createElement('p');
+        ref.className = 'engine-transcript';
+        ref.textContent = refText;
+        stage.appendChild(ref);
+      }
+
+      renderDetailsReveal(stage, clip.details, () => {
+        index += 1;
+        if (index < clips.length) {
+          showClip();
+        } else {
+          completeTask(lessonKey, task.id);
+          reactToTaskComplete();
+          rerenderCurrentLesson();
+        }
+      });
+    };
+
+    showClip();
+  };
+
+  // Лайтбокс: клик по картинке в "Окне в иной век" открывает её крупно
+  // поверх всего, чтобы можно было рассмотреть детали кадра перед разбором.
+  const openImageLightbox = (src, alt) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'image-lightbox-overlay';
+
+    const img = document.createElement('img');
+    img.className = 'image-lightbox-image';
+    img.src = src;
+    img.alt = alt || '';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'image-lightbox-close';
+    closeBtn.setAttribute('aria-label', 'Закрыть');
+    closeBtn.textContent = '×';
+
+    const onKeydown = (e) => {
+      if (e.key === 'Escape') close();
+    };
+    const close = () => {
+      overlay.remove();
+      document.removeEventListener('keydown', onKeydown);
+    };
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+    closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', onKeydown);
+
+    overlay.append(img, closeBtn);
+    document.body.appendChild(overlay);
+  };
+
+  // "Окно в иной век" (guna_image) — та же механика, но короче: медиа →
+  // Гуна → Детали, без шага "Причина".
+  const renderGunaImageTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = data.introText;
+
+    const progress = document.createElement('p');
+    progress.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(intro, progress, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const cards = shuffle(data.cards);
+    let index = 0;
+
+    const showCard = () => {
+      stage.innerHTML = '';
+      progress.textContent = `${index + 1} из ${cards.length}`;
+      const card = cards[index];
+
+      const media = document.createElement('div');
+      media.className = 'engine-media';
+      const img = document.createElement('img');
+      img.className = 'engine-image-frame';
+      img.src = card.imageUrl;
+      img.alt = card.setting || '';
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.setAttribute('aria-label', 'Увеличить изображение');
+      img.addEventListener('click', () => openImageLightbox(card.imageUrl, card.setting));
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openImageLightbox(card.imageUrl, card.setting);
+        }
+      });
+      media.appendChild(img);
+      if (card.setting) {
+        const caption = document.createElement('p');
+        caption.className = 'engine-image-caption';
+        caption.textContent = card.setting;
+        media.appendChild(caption);
+      }
+      stage.appendChild(media);
+
+      const step = document.createElement('div');
+      step.className = 'engine-step';
+      stage.appendChild(step);
+      renderChoiceButtons(
+        step,
+        'Какая гуна проявлена на этой картинке?',
+        shuffle(GUNA_ORDER.map((g) => ({ text: g, correct: g === card.guna }))),
+        () => showDetails(card)
+      );
+    };
+
+    const showDetails = (card) => {
+      stage.innerHTML = '';
+      const label = document.createElement('p');
+      label.className = 'engine-step-question';
+      label.textContent = 'Разбери детали изображения:';
+      stage.appendChild(label);
+
+      renderDetailsReveal(stage, card.details, () => {
+        index += 1;
+        if (index < cards.length) {
+          showCard();
+        } else {
+          completeTask(lessonKey, task.id);
+          reactToTaskComplete();
+          rerenderCurrentLesson();
+        }
+      });
+    };
+
+    showCard();
+  };
+
+  // "Слово гуны" (guna_phrase) — фраза на экране, тап по одной из трёх
+  // кнопок-гун, общий таймер на всё задание (без штрафов за ошибку —
+  // просто показывается верная гуна и задание идёт дальше).
+  const renderGunaPhraseTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = 'Тапни по гуне, которая проявлена во фразе. Время ограничено.';
+
+    const timerEl = document.createElement('p');
+    timerEl.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(intro, timerEl, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const phrases = shuffle(data.phrases);
+    let index = 0;
+    let secondsLeft = data.timerSeconds;
+    let finished = false;
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      clearInterval(timerId);
+      completeTask(lessonKey, task.id);
+      reactToTaskComplete();
+      rerenderCurrentLesson();
+    };
+
+    timerEl.textContent = `Осталось: ${secondsLeft} сек`;
+    const timerId = setInterval(() => {
+      secondsLeft -= 1;
+      timerEl.textContent = `Осталось: ${Math.max(secondsLeft, 0)} сек`;
+      if (secondsLeft <= 0) finish();
+    }, 1000);
+
+    const showPhrase = () => {
+      if (finished) return;
+      stage.innerHTML = '';
+      const phraseEl = document.createElement('p');
+      phraseEl.className = 'engine-phrase-text';
+      phraseEl.textContent = `«${phrases[index].text}»`;
+      stage.appendChild(phraseEl);
+
+      const buttons = document.createElement('div');
+      buttons.className = 'engine-choice-list';
+      stage.appendChild(buttons);
+
+      let answered = false;
+      GUNA_ORDER.forEach((guna) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'engine-choice-btn';
+        btn.textContent = guna;
+        btn.addEventListener('click', () => {
+          if (answered || finished) return;
+          answered = true;
+          const correct = guna === phrases[index].guna;
+          btn.classList.add(correct ? 'engine-choice-correct' : 'engine-choice-wrong');
+          if (!correct) {
+            buttons.querySelectorAll('.engine-choice-btn').forEach((b) => {
+              if (b.textContent === phrases[index].guna) b.classList.add('engine-choice-correct');
+            });
+          }
+          setTimeout(() => {
+            index += 1;
+            if (index < phrases.length) showPhrase();
+            else finish();
+          }, 650);
+        });
+        buttons.appendChild(btn);
+      });
+    };
+
+    showPhrase();
+  };
+
+  // "Изъян в писании" (find_error у движков — обычный тест "выбери 1 из 4",
+  // не цветок с лепестками: та механика была специфична для task_2).
+  const renderFindErrorEngineTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const progress = document.createElement('p');
+    progress.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(progress, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const questions = shuffle(data.questions);
+    let index = 0;
+
+    const showQuestion = () => {
+      stage.innerHTML = '';
+      progress.textContent = `Вопрос ${index + 1} из ${questions.length}`;
+      const q = questions[index];
+
+      const statement = document.createElement('p');
+      statement.className = 'engine-step-question';
+      statement.textContent = `«${q.statement}»`;
+      stage.appendChild(statement);
+
+      const list = document.createElement('div');
+      list.className = 'engine-choice-list engine-choice-list-vertical';
+      stage.appendChild(list);
+
+      let settled = false;
+      let correctBtn = null;
+      const entries = shuffle(q.options).map((opt) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'engine-choice-btn';
+        btn.textContent = opt.text;
+        if (opt.correct) correctBtn = btn;
+        list.appendChild(btn);
+        return { btn, opt };
+      });
+
+      entries.forEach(({ btn, opt }) => {
+        btn.addEventListener('click', () => {
+          if (settled) return;
+          settled = true;
+          btn.classList.add(opt.correct ? 'engine-choice-correct' : 'engine-choice-wrong');
+          if (!opt.correct) correctBtn.classList.add('engine-choice-correct');
+
+          const nextBtn = document.createElement('button');
+          nextBtn.type = 'button';
+          nextBtn.className = 'btn btn-primary engine-details-next';
+          nextBtn.textContent = index === questions.length - 1 ? 'Завершить' : 'Дальше';
+          nextBtn.addEventListener('click', () => {
+            index += 1;
+            if (index < questions.length) {
+              showQuestion();
+            } else {
+              completeTask(lessonKey, task.id);
+              reactToTaskComplete();
+              rerenderCurrentLesson();
+            }
+          });
+          stage.appendChild(nextBtn);
+        });
+      });
+    };
+
+    showQuestion();
+  };
+
+  // "Карта звёздного покровителя" (planet_map_matching) — 8 подписанных
+  // категорий-слотов и вперемешку карточки: по одной верной на категорию
+  // + дистракторы (верные ответы для ДРУГИХ планет), чтобы нельзя было
+  // пройти на угадывании "куда влезет" без знания сути. Драг-н-дроп + тап,
+  // как в "Гении кулинарии".
+  const renderPlanetMapTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task map-match-task';
+
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent =
+      'Собери карту звёздного покровителя: перетащи (или тапни, затем тапни категорию) верную карточку на её место. Среди карточек есть и чужие — ответы других планет.';
+
+    const categoriesEl = document.createElement('div');
+    categoriesEl.className = 'map-match-categories';
+
+    const poolEl = document.createElement('div');
+    poolEl.className = 'map-match-pool';
+
+    wrap.append(intro, categoriesEl, poolEl);
+    taskContentPanel.appendChild(wrap);
+
+    let cardSeq = 0;
+    const cards = [];
+    data.categories.forEach((cat) => {
+      cards.push({ uid: `c${cardSeq += 1}`, text: cat.correct, categoryId: cat.id, correct: true });
+      cat.distractors.forEach((text) => {
+        cards.push({ uid: `c${cardSeq += 1}`, text, categoryId: cat.id, correct: false });
+      });
+    });
+
+    const filled = new Set();
+    let selectedUid = null;
+    const cardEls = {};
+    const slotEls = {};
+
+    const clearSelection = () => {
+      selectedUid = null;
+      Object.values(cardEls).forEach((el) => el.classList.remove('map-match-card-selected'));
+    };
+
+    const attemptPlace = (uid, categoryId) => {
+      if (!uid || filled.has(categoryId) || !cardEls[uid]) return;
+      const card = cards.find((c) => c.uid === uid);
+
+      if (card.correct && card.categoryId === categoryId) {
+        filled.add(categoryId);
+        const slot = slotEls[categoryId];
+        slot.classList.add('map-match-slot-filled');
+        const valueEl = slot.querySelector('.map-match-slot-value');
+        valueEl.textContent = card.text;
+        valueEl.hidden = false;
+        cardEls[uid].remove();
+        delete cardEls[uid];
+        clearSelection();
+
+        if (filled.size === data.categories.length) {
+          completeTask(lessonKey, task.id);
+          reactToTaskComplete();
+          rerenderCurrentLesson();
+        }
+      } else {
+        const slot = slotEls[categoryId];
+        slot.classList.remove('map-match-slot-shake');
+        // eslint-disable-next-line no-void
+        void slot.offsetWidth;
+        slot.classList.add('map-match-slot-shake');
+        clearSelection();
+      }
+    };
+
+    data.categories.forEach((cat) => {
+      const slot = document.createElement('div');
+      slot.className = 'map-match-slot';
+
+      const label = document.createElement('div');
+      label.className = 'map-match-slot-label';
+      label.textContent = cat.label;
+
+      const value = document.createElement('div');
+      value.className = 'map-match-slot-value';
+      value.hidden = true;
+
+      slot.append(label, value);
+
+      slot.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!filled.has(cat.id)) slot.classList.add('map-match-slot-hover');
+      });
+      slot.addEventListener('dragleave', () => slot.classList.remove('map-match-slot-hover'));
+      slot.addEventListener('drop', (e) => {
+        e.preventDefault();
+        slot.classList.remove('map-match-slot-hover');
+        attemptPlace(e.dataTransfer.getData('text/plain'), cat.id);
+      });
+      slot.addEventListener('click', () => {
+        if (filled.has(cat.id) || !selectedUid) return;
+        attemptPlace(selectedUid, cat.id);
+      });
+
+      slotEls[cat.id] = slot;
+      categoriesEl.appendChild(slot);
+    });
+
+    shuffle(cards).forEach((card) => {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'map-match-card';
+      el.textContent = card.text;
+      el.draggable = true;
+      el.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', card.uid);
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      el.addEventListener('click', () => {
+        if (selectedUid === card.uid) {
+          clearSelection();
+          return;
+        }
+        clearSelection();
+        selectedUid = card.uid;
+        el.classList.add('map-match-card-selected');
+      });
+      cardEls[card.uid] = el;
+      poolEl.appendChild(el);
+    });
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -1123,6 +1808,18 @@ document.addEventListener('DOMContentLoaded', () => {
       renderDragTask(lessonKey, task, task3Data);
     } else if (task.id === 'task_4' && task.type === 'layered_map') {
       renderLayeredMapTask(lessonKey, task, task4Data);
+    } else if (task.id === 'engine_video' && task.type === 'guna_video') {
+      renderGunaMediaTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].videoTask, 'video');
+    } else if (task.id === 'engine_phrase' && task.type === 'guna_phrase') {
+      renderGunaPhraseTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].phraseTask);
+    } else if (task.id === 'engine_audio' && task.type === 'guna_audio') {
+      renderGunaMediaTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].audioTask, 'audio');
+    } else if (task.id === 'engine_error' && task.type === 'find_error') {
+      renderFindErrorEngineTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].findErrorTask);
+    } else if (task.id === 'engine_image' && task.type === 'guna_image') {
+      renderGunaImageTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].imageTask);
+    } else if (task.id === 'engine_map' && task.type === 'planet_map_matching') {
+      renderPlanetMapTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].mapTask);
     } else if (task.type === 'guided_tour') {
       taskContentPanel.innerHTML = `<p class="task-content-text">Обзор обители идёт прямо на карте слева.</p>`;
       startVillageTour(lessonKey, task);

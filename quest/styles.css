@@ -3317,7 +3317,10 @@ h3 {
   .village-ground-whiteout,
   .village-ground-reveal,
   .village-building-rubble-clear,
-  .village-building-reveal {
+  .village-building-reveal,
+  .engine-choice-shake,
+  .map-match-slot-shake,
+  .image-lightbox-overlay {
     animation: none;
     transition: none;
   }
@@ -3737,4 +3740,441 @@ h3 {
    из .onboarding-highlight как есть. */
 .village-building.onboarding-highlight {
   position: absolute;
+}
+
+/* --- Планетные движки (урок "Солнце" и далее): видео/аудио/картинка на
+   гуну, фраза-гуна, тест "изъян в писании", карта звёздного покровителя.
+   Общий язык — та же карточная эстетика, что у .cook-card/.cook-container
+   (border #e3ece8, bg #fbfdfa, зелёный #5bd1a0 = верно, красный #e2685f =
+   неверно), чтобы всё выглядело одним набором заданий, а не разными. */
+
+.engine-task {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.engine-stage {
+  display: grid;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
+}
+
+.engine-media {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.engine-video-frame {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  border: 1px solid #e3ece8;
+  background: #10141c;
+}
+
+.engine-image-frame {
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  border: 1px solid #e3ece8;
+  object-fit: cover;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.engine-image-frame:hover {
+  transform: scale(1.015);
+}
+
+.image-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  box-sizing: border-box;
+  background: rgba(10, 14, 20, 0.86);
+  animation: image-lightbox-fade-in 0.15s ease;
+}
+
+@keyframes image-lightbox-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.image-lightbox-image {
+  max-width: min(92vw, 1100px);
+  max-height: 88vh;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  object-fit: contain;
+  cursor: default;
+}
+
+.image-lightbox-close {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1a2130;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.engine-image-caption {
+  margin: 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.engine-step {
+  width: 100%;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+.engine-step-question {
+  margin: 0;
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.08rem;
+}
+
+.engine-transcript {
+  margin: 0;
+  max-width: 640px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.engine-choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.engine-choice-list-vertical {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 560px;
+}
+
+.engine-choice-btn {
+  font: inherit;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.engine-choice-btn:hover {
+  transform: translateY(-2px);
+}
+
+.engine-choice-correct {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.18);
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+}
+
+.engine-choice-wrong {
+  border-color: #e2685f;
+  background: rgba(226, 104, 95, 0.14);
+}
+
+.engine-choice-shake {
+  animation: engine-choice-shake 0.4s ease;
+}
+
+@keyframes engine-choice-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.engine-details-list {
+  width: 100%;
+  max-width: 640px;
+  display: grid;
+  gap: 10px;
+}
+
+.engine-detail-item {
+  font: inherit;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px dashed rgba(96, 197, 255, 0.3);
+  background: rgba(96, 197, 255, 0.06);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.engine-detail-item.revealed {
+  cursor: default;
+  border-style: solid;
+}
+
+.engine-detail-item.kind-correct {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.14);
+}
+
+.engine-detail-item.kind-trap,
+.engine-detail-item.kind-distractor {
+  border-color: #e2685f;
+  background: rgba(226, 104, 95, 0.1);
+}
+
+.engine-detail-item.kind-neutral {
+  border-color: rgba(103, 112, 137, 0.35);
+  background: rgba(103, 112, 137, 0.08);
+}
+
+.engine-detail-mark {
+  flex-shrink: 0;
+  font-weight: 800;
+}
+
+.engine-detail-item.kind-correct .engine-detail-mark {
+  color: #2f9e6e;
+}
+
+.engine-detail-item.kind-trap .engine-detail-mark,
+.engine-detail-item.kind-distractor .engine-detail-mark {
+  color: #c8453b;
+}
+
+.engine-detail-text {
+  flex: 1 1 auto;
+}
+
+.engine-detail-note {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-style: italic;
+}
+
+.engine-details-hint {
+  margin: 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.engine-details-hint:empty {
+  display: none;
+}
+
+.engine-details-next {
+  justify-self: center;
+}
+
+.engine-details-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.engine-phrase-text {
+  margin: 0;
+  max-width: 560px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+/* --- Минимальный кастомный аудио-плеер для "Голоса трёх начал" — не
+   голый <audio controls>, который выглядит инородно рядом с остальным
+   интерфейсом. */
+
+.audio-player {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+}
+
+.audio-player-toggle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #86b85c, #4f8e39);
+  color: #ffffff;
+  font-size: 1.1rem;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.18s ease;
+}
+
+.audio-player-toggle:hover {
+  transform: scale(1.06);
+}
+
+.audio-player-bar {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(96, 197, 255, 0.18);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.audio-player-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60c5ff, #4f8e39);
+}
+
+.audio-player-time {
+  flex-shrink: 0;
+  min-width: 42px;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* --- "Карта звёздного покровителя" — категории-слоты слева/сверху,
+   перемешанный пул карточек (верные + чужие-дистракторы) снизу. Тот же
+   drag+tap паттерн, что у .cook-card/.cook-container. */
+
+.map-match-task {
+  max-width: 960px;
+  display: grid;
+  gap: 22px;
+}
+
+.map-match-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.map-match-slot {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid #e3ece8;
+  background: #fbfdfa;
+  min-height: 68px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.map-match-slot-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-2);
+}
+
+.map-match-slot-value {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.map-match-slot-hover {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.1);
+}
+
+.map-match-slot-filled {
+  border-color: #89d5a9;
+  background: rgba(145, 226, 178, 0.16);
+}
+
+.map-match-slot-shake {
+  animation: map-match-slot-shake 0.4s ease;
+}
+
+@keyframes map-match-slot-shake {
+  0%, 100% {
+    transform: translateX(0);
+    border-color: #e3ece8;
+  }
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+  40% {
+    border-color: #e2685f;
+    background: rgba(226, 104, 95, 0.14);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.map-match-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(96, 197, 255, 0.06);
+  border: 1px dashed rgba(96, 197, 255, 0.3);
+  min-height: 56px;
+}
+
+.map-match-card {
+  font: inherit;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+  color: var(--text);
+  cursor: grab;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.map-match-card:active {
+  cursor: grabbing;
+}
+
+.map-match-card-selected {
+  border-color: #5bd1a0;
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+  transform: translateY(-2px);
 }

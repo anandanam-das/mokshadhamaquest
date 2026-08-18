@@ -59,12 +59,12 @@ const getEngineTasksForPlanet = (planetGrahaTitle) => {
   const genitive = genitiveCase[planetGrahaTitle] || planetGrahaTitle;
   return [
     LECTURE_TASK,
-    { id: 'engine_1', type: 'video', title: `Три лика ${genitive} (разбор видений)` },
-    { id: 'engine_2', type: 'phrase', title: 'Слово гуны (быстрый выбор)' },
-    { id: 'engine_3', type: 'audio', title: 'Голос трёх начал (слушай и различай)' },
-    { id: 'engine_4', type: 'quiz', title: 'Изъян в писании (найди ошибку)' },
-    { id: 'engine_5', type: 'image', title: 'Зеркало времён (распознай гуну)' },
-    { id: 'engine_6', type: 'match', title: 'Карта звёздного покровителя (собери знания)' },
+    { id: 'engine_video', type: 'guna_video', title: `Три лика ${genitive}` },
+    { id: 'engine_phrase', type: 'guna_phrase', title: 'Слово гуны' },
+    { id: 'engine_audio', type: 'guna_audio', title: 'Голос трёх начал' },
+    { id: 'engine_error', type: 'find_error', title: 'Изъян в писании' },
+    { id: 'engine_image', type: 'guna_image', title: 'Окно в иной век' },
+    { id: 'engine_map', type: 'planet_map_matching', title: 'Карта звёздного покровителя' },
   ];
 };
 
