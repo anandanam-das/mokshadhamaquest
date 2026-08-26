@@ -14,290 +14,264 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css" />
+    <link rel="stylesheet" href="landing.css?v=7" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
 
     <header class="site-header">
-      <div class="site-header-inner">
-        <span class="brand">MOKSHA EDUCATION</span>
-        <a href="/quest/" class="btn btn-primary btn-compact">Начать обучение</a>
-      </div>
+      <nav class="site-header-inner">
+        <a href="#teacher" class="nav-pill">О преподавателе</a>
+        <a href="#practice" class="nav-pill">Из чего состоит курс</a>
+        <a href="#depth" class="nav-pill">Особенность обучения</a>
+        <a href="#pricing" class="nav-pill nav-pill-primary">Начать приключение</a>
+      </nav>
     </header>
 
     <main>
-      <!-- 1. Первый экран (только заголовок — остаётся на месте) -->
+      <!-- Hero -->
       <section class="hero">
         <div class="hero-inner">
-          <p class="eyebrow">MOKSHA EDUCATION</p>
-          <h1>Джйотиш, который не нужно заучивать</h1>
-          <p class="hero-lead">
-            Большинство сложностей в джйотиш начинается тогда, когда нужно соединить сотни отдельных
-            значений в одну трактовку. Поэтому мы идём от простого к сложному, и каждый новый уровень
-            накладывается на предыдущий:
-          </p>
+          <div class="hero-text">
+            <h1 class="pixel-heading">Джйотиш</h1>
+            <p class="hero-sub pixel-heading">который не нужно заучивать</p>
+            <p class="hero-lead">
+              Мы создали систему обучения джйотиш через игру. Вы становитесь персонажем,
+              олицетворяющим планету, проживаете сюжет, изучаете древние науки, выполняете
+              интерактивные практические задания и постепенно открываете целый мир планет и
+              божеств.
+            </p>
+            <a href="/quest/create-character.html" class="btn btn-primary btn-large">Выбрать персонажа</a>
+          </div>
+          <div class="hero-scene">
+            <img
+              class="hero-scene-float"
+              src="/assets/illustrations/hero-scene.png"
+              alt="Деревня джйотиш-мира на фоне гигантского Сатурна"
+              loading="eager"
+            />
+          </div>
+        </div>
+
+        <div class="hero-cat-strip">
+          <div class="hero-cat-track" id="cat-track">
+            <div class="cat-patrol" id="cat-patrol">
+              <img
+                id="cat-walk-img"
+                class="cat-walk-frame"
+                src="/assets/illustrations/cat-walk-1.png"
+                alt="Спутник-кот MOKSHA идёт рядом"
+                loading="eager"
+                data-frames="/assets/illustrations/cat-walk-1.png,/assets/illustrations/cat-walk-2.png,/assets/illustrations/cat-walk-3.png"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- 2. Главное отличие (переставлено на первое место) -->
-      <section class="section">
+      <!-- Course fit -->
+      <section class="section section-center">
         <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">Главное отличие</p>
-          <h2 class="section-heading-quote">
-            «Мы создали игровую форму обучения, где внимание не нужно удерживать усилием — оно приходит
-            само, потому что процесс живой и увлекательный. Игра пробуждает внутреннего ребёнка, а через
-            яркие, продуманные образы знание закладывается без зубрёжки — просто остаётся с вами.»
+          <h2 class="pixel-heading" style="color:#fff; text-shadow:0 2px 6px rgba(19,42,68,.35); font-size:clamp(1.1rem,2.6vw,1.6rem);">
+            Этот курс подойдёт вам, если:
           </h2>
 
-          <p class="section-closing">
-            Уже после первых этапов вы начинаете самостоятельно собирать трактовки, а не искать готовые
-            значения сочетаний.
-          </p>
-        </div>
-      </section>
-
-      <!-- 1b. Дорожная карта (тело первого блока, переставлено на второе место) -->
-      <section class="section">
-        <div class="section-inner">
-          <div class="layer-grid">
-            <div class="layer-card">
-              <span class="layer-index">01</span>
-              <h3>Планета</h3>
-              <p>Что за сила?</p>
-            </div>
-            <div class="layer-card">
-              <span class="layer-index">02</span>
-              <h3>Знак</h3>
-              <p>Как она проявляется?</p>
-            </div>
-            <div class="layer-card">
-              <span class="layer-index">03</span>
-              <h3>Дом</h3>
-              <p>Где она реализуется?</p>
-            </div>
-            <div class="layer-card">
-              <span class="layer-index">04</span>
-              <h3>Связи</h3>
-              <p>Как взаимодействует с остальной картой?</p>
-            </div>
-          </div>
-
-          <p class="hero-sub">От первых принципов до самостоятельного глубокого чтения натальной карты.</p>
-
-          <a href="/quest/" class="btn btn-primary btn-large">Начать обучение</a>
-        </div>
-      </section>
-
-      <!-- 2.5. Второй слой глубины -->
-      <section class="section section-depth">
-        <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">Глубина</p>
-          <h2>Но это только первый слой</h2>
-          <p class="section-lead">
-            Сначала вы учитесь видеть основу карты: какая сила действует, как она проявляется, где
-            реализуется и с чем взаимодействует.
-          </p>
-          <p class="section-lead">А затем мы увеличиваем глубину восприятия.</p>
-
-          <div class="layer-grid layer-grid-3">
-            <div class="layer-card">
-              <span class="layer-index">05</span>
-              <h3>Накшатры</h3>
+          <div class="fit-grid">
+            <div class="fit-card">
+              <img class="fit-card-img" src="/assets/illustrations/fit-card-1.png" alt="" loading="lazy" />
               <p>
-                Исследуем более тонкую природу планетарной энергии — её импульс, развитие и внутреннее
-                содержание.
+                Вы уже пробовали изучать джйотиш, но застряли в бесконечных таблицах значений и не
+                можете сложить их в целостную трактовку
               </p>
             </div>
-            <div class="layer-card">
-              <span class="layer-index">06</span>
-              <h3>Пады и Навамша</h3>
-              <p>Идём ещё глубже и учимся различать более точные оттенки и результаты проявления каждой энергии.</p>
-            </div>
-            <div class="layer-card">
-              <span class="layer-index">07</span>
-              <h3>Глубокая практика</h3>
+            <div class="fit-card">
+              <img class="fit-card-img" src="/assets/illustrations/fit-card-2.png" alt="" loading="lazy" />
               <p>
-                Возвращаемся к карте уже с новым уровнем видения — снова учимся связывать всё воедино, но
-                теперь значительно глубже и точнее.
+                Вам важно не запомнить, а понять принцип — чтобы самостоятельно читать любую
+                натальную карту, а не искать готовые ответы.
+              </p>
+            </div>
+            <div class="fit-card">
+              <img class="fit-card-img" src="/assets/illustrations/fit-card-3.png" alt="" loading="lazy" />
+              <p>
+                Вы только начинаете и не хотите зубрить сотни готовых комбинаций «планета в доме»
               </p>
             </div>
           </div>
-
-          <p class="section-closing section-closing-large">
-            С каждым этапом карта не становится сложнее — она становится глубже.
-          </p>
-
-          <div class="depth-diagram">
-            <div class="depth-row">
-              <ol class="path-chain">
-                <li>Планеты</li>
-                <li>Знаки</li>
-                <li>Дома</li>
-                <li>Связи</li>
-              </ol>
-              <span class="depth-caption">учимся видеть структуру</span>
-            </div>
-            <div class="depth-arrow" aria-hidden="true">↓</div>
-            <div class="depth-row">
-              <ol class="path-chain">
-                <li>Накшатры</li>
-                <li>Пады и Навамша</li>
-                <li>Практика</li>
-              </ol>
-              <span class="depth-caption">учимся видеть глубину</span>
-            </div>
-          </div>
         </div>
       </section>
 
-      <!-- 2.6. Дорожная карта (картинка), отдельный блок после "Глубина" -->
+      <!-- Difference / key -->
       <section class="section">
         <div class="section-inner">
-          <img
-            class="hero-roadmap"
-            src="/assets/roadmap.png"
-            alt="Дорожная карта обучения джйотиш: мы создали последовательную систему обучения, в которой вы не запоминаете тысячи готовых трактовок, а учитесь понимать, как устроена карта. Путь: Планеты → Знаки → Дома → Связи → Накшатры → Навамша → Практика."
-          />
-        </div>
-      </section>
+          <div class="difference-grid">
+            <div>
+              <h2 class="pixel-heading difference-heading">
+                Большинство сложностей в джйотиш начинается
+                <span class="hl">не с нехватки знаний</span>, а в тот момент, когда нужно
+                соединить <span class="hl">сотни отдельных значений</span> в одну
+                <span class="hl">целостную трактовку.</span>
+              </h2>
 
-      <!-- 3. Игра -->
-      <section class="section section-game">
-        <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">И да — это ещё и настоящая игра</p>
-          <h2>Изучайте джйотиш внутри собственного мира</h2>
-          <p class="section-lead">
-            В обучение встроена полноценная пиксельная игра. Вы выбираете одного из девяти
-            персонажей-планет, исследуете мир, взаимодействуете с ним, открываете здания и новые
-            территории.
-          </p>
+              <p class="difference-text">
+                Можно выучить характеристики планет, знаков, домов и накшатр — но, открывая
+                реальную натальную карту, снова не понимать, с чего начать и как связать всё это
+                между собой.
+              </p>
+              <p class="difference-text">
+                В результате знания остаются <strong>разрозненными</strong>: значения приходится
+                постоянно вспоминать или искать в таблицах, выученное забывается, а
+                <strong>уверенности</strong> в самостоятельном чтении карты так и не появляется.
+              </p>
+            </div>
 
-          <div class="character-grid" role="list" aria-label="Персонажи-планеты">
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/surya.png" alt="Сурья, Солнце" loading="lazy" />
-              <span>Сурья</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/chandra.png" alt="Чандра, Луна" loading="lazy" />
-              <span>Чандра</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/mangal.png" alt="Мангала, Марс" loading="lazy" />
-              <span>Мангала</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/budha.png" alt="Буддха, Меркурий" loading="lazy" />
-              <span>Буддха</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/guru.png" alt="Гуру, Юпитер" loading="lazy" />
-              <span>Гуру</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/shukra.png" alt="Шукра, Венера" loading="lazy" />
-              <span>Шукра</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/shani.png" alt="Шани, Сатурн" loading="lazy" />
-              <span>Шани</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/rahu.png" alt="Раху" loading="lazy" />
-              <span>Раху</span>
-            </div>
-            <div class="character-tile" role="listitem">
-              <img src="/quest/assets/characters/ketu.png" alt="Кету" loading="lazy" />
-              <span>Кету</span>
+            <div class="key-wrap reveal">
+              <img src="/assets/illustrations/key-ribbon.png" alt="Золотой ключ джйотиш" loading="lazy" />
             </div>
           </div>
-
-          <p class="section-lead">
-            Это не баллы и значки поверх курса. Игра существует как отдельный мир и развивается вместе с
-            вашим обучением.
-          </p>
-          <p class="section-lead">
-            Сначала перед вами Обитель Богов, затем открывается Город Знания с Обсерваторией, Академией
-            Законов и Цитаделью Перемен. По мере продвижения знакомые места меняются, а ранее недоступные
-            области становятся частью вашего путешествия.
-          </p>
-
-          <p class="section-closing">Ваш прогресс в джйотиш буквально открывает игровой мир.</p>
         </div>
       </section>
 
-      <!-- 4. Практика -->
+      <!-- Tagline -->
+      <section class="section section-center">
+        <div class="section-inner">
+          <p class="pixel-heading tagline">
+            Мы создали игровую форму обучения… знание закладывается без зубрёжки — просто
+            остаётся с вами
+          </p>
+        </div>
+      </section>
+
+      <!-- Console drag-drop -->
       <section class="section">
         <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">Смотреть недостаточно</p>
-          <h2>После каждой лекции знания сразу закрепляются на практике</h2>
-
-          <div class="practice-grid">
-            <div class="practice-card">
-              <h3>Кинофрагменты</h3>
-              <p>Распознать проявление планеты и гуны.</p>
-            </div>
-            <div class="practice-card">
-              <h3>Интерактивные задания</h3>
-              <p>Найти связи и закономерности.</p>
-            </div>
-            <div class="practice-card">
-              <h3>Реальные ситуации</h3>
-              <p>Самостоятельно вывести трактовку.</p>
-            </div>
-            <div class="practice-card">
-              <h3>Натальные карты</h3>
-              <p>Постепенно перейти к настоящему чтению.</p>
+          <div class="console-wrap" id="console-wrap">
+            <img class="console-frame-img" src="/assets/illustrations/console-frame.png" alt="Игровая приставка с натальной картой" />
+            <div class="console-chart-zone" id="chart-zone">
+              <!-- house drop zones injected by JS -->
+              <img class="draggable-planet" src="/assets/illustrations/planet-saturn.png" alt="Сатурн" style="left:20%; top:75%;" data-planet="saturn" />
+              <img class="draggable-planet" src="/assets/illustrations/planet-moon.png" alt="Луна" style="left:50%; top:15%;" data-planet="moon" />
+              <img class="draggable-planet" src="/assets/illustrations/planet-jupiter.png" alt="Юпитер" style="left:80%; top:75%;" data-planet="jupiter" />
             </div>
           </div>
-
-          <p class="section-closing">
-            Минимум длинных письменных работ. Основной акцент — увидеть, распознать, сопоставить и
-            применить.
-          </p>
+          <p class="console-caption">Можешь переместить планеты на карте в любой из домов</p>
         </div>
       </section>
 
-      <!-- 5. Путь обучения -->
-      <section class="section section-roadmap">
+      <!-- Depth / iceberg -->
+      <section class="section" id="depth">
         <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">Путь обучения</p>
+          <div class="depth-grid">
+            <div>
+              <h2 class="pixel-heading depth-heading">
+                Единый путь от основ к глубокому чтению карты
+              </h2>
+              <p class="depth-text">Вместо разрозненных знаний — одна последовательная система.</p>
+              <p class="depth-text">
+                Вы шаг за шагом погружаетесь в джйотиш: каждый новый уровень опирается на
+                предыдущий и открывает более глубокий слой натальной карты.
+              </p>
+              <p class="depth-text">
+                Как у <strong>айсберга</strong>: сначала вы осваиваете то, что лежит на
+                поверхности, затем постепенно учитесь видеть скрытые уровни карты и соединять их
+                в целостную трактовку.
+              </p>
+            </div>
 
-          <ol class="roadmap">
-            <li class="roadmap-stage">
-              <span class="roadmap-name">Обитель Богов</span>
-              <span class="roadmap-detail">Планеты → Знаки</span>
-            </li>
-            <li class="roadmap-stage">
-              <span class="roadmap-name">Город Знания</span>
-              <span class="roadmap-detail">Дома → Законы → Практика</span>
-            </li>
-            <li class="roadmap-stage">
-              <span class="roadmap-name">Возвращение в Обитель Богов</span>
-              <span class="roadmap-detail">Накшатры</span>
-            </li>
-            <li class="roadmap-stage">
-              <span class="roadmap-name">Храм Истоков</span>
-              <span class="roadmap-detail">Пады → Навамша</span>
-            </li>
-            <li class="roadmap-stage">
-              <span class="roadmap-name">Цитадель Перемен II</span>
-              <span class="roadmap-detail">Глубокая практика</span>
-            </li>
-          </ol>
+            <div class="iceberg-visual reveal">
+              <img class="iceberg-swing" src="/assets/illustrations/iceberg.png" alt="Айсберг: видимая и скрытая глубина карты" />
+              <div class="iceberg-labels">
+                <span class="iceberg-label">Планета</span>
+                <span class="iceberg-label">Знаки</span>
+                <span class="iceberg-label">Дома</span>
+                <span class="iceberg-label">Связи</span>
+                <span class="iceberg-waterline"></span>
+                <span class="iceberg-label iceberg-label-below">Практика</span>
+                <span class="iceberg-label iceberg-label-below">Накшатра</span>
+                <span class="iceberg-label iceberg-label-below">Пада</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <p class="section-closing">
-            Каждый этап углубляет предыдущий: от понимания отдельных элементов карты — к способности
-            видеть их как единую систему и самостоятельно читать судьбу человека.
-          </p>
+      <!-- Practice carousel -->
+      <section class="section section-center" id="practice">
+        <div class="section-inner">
+          <h2 class="pixel-heading practice-heading">Практика</h2>
 
-          <a href="/quest/" class="btn btn-primary btn-large">Начать обучение</a>
+          <div class="carousel">
+            <div class="carousel-track" id="carousel-track">
+              <div class="carousel-slide">
+                <img src="/assets/illustrations/practice-cinema.png" alt="Кинофрагмент для разбора" loading="lazy" />
+                <p>
+                  Учимся видеть джйотиш в знакомых образах. Смотрим сцены из кино и определяем,
+                  какая гуна, планета, знак или накшатра проявляется в характере героя и его
+                  поведении. Так абстрактные значения превращаются в живые и запоминающиеся
+                  образы.
+                </p>
+              </div>
+              <div class="carousel-slide">
+                <img src="/assets/illustrations/practice-chart.png" alt="Разбор реальной натальной карты" loading="lazy" />
+                <p>
+                  Переходим к настоящей практике астролога. Последовательно учимся читать реальные
+                  карты, соединять отдельные показатели в целостную трактовку и разбираем карты
+                  участников, их близких и другие практические примеры.
+                </p>
+              </div>
+              <div class="carousel-slide">
+                <img src="/assets/illustrations/practice-phone.png" alt="Голосовое практическое задание" loading="lazy" />
+                <p>
+                  Не просто читаем теорию, а постоянно применяем её. Определяем проявления планет
+                  по голосу и речи, находим верные утверждения, соединяем понятия и значения,
+                  сравниваем признаки и решаем небольшие практические задачи.
+                </p>
+              </div>
+            </div>
+
+            <div class="carousel-controls">
+              <button class="carousel-arrow" id="carousel-prev" aria-label="Предыдущий слайд">←</button>
+              <div class="carousel-dots" id="carousel-dots"></div>
+              <button class="carousel-arrow" id="carousel-next" aria-label="Следующий слайд">→</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Teacher placeholder -->
+      <section class="section placeholder-section" id="teacher">
+        <div class="section-inner">
+          <p class="eyebrow eyebrow-alt">О преподавателе</p>
+          <h2 class="pixel-heading" style="color:#fff; text-shadow:0 2px 6px rgba(19,42,68,.35); font-size:clamp(1.1rem,2.6vw,1.6rem);">
+            Блок в разработке
+          </h2>
+          <div class="placeholder-card">
+            <img src="/assets/illustrations/sun-emblem.png" alt="" />
+            <p>Здесь появится рассказ о преподавателе: фото, опыт, философия обучения.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Pricing placeholder -->
+      <section class="section placeholder-section" id="pricing">
+        <div class="section-inner">
+          <p class="eyebrow">Начать приключение</p>
+          <h2 class="pixel-heading" style="color:#fff; text-shadow:0 2px 6px rgba(19,42,68,.35); font-size:clamp(1.1rem,2.6vw,1.6rem);">
+            Блок в разработке
+          </h2>
+          <div class="placeholder-card">
+            <p>Здесь появятся варианты входа в обучение — с какого блока и уровня начать.</p>
+          </div>
+          <a href="/quest/" class="btn btn-primary btn-large" style="margin-top:24px;">Начать обучение</a>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
+      <img class="footer-emblem" src="/assets/illustrations/sun-emblem.png" alt="" aria-hidden="true" />
       <span>MOKSHA EDUCATION</span>
     </footer>
+
+    <script src="landing.js?v=2"></script>
   </body>
 </html>
