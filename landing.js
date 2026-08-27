@@ -140,7 +140,13 @@
     chartZone.querySelectorAll('.draggable-planet').forEach((planet) => {
       let dragging = false;
 
+      // Belt-and-suspenders: stop the browser's native image drag-and-drop
+      // from hijacking the gesture (draggable="false" alone isn't honored
+      // consistently everywhere).
+      planet.addEventListener('dragstart', (e) => e.preventDefault());
+
       planet.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
         dragging = true;
         planet.setPointerCapture(e.pointerId);
         planet.classList.add('is-dragging');

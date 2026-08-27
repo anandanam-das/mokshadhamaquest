@@ -487,6 +487,8 @@ main {
   position: absolute;
   cursor: grab;
   touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
   animation: planet-bob 4s ease-in-out infinite;
