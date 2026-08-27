@@ -363,6 +363,10 @@ main {
   font-weight: 600;
 }
 
+.carousel-controls.fit-mobile-controls {
+  display: none;
+}
+
 /* Difference section */
 
 .difference-grid {
@@ -844,7 +848,29 @@ main {
     padding: 34px 0 20px;
   }
 
+  /* Mobile: the 3-card grid becomes a one-at-a-time swipeable carousel */
   .fit-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    scrollbar-width: none;
+  }
+
+  .fit-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fit-grid .fit-card {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+  }
+
+  .carousel-controls.fit-mobile-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 16px;
   }
 }

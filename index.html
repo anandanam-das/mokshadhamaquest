@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css?v=10" />
+    <link rel="stylesheet" href="landing.css?v=12" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
@@ -76,7 +76,7 @@
             Этот курс подойдёт вам, если:
           </h2>
 
-          <div class="fit-grid">
+          <div class="fit-grid" id="fit-grid">
             <div class="fit-card">
               <img class="fit-card-img" src="/assets/illustrations/fit-card-1.png" alt="" loading="lazy" />
               <p>
@@ -97,6 +97,12 @@
                 Вы только начинаете и&nbsp;не&nbsp;хотите зубрить сотни готовых комбинаций «планета в&nbsp;доме»
               </p>
             </div>
+          </div>
+
+          <div class="carousel-controls fit-mobile-controls">
+            <button class="carousel-arrow" id="fit-prev" aria-label="Предыдущая карточка">←</button>
+            <div class="carousel-dots" id="fit-dots"></div>
+            <button class="carousel-arrow" id="fit-next" aria-label="Следующая карточка">→</button>
           </div>
         </div>
       </section>
@@ -271,6 +277,6 @@
       <span>MOKSHA EDUCATION</span>
     </footer>
 
-    <script src="landing.js?v=4"></script>
+    <script src="landing.js?v=5"></script>
   </body>
 </html>

@@ -83,6 +83,9 @@
   }
 
   setupCarousel('carousel-track', 'carousel-prev', 'carousel-next', 'carousel-dots');
+  // Same track element serves as a 3-column grid on desktop and a
+  // one-at-a-time swipeable carousel on mobile (CSS switches the display mode).
+  setupCarousel('fit-grid', 'fit-prev', 'fit-next', 'fit-dots');
 
   /* ---- Draggable planets on the console chart ---- */
   const chartZone = document.getElementById('chart-zone');
