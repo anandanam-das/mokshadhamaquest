@@ -90,19 +90,24 @@
   /* ---- Draggable planets on the console chart ---- */
   const chartZone = document.getElementById('chart-zone');
   if (chartZone) {
+    // Centroids of the 12 houses in a classic North-Indian chart (a square with
+    // both diagonals plus a diamond connecting the edge midpoints): 4 "kite"
+    // houses at the top/right/bottom/left, and 8 corner triangles — each pair
+    // split by the diagonal running through that corner. Computed analytically
+    // as percentages of the chart's own square (0-100 on each axis).
     const houseCenters = [
-      { x: 50, y: 12 },
-      { x: 68, y: 22 },
-      { x: 80, y: 35 },
-      { x: 88, y: 50 },
-      { x: 80, y: 65 },
-      { x: 68, y: 78 },
-      { x: 50, y: 88 },
-      { x: 32, y: 78 },
-      { x: 20, y: 65 },
-      { x: 12, y: 50 },
-      { x: 20, y: 35 },
-      { x: 32, y: 22 },
+      { x: 25, y: 8.33 }, // top-left corner, upper triangle
+      { x: 8.33, y: 25 }, // top-left corner, lower triangle
+      { x: 50, y: 25 }, // top kite
+      { x: 75, y: 8.33 }, // top-right corner, upper triangle
+      { x: 91.67, y: 25 }, // top-right corner, lower triangle
+      { x: 75, y: 50 }, // right kite
+      { x: 91.67, y: 75 }, // bottom-right corner, upper triangle
+      { x: 75, y: 91.67 }, // bottom-right corner, lower triangle
+      { x: 50, y: 75 }, // bottom kite
+      { x: 25, y: 91.67 }, // bottom-left corner, lower triangle
+      { x: 8.33, y: 75 }, // bottom-left corner, upper triangle
+      { x: 25, y: 50 }, // left kite
     ];
 
     houseCenters.forEach((pos) => {
