@@ -205,12 +205,12 @@ main {
 }
 
 .hero-inner {
-  max-width: 1180px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 20px;
   display: grid;
-  grid-template-columns: minmax(280px, 460px) 1fr;
-  gap: 30px;
+  grid-template-columns: minmax(280px, 400px) 1fr;
+  gap: 8px;
   align-items: center;
 }
 
@@ -295,9 +295,13 @@ main {
 }
 
 .hero-scene-float {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
   will-change: transform;
+  justify-self: end;
 }
 
 @keyframes hero-float {
@@ -793,10 +797,6 @@ main {
     margin-right: auto;
   }
 
-  .fit-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .difference-grid {
     grid-template-columns: 1fr;
     text-align: center;
@@ -824,6 +824,10 @@ main {
     grid-template-columns: 1fr;
     text-align: center;
   }
+
+  .fit-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 640px) {
@@ -836,11 +840,11 @@ main {
     padding: 10px 14px;
   }
 
-  .fit-grid {
-    grid-template-columns: 1fr;
-  }
-
   .hero {
     padding: 34px 0 20px;
+  }
+
+  .fit-grid {
+    grid-template-columns: 1fr;
   }
 }

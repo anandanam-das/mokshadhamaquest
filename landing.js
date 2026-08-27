@@ -38,13 +38,15 @@
     }, 150);
   }
 
-  /* ---- Carousel ---- */
-  const track = document.getElementById('carousel-track');
-  if (track) {
+  /* ---- Carousel (generic: track + prev/next arrows + dots) ---- */
+  function setupCarousel(trackId, prevId, nextId, dotsId) {
+    const track = document.getElementById(trackId);
+    if (!track) return;
+
     const slides = [...track.children];
-    const dotsWrap = document.getElementById('carousel-dots');
-    const prevBtn = document.getElementById('carousel-prev');
-    const nextBtn = document.getElementById('carousel-next');
+    const dotsWrap = document.getElementById(dotsId);
+    const prevBtn = document.getElementById(prevId);
+    const nextBtn = document.getElementById(nextId);
 
     slides.forEach((_, i) => {
       const dot = document.createElement('button');
@@ -79,6 +81,8 @@
       scrollTimer = setTimeout(updateDots, 80);
     });
   }
+
+  setupCarousel('carousel-track', 'carousel-prev', 'carousel-next', 'carousel-dots');
 
   /* ---- Draggable planets on the console chart ---- */
   const chartZone = document.getElementById('chart-zone');
