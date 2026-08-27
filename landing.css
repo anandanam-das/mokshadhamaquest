@@ -403,7 +403,7 @@ main {
 
 .key-wrap {
   justify-self: center;
-  width: 300px;
+  width: 360px;
   opacity: 0;
   transform: translateY(40px) scale(0.6) rotate(-15deg);
   transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.3, 1.2), transform 0.7s cubic-bezier(0.2, 0.8, 0.3, 1.2);
@@ -415,6 +415,7 @@ main {
 }
 
 .key-wrap img {
+  transform: scaleX(-1);
   animation: key-glint 4.5s ease-in-out infinite;
 }
 
