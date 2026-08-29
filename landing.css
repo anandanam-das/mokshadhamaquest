@@ -559,7 +559,7 @@ main {
 
 .iceberg-swing {
   position: relative;
-  width: 65%;
+  width: 90%;
   animation: iceberg-pendulum 5.5s ease-in-out infinite;
   transform-origin: 50% 20%;
 }
@@ -585,10 +585,11 @@ main {
 .iceberg-labels-above,
 .iceberg-labels-below {
   position: absolute;
-  right: 6%;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 6px;
   pointer-events: none;
 }
@@ -620,8 +621,8 @@ main {
 .iceberg-waterline {
   position: absolute;
   top: 43%;
-  right: 6%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 40px;
   height: 2px;
   background: rgba(255, 255, 255, 0.9);
@@ -846,12 +847,6 @@ main {
 
   .depth-grid {
     grid-template-columns: 1fr;
-  }
-
-  .iceberg-labels-above,
-  .iceberg-labels-below,
-  .iceberg-waterline {
-    right: 2%;
   }
 
   .carousel-slide {
