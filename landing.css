@@ -674,6 +674,20 @@ main {
   margin-top: 0;
 }
 
+@media (min-width: 961px) {
+  .section-tight-bottom {
+    padding-bottom: 4px;
+  }
+
+  .section-tight-top {
+    padding-top: 4px;
+  }
+
+  .console-caption-heading {
+    margin-top: 8px;
+  }
+}
+
 /* Depth / iceberg */
 
 .depth-grid {
