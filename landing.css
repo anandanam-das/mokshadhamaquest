@@ -284,7 +284,7 @@ main {
 
 .hero-text .hero-sub {
   font-size: clamp(0.8rem, 1.26vw, 1.5rem);
-  color: #ffffff;
+  color: var(--accent);
   opacity: 0.96;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
   margin-bottom: 22px;
