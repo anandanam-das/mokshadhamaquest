@@ -683,8 +683,15 @@ main {
     padding-top: 0;
   }
 
+  /* Pull the text into the console-frame illustration's own transparent
+     padding (it isn't drawn edge-to-edge) so it reads as tight to the
+     console art itself, not just to the image's bounding box. */
+  .tagline-lead {
+    margin-bottom: -45px;
+  }
+
   .console-caption-heading {
-    margin-top: 2px;
+    margin-top: -40px;
   }
 }
 
