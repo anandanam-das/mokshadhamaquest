@@ -913,12 +913,9 @@ main {
     display: none;
   }
 
-  .hero-lead-first {
-    margin-bottom: 0;
-  }
-
+  .hero-lead-first,
   .hero-lead-last {
-    margin-top: 0;
+    display: inline;
   }
 
   .hero-inner {
