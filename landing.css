@@ -241,8 +241,25 @@ main {
   padding: 0 var(--hero-container-pad);
   display: grid;
   grid-template-columns: minmax(360px, min(620px, 46vw)) 1fr;
+  grid-template-areas:
+    'text  image'
+    'cta   image';
   gap: clamp(10px, 2.5vw, 40px);
   align-items: center;
+}
+
+.hero-text {
+  grid-area: text;
+}
+
+.hero-scene {
+  grid-area: image;
+}
+
+.hero-cta {
+  grid-area: cta;
+  justify-self: start;
+  margin-left: clamp(10px, 1.8vw, 32px);
 }
 
 .hero-text h1 {
@@ -877,6 +894,10 @@ main {
 
   .hero-inner {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      'text'
+      'image'
+      'cta';
     text-align: center;
   }
 
@@ -885,11 +906,25 @@ main {
     margin-right: auto;
   }
 
+  .hero-inner {
+    row-gap: 12px;
+  }
+
   .hero-scene-float {
     width: 100%;
     max-width: 520px;
     margin-top: 0;
     justify-self: center;
+  }
+
+  .hero-cta {
+    justify-self: center;
+    margin-left: 0;
+    margin-top: 24px;
+  }
+
+  .hero-cat-strip {
+    bottom: calc(var(--cat-track-h) / -2 - 24px);
   }
 
   .difference-grid {
@@ -932,7 +967,7 @@ main {
   }
 
   .hero {
-    padding: 34px 0 20px;
+    padding: 34px 0 58px;
   }
 
   /* Mobile: the 3-card grid becomes a one-at-a-time swipeable carousel */
