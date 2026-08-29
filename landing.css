@@ -481,6 +481,11 @@ main {
   color: var(--accent);
 }
 
+.difference-text .hl {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .key-wrap {
   justify-self: center;
   width: 360px;
