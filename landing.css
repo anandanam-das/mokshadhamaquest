@@ -553,8 +553,45 @@ main {
   height: 53.5%;
 }
 
+[data-planet='saturn'] {
+  --pw: 74px;
+  --ph: 74px;
+}
+
+[data-planet='moon'] {
+  --pw: 66px;
+  --ph: 64px;
+}
+
+[data-planet='jupiter'] {
+  --pw: 48px;
+  --ph: 48px;
+}
+
+[data-planet='venus'] {
+  --pw: 56px;
+  --ph: 56px;
+}
+
+[data-planet='mars'] {
+  --pw: 58px;
+  --ph: 58px;
+}
+
+[data-planet='mercury'] {
+  --pw: 84px;
+  --ph: 56px;
+}
+
+[data-planet='sun'] {
+  --pw: 51px;
+  --ph: 51px;
+}
+
 .draggable-planet {
   position: absolute;
+  width: var(--pw);
+  height: var(--ph);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -922,7 +959,7 @@ main {
 
   .hero-scene-float {
     width: 100%;
-    max-width: 520px;
+    max-width: 600px;
     margin-top: 0;
     justify-self: center;
   }
@@ -967,6 +1004,8 @@ main {
 
 @media (max-width: 640px) {
   .site-header-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
@@ -984,6 +1023,8 @@ main {
   .fit-grid {
     display: flex;
     overflow-x: auto;
+    overflow-y: hidden;
+    touch-action: pan-x;
     scroll-snap-type: x mandatory;
     gap: 16px;
     scrollbar-width: none;
@@ -1004,5 +1045,42 @@ main {
     justify-content: center;
     gap: 18px;
     margin-top: 16px;
+  }
+
+  /* Smaller draggable planets on the console chart — the fixed desktop
+     sizes look oversized once the whole console shrinks down. */
+  [data-planet='saturn'] {
+    --pw: 48px;
+    --ph: 48px;
+  }
+
+  [data-planet='moon'] {
+    --pw: 43px;
+    --ph: 42px;
+  }
+
+  [data-planet='jupiter'] {
+    --pw: 31px;
+    --ph: 31px;
+  }
+
+  [data-planet='venus'] {
+    --pw: 36px;
+    --ph: 36px;
+  }
+
+  [data-planet='mars'] {
+    --pw: 38px;
+    --ph: 38px;
+  }
+
+  [data-planet='mercury'] {
+    --pw: 55px;
+    --ph: 36px;
+  }
+
+  [data-planet='sun'] {
+    --pw: 33px;
+    --ph: 33px;
   }
 }
