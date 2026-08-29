@@ -558,9 +558,15 @@ main {
 }
 
 .iceberg-swing {
+  position: relative;
   width: 65%;
   animation: iceberg-pendulum 5.5s ease-in-out infinite;
   transform-origin: 50% 20%;
+}
+
+.iceberg-img {
+  width: 100%;
+  display: block;
 }
 
 @keyframes iceberg-pendulum {
@@ -572,16 +578,27 @@ main {
   }
 }
 
-.iceberg-labels {
+/* The labels sit on the iceberg artwork itself (inside the same rotating
+   wrapper as the image) and are split exactly at the image's own waterline
+   — measured pixel-for-pixel at 43% down from the top of the source PNG —
+   so the divider lines up with where the ice actually meets the water. */
+.iceberg-labels-above,
+.iceberg-labels-below {
   position: absolute;
-  inset: 0;
+  right: 6%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: flex-end;
   gap: 6px;
-  padding-right: 4%;
   pointer-events: none;
+}
+
+.iceberg-labels-above {
+  bottom: 58%;
+}
+
+.iceberg-labels-below {
+  top: 44%;
 }
 
 .iceberg-label {
@@ -601,12 +618,15 @@ main {
 }
 
 .iceberg-waterline {
-  margin: 2px 0;
+  position: absolute;
+  top: 43%;
+  right: 6%;
+  transform: translateY(-50%);
   width: 40px;
   height: 2px;
-  background: rgba(255, 255, 255, 0.6);
-  align-self: flex-end;
-  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
 }
 
 /* Practice carousel */
@@ -828,9 +848,10 @@ main {
     grid-template-columns: 1fr;
   }
 
-  .iceberg-labels {
-    align-items: center;
-    padding-right: 0;
+  .iceberg-labels-above,
+  .iceberg-labels-below,
+  .iceberg-waterline {
+    right: 2%;
   }
 
   .carousel-slide {
