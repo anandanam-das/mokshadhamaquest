@@ -326,9 +326,15 @@ main {
 }
 
 .hero-scene-float {
-  width: 100%;
-  max-width: 1300px;
+  /* Capped by height (not just column width) so it can't balloon taller
+     than the text block on very wide screens and shove everything below
+     it — including the cat — down past the fold. Whichever limit (column
+     width or this height cap) is tighter wins; aspect ratio is preserved
+     either way since neither dimension is forced. */
+  width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: min(56vh, 560px);
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
   will-change: transform;
