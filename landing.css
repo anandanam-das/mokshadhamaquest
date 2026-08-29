@@ -13,8 +13,9 @@
   --gold: #d99a2b;
   --radius: 22px;
   --shadow-lift: 0 14px 30px rgba(10, 26, 46, 0.28);
-  --hero-container-width: 1500px;
-  --hero-container-pad: clamp(20px, 6vw, 80px);
+  --hero-container-width: 1800px;
+  --hero-container-pad: clamp(24px, 7vw, 140px);
+  --hero-container-pad-right: clamp(20px, 3vw, 70px);
 }
 
 * {
@@ -224,7 +225,8 @@ main {
   width: 100%;
   max-width: var(--hero-container-width);
   margin: 0 auto;
-  padding: 0 var(--hero-container-pad);
+  padding-left: var(--hero-container-pad);
+  padding-right: var(--hero-container-pad-right);
   display: grid;
   grid-template-columns: minmax(400px, 460px) 1fr;
   gap: clamp(24px, 4vw, 64px);
@@ -320,7 +322,7 @@ main {
 
 .hero-scene-float {
   width: 100%;
-  max-width: 1050px;
+  max-width: 1300px;
   height: auto;
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
