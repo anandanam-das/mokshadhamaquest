@@ -1,7 +1,7 @@
 :root {
-  --bg-top: #8fe0ff;
-  --bg-mid: #4fb3e8;
-  --bg-bottom: #1f6fb0;
+  --bg-top: #51a0ca;
+  --bg-mid: #38708d;
+  --bg-bottom: #204050;
   --cream: #f7ecd3;
   --cream-border: #2a2440;
   --navy: #1c2138;
@@ -30,7 +30,7 @@ body {
   font-family: 'Inter', sans-serif;
   color: var(--navy);
   background-color: var(--bg-bottom);
-  background-image: linear-gradient(180deg, var(--bg-top) 0%, #6cc9e6 20%, #4fb3e8 45%, #2e8fca 72%, var(--bg-bottom) 100%);
+  background-image: linear-gradient(180deg, var(--bg-top) 0%, #4488ab 35%, var(--bg-mid) 65%, var(--bg-bottom) 100%);
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
