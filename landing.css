@@ -216,9 +216,13 @@ main {
 .hero {
   position: relative;
   display: flex;
-  align-items: center;
-  min-height: calc(100vh - 96px);
-  padding: 24px 0 140px;
+  align-items: flex-start;
+  /* Scales with viewport WIDTH (like the rest of the composition), not vh —
+     that way the whole section compacts together as the window narrows or
+     shortens, instead of staying pinned to a near-100vh height while the
+     content shrinks inside it and leaves a growing dead zone above the cat. */
+  min-height: clamp(320px, 34vw, 820px);
+  padding: clamp(24px, 4vw, 72px) 0 clamp(90px, 8vw, 150px);
 }
 
 .hero-inner {
@@ -228,20 +232,20 @@ main {
   padding-left: var(--hero-container-pad);
   padding-right: var(--hero-container-pad-right);
   display: grid;
-  grid-template-columns: minmax(400px, 460px) 1fr;
-  gap: clamp(24px, 4vw, 64px);
-  align-items: center;
+  grid-template-columns: minmax(400px, 560px) 1fr;
+  gap: clamp(14px, 5vw, 72px);
+  align-items: start;
 }
 
 .hero-text h1 {
-  font-size: clamp(2.1rem, 5vw, 3.6rem);
+  font-size: clamp(2.1rem, 3.7vw, 4.4rem);
   color: #ffffff;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
   margin-bottom: 12px;
 }
 
 .hero-text .hero-sub {
-  font-size: clamp(0.95rem, 2vw, 1.25rem);
+  font-size: clamp(0.95rem, 1.26vw, 1.5rem);
   color: #ffffff;
   opacity: 0.96;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
@@ -250,12 +254,12 @@ main {
 }
 
 .hero-lead {
-  font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+  font-size: clamp(0.92rem, 0.97vw, 1.15rem);
   line-height: 1.55;
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
   margin-bottom: 28px;
-  max-width: 460px;
+  max-width: 540px;
 }
 
 .hero-cta {
@@ -277,16 +281,17 @@ main {
 
 .hero-cat-track {
   width: 100%;
-  height: 130px;
+  height: clamp(80px, 6.7vw, 130px);
   position: relative;
   overflow: hidden;
 }
 
 .cat-patrol {
+  --cat-w: clamp(120px, 10.4vw, 200px);
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 200px;
+  width: var(--cat-w);
   animation: cat-walk-loop 26s linear infinite;
 }
 
@@ -300,7 +305,7 @@ main {
    completely out of view — the flip itself is never seen. */
 @keyframes cat-walk-loop {
   0% {
-    transform: translateX(-200px) scaleX(1);
+    transform: translateX(calc(-1 * var(--cat-w))) scaleX(1);
   }
   48% {
     transform: translateX(100vw) scaleX(1);
@@ -309,10 +314,10 @@ main {
     transform: translateX(100vw) scaleX(-1);
   }
   98% {
-    transform: translateX(-200px) scaleX(-1);
+    transform: translateX(calc(-1 * var(--cat-w))) scaleX(-1);
   }
   100% {
-    transform: translateX(-200px) scaleX(1);
+    transform: translateX(calc(-1 * var(--cat-w))) scaleX(1);
   }
 }
 
