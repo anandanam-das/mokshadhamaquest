@@ -13,9 +13,8 @@
   --gold: #d99a2b;
   --radius: 22px;
   --shadow-lift: 0 14px 30px rgba(10, 26, 46, 0.28);
-  --hero-container-width: 1800px;
-  --hero-container-pad: clamp(24px, 7vw, 140px);
-  --hero-container-pad-right: clamp(20px, 3vw, 70px);
+  --hero-container-width: 1920px;
+  --hero-container-pad: clamp(28px, 5vw, 110px);
 }
 
 * {
@@ -74,7 +73,7 @@ h3 {
   position: sticky;
   top: 0;
   z-index: 20;
-  padding: clamp(20px, 3vw, 32px) 20px 16px;
+  padding: clamp(14px, 2vw, 22px) 20px 14px;
 }
 
 .site-header-inner {
@@ -85,21 +84,21 @@ h3 {
   align-items: stretch;
   justify-content: center;
   flex-wrap: wrap;
-  gap: clamp(10px, 1.4vw, 18px);
+  gap: clamp(14px, 1.8vw, 24px);
 }
 
 .nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
-  padding: 14px 26px;
+  min-height: 59px;
+  padding: 16px 30px;
   background: rgba(247, 236, 211, 0.95);
   color: var(--navy);
   border: 2px solid var(--cream-border);
   border-radius: 999px;
   font-weight: 700;
-  font-size: clamp(0.78rem, 0.95vw, 0.92rem);
+  font-size: clamp(0.87rem, 1.06vw, 1.03rem);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   text-decoration: none;
@@ -192,6 +191,12 @@ main {
   padding-top: 10px;
 }
 
+/* Extra top clearance for the section right after the hero, since the cat
+   strip straddles the seam and paints above it (z-index) while walking. */
+.section-cat-clearance {
+  padding-top: clamp(90px, 7vw, 120px);
+}
+
 .eyebrow {
   display: inline-block;
   color: #ffffff;
@@ -215,33 +220,36 @@ main {
 
 .hero {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   /* Scales with viewport WIDTH (like the rest of the composition), not vh —
      that way the whole section compacts together as the window narrows or
      shortens, instead of staying pinned to a near-100vh height while the
-     content shrinks inside it and leaves a growing dead zone above the cat. */
-  min-height: clamp(320px, 34vw, 820px);
-  padding: clamp(24px, 4vw, 72px) 0 clamp(90px, 8vw, 150px);
+     content shrinks inside it and leaves a growing dead zone above the cat.
+     Bottom padding is deliberately modest so the next section's heading
+     peeks into view on load instead of the fold landing exactly on the
+     seam. */
+  min-height: clamp(360px, 38vw, 860px);
+  padding: clamp(20px, 3vw, 60px) 0 clamp(50px, 5vw, 90px);
 }
 
 .hero-inner {
   width: 100%;
   max-width: var(--hero-container-width);
   margin: 0 auto;
-  padding-left: var(--hero-container-pad);
-  padding-right: var(--hero-container-pad-right);
+  padding: 0 var(--hero-container-pad);
   display: grid;
-  grid-template-columns: minmax(340px, min(560px, 44vw)) 1fr;
+  grid-template-columns: minmax(360px, min(620px, 46vw)) 1fr;
   gap: clamp(10px, 2.5vw, 40px);
-  align-items: start;
+  align-items: center;
 }
 
 .hero-text h1 {
-  font-size: clamp(2.1rem, 3.7vw, 4.4rem);
+  font-size: clamp(2.5rem, 4.4vw, 5.2rem);
   color: #ffffff;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
-  margin-bottom: 12px;
+  margin-bottom: 6px;
 }
 
 .hero-text .hero-sub {
@@ -250,44 +258,52 @@ main {
   opacity: 0.96;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
   margin-bottom: 22px;
-  line-height: 1.4;
+  line-height: 1.3;
+}
+
+.hero-text {
+  margin-left: clamp(-50px, -4vw, -16px);
+  margin-top: 14px;
 }
 
 .hero-lead {
-  font-size: clamp(0.92rem, 0.97vw, 1.15rem);
-  line-height: 1.55;
+  font-size: clamp(1.05rem, 1.1vw, 1.3rem);
+  line-height: 1.72;
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
   margin-bottom: 28px;
-  max-width: 540px;
+  max-width: 520px;
 }
 
 .hero-cta {
-  padding: 18px 40px;
+  padding: 22px 48px;
   font-size: 1rem;
 }
 
-/* Pinned to the bottom of the hero section, full viewport width. Absolute
-   (rather than a normal-flow block) so it never competes with hero-inner
-   for flex space — the one exception the layout allows itself to position
-   outright, since it's purely decorative. */
+/* Pinned to the seam between the hero and the next section (half in each)
+   so it reads as a connecting element between the two screens, full
+   viewport width. Absolute (rather than a normal-flow block) so it never
+   competes with hero-inner for flex space — the one exception the layout
+   allows itself to position outright, since it's purely decorative. */
 .hero-cat-strip {
+  --cat-track-h: clamp(96px, 7.7vw, 150px);
   width: 100vw;
   position: absolute;
   left: 50%;
-  bottom: 0;
+  bottom: calc(var(--cat-track-h) / -2);
   transform: translateX(-50%);
+  z-index: 2;
 }
 
 .hero-cat-track {
   width: 100%;
-  height: clamp(80px, 6.7vw, 130px);
+  height: var(--cat-track-h);
   position: relative;
   overflow: hidden;
 }
 
 .cat-patrol {
-  --cat-w: clamp(120px, 10.4vw, 200px);
+  --cat-w: clamp(140px, 12.2vw, 234px);
   position: absolute;
   bottom: 0;
   left: 0;
@@ -334,11 +350,12 @@ main {
   width: auto;
   height: auto;
   max-width: 100%;
-  max-height: min(56vh, 560px);
+  max-height: min(70vh, 710px);
+  margin-right: clamp(-60px, -3.5vw, -24px);
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
   will-change: transform;
-  justify-self: start;
+  justify-self: end;
 }
 
 @keyframes hero-float {
