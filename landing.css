@@ -676,15 +676,15 @@ main {
 
 @media (min-width: 961px) {
   .section-tight-bottom {
-    padding-bottom: 4px;
+    padding-bottom: 0;
   }
 
   .section-tight-top {
-    padding-top: 4px;
+    padding-top: 0;
   }
 
   .console-caption-heading {
-    margin-top: 8px;
+    margin-top: 2px;
   }
 }
 
