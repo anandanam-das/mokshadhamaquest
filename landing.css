@@ -543,12 +543,26 @@ main {
 
 /* Tagline */
 
-.tagline {
+.tagline-heading {
   text-align: center;
-  font-size: clamp(1rem, 2.6vw, 1.55rem);
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
   color: #ffffff;
   text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
   line-height: 1.7;
+  max-width: 820px;
+  margin: 0 auto 18px;
+}
+
+.tagline-heading .hl {
+  color: var(--accent);
+}
+
+.tagline-lead {
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
   max-width: 820px;
   margin: 0 auto;
 }
@@ -642,13 +656,22 @@ main {
   }
 }
 
+.console-caption-heading {
+  text-align: center;
+  color: var(--accent);
+  text-shadow: 0 1px 4px rgba(19, 42, 68, 0.3);
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
+  line-height: 1.6;
+  margin: 22px 0 8px;
+}
+
 .console-caption {
   text-align: center;
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(19, 42, 68, 0.3);
   font-size: 0.95rem;
   font-weight: 600;
-  margin-top: 22px;
+  margin-top: 0;
 }
 
 /* Depth / iceberg */
