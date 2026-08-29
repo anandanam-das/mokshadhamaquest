@@ -906,6 +906,21 @@ main {
     margin-right: auto;
   }
 
+  /* Mobile reads as one plain flowing paragraph — the manual <br> breaks
+     and the extra gap between the two sentences are a desktop-only
+     composition choice. */
+  .hero-lead br {
+    display: none;
+  }
+
+  .hero-lead-first {
+    margin-bottom: 0;
+  }
+
+  .hero-lead-last {
+    margin-top: 0;
+  }
+
   .hero-inner {
     row-gap: 12px;
   }
