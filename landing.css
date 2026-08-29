@@ -13,6 +13,8 @@
   --gold: #d99a2b;
   --radius: 22px;
   --shadow-lift: 0 14px 30px rgba(10, 26, 46, 0.28);
+  --hero-container-width: 1500px;
+  --hero-container-pad: clamp(20px, 6vw, 80px);
 }
 
 * {
@@ -71,30 +73,32 @@ h3 {
   position: sticky;
   top: 0;
   z-index: 20;
-  padding: 14px 20px;
+  padding: clamp(20px, 3vw, 32px) 20px 16px;
 }
 
 .site-header-inner {
-  max-width: 1180px;
+  max-width: var(--hero-container-width);
   margin: 0 auto;
+  padding: 0 var(--hero-container-pad);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: clamp(10px, 1.4vw, 18px);
 }
 
 .nav-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
+  min-height: 52px;
+  padding: 14px 26px;
   background: rgba(247, 236, 211, 0.95);
   color: var(--navy);
   border: 2px solid var(--cream-border);
   border-radius: 999px;
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: clamp(0.78rem, 0.95vw, 0.92rem);
   text-transform: uppercase;
   letter-spacing: 0.03em;
   text-decoration: none;
@@ -209,24 +213,29 @@ main {
 /* Hero */
 
 .hero {
-  padding: 50px 0 30px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(100vh - 96px);
+  padding: 24px 0 140px;
 }
 
 .hero-inner {
-  max-width: 1320px;
+  width: 100%;
+  max-width: var(--hero-container-width);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 var(--hero-container-pad);
   display: grid;
-  grid-template-columns: minmax(280px, 400px) 1fr;
-  gap: 8px;
+  grid-template-columns: minmax(400px, 460px) 1fr;
+  gap: clamp(24px, 4vw, 64px);
   align-items: center;
 }
 
 .hero-text h1 {
-  font-size: clamp(1.9rem, 4.6vw, 3.1rem);
+  font-size: clamp(2.1rem, 5vw, 3.6rem);
   color: #ffffff;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .hero-text .hero-sub {
@@ -234,27 +243,34 @@ main {
   color: #ffffff;
   opacity: 0.96;
   text-shadow: 0 3px 0 rgba(19, 42, 68, 0.4);
-  margin-bottom: 20px;
-  line-height: 1.5;
+  margin-bottom: 22px;
+  line-height: 1.4;
 }
 
 .hero-lead {
-  font-size: 1.02rem;
-  line-height: 1.6;
+  font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+  line-height: 1.55;
   color: #ffffff;
   text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
-  margin-bottom: 26px;
-  max-width: 480px;
+  margin-bottom: 28px;
+  max-width: 460px;
 }
 
-/* Full-bleed strip: breaks out of the centered content column so the cat's
-   lane spans the actual browser viewport, edge to edge. */
+.hero-cta {
+  padding: 18px 40px;
+  font-size: 1rem;
+}
+
+/* Pinned to the bottom of the hero section, full viewport width. Absolute
+   (rather than a normal-flow block) so it never competes with hero-inner
+   for flex space — the one exception the layout allows itself to position
+   outright, since it's purely decorative. */
 .hero-cat-strip {
   width: 100vw;
-  position: relative;
+  position: absolute;
   left: 50%;
+  bottom: 0;
   transform: translateX(-50%);
-  margin-top: 10px;
 }
 
 .hero-cat-track {
@@ -268,7 +284,7 @@ main {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 168px;
+  width: 200px;
   animation: cat-walk-loop 26s linear infinite;
 }
 
@@ -282,7 +298,7 @@ main {
    completely out of view — the flip itself is never seen. */
 @keyframes cat-walk-loop {
   0% {
-    transform: translateX(-168px) scaleX(1);
+    transform: translateX(-200px) scaleX(1);
   }
   48% {
     transform: translateX(100vw) scaleX(1);
@@ -291,10 +307,10 @@ main {
     transform: translateX(100vw) scaleX(-1);
   }
   98% {
-    transform: translateX(-168px) scaleX(-1);
+    transform: translateX(-200px) scaleX(-1);
   }
   100% {
-    transform: translateX(-168px) scaleX(1);
+    transform: translateX(-200px) scaleX(1);
   }
 }
 
@@ -304,7 +320,7 @@ main {
 
 .hero-scene-float {
   width: 100%;
-  max-width: 900px;
+  max-width: 1050px;
   height: auto;
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
@@ -816,6 +832,10 @@ main {
 /* Responsive */
 
 @media (max-width: 960px) {
+  .hero {
+    min-height: auto;
+  }
+
   .hero-inner {
     grid-template-columns: 1fr;
     text-align: center;
@@ -826,9 +846,11 @@ main {
     margin-right: auto;
   }
 
-  .hero-cat-wrap {
-    margin-left: auto;
-    margin-right: auto;
+  .hero-scene-float {
+    width: 100%;
+    max-width: 520px;
+    margin-top: 0;
+    justify-self: center;
   }
 
   .difference-grid {
@@ -866,6 +888,7 @@ main {
 
   .nav-pill {
     font-size: 0.66rem;
+    min-height: 40px;
     padding: 10px 14px;
   }
 
