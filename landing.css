@@ -519,8 +519,17 @@ main {
 }
 
 .key-wrap img {
-  transform: scaleX(-1);
-  animation: key-glint 4.5s ease-in-out infinite;
+  transform-origin: 50% 12%;
+  animation: key-glint 4.5s ease-in-out infinite, key-sway 5s ease-in-out infinite;
+}
+
+@keyframes key-sway {
+  0%, 100% {
+    transform: scaleX(-1) rotate(-4deg);
+  }
+  50% {
+    transform: scaleX(-1) rotate(4deg);
+  }
 }
 
 @keyframes key-glint {
