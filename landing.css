@@ -490,7 +490,7 @@ main {
   user-select: none;
   -webkit-user-drag: none;
   transform: translate(-50%, -50%);
-  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.25));
   animation: planet-bob 4s ease-in-out infinite;
   transition: filter 0.15s ease;
 }
@@ -500,7 +500,7 @@ main {
   cursor: grabbing;
   animation: none;
   transition: filter 0.15s ease;
-  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.3));
   z-index: 5;
 }
 
