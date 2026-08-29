@@ -1024,7 +1024,6 @@ main {
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
-    touch-action: pan-x;
     scroll-snap-type: x mandatory;
     gap: 16px;
     scrollbar-width: none;
