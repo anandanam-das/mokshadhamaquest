@@ -90,53 +90,8 @@
   /* ---- Draggable planets on the console chart ---- */
   const chartZone = document.getElementById('chart-zone');
   if (chartZone) {
-    // Centroids of the 12 houses in a classic North-Indian chart (a square with
-    // both diagonals plus a diamond connecting the edge midpoints): 4 "kite"
-    // houses at the top/right/bottom/left, and 8 corner triangles — each pair
-    // split by the diagonal running through that corner. Computed analytically
-    // as percentages of the chart's own square (0-100 on each axis).
-    const houseCenters = [
-      { x: 25, y: 12 }, // top-left corner, upper triangle
-      { x: 8.33, y: 25 }, // top-left corner, lower triangle
-      { x: 50, y: 25 }, // top kite
-      { x: 75, y: 12 }, // top-right corner, upper triangle
-      { x: 91.67, y: 25 }, // top-right corner, lower triangle
-      { x: 75, y: 50 }, // right kite
-      { x: 91.67, y: 75 }, // bottom-right corner, upper triangle
-      { x: 75, y: 91.67 }, // bottom-right corner, lower triangle
-      { x: 50, y: 75 }, // bottom kite
-      { x: 25, y: 91.67 }, // bottom-left corner, lower triangle
-      { x: 8.33, y: 75 }, // bottom-left corner, upper triangle
-      { x: 25, y: 50 }, // left kite
-    ];
-
-    houseCenters.forEach((pos) => {
-      const zone = document.createElement('div');
-      zone.className = 'house-zone';
-      zone.style.left = pos.x + '%';
-      zone.style.top = pos.y + '%';
-      zone.dataset.x = pos.x;
-      zone.dataset.y = pos.y;
-      chartZone.insertBefore(zone, chartZone.firstChild);
-    });
-
-    const houseZones = [...chartZone.querySelectorAll('.house-zone')];
-
-    function nearestZone(xPct, yPct) {
-      let best = null;
-      let bestDist = Infinity;
-      houseZones.forEach((zone) => {
-        const zx = parseFloat(zone.dataset.x);
-        const zy = parseFloat(zone.dataset.y);
-        const d = (zx - xPct) ** 2 + (zy - yPct) ** 2;
-        if (d < bestDist) {
-          bestDist = d;
-          best = zone;
-        }
-      });
-      return best;
-    }
-
+    // Free placement: planets can be dropped anywhere within the chart
+    // (including several in the same house) — no snapping to house centers.
     chartZone.querySelectorAll('.draggable-planet').forEach((planet) => {
       let dragging = false;
 
@@ -162,27 +117,12 @@
         yPct = Math.max(2, Math.min(98, yPct));
         planet.style.left = xPct + '%';
         planet.style.top = yPct + '%';
-
-        houseZones.forEach((z) => z.classList.remove('drag-over'));
-        const near = nearestZone(xPct, yPct);
-        if (near) near.classList.add('drag-over');
       });
 
-      function endDrag(e) {
+      function endDrag() {
         if (!dragging) return;
         dragging = false;
         planet.classList.remove('is-dragging');
-        houseZones.forEach((z) => z.classList.remove('drag-over'));
-
-        const rect = chartZone.getBoundingClientRect();
-        const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-        const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-        const near = nearestZone(xPct, yPct);
-        if (near) {
-          planet.style.transition = 'left 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.1), top 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.1)';
-          planet.style.left = near.dataset.x + '%';
-          planet.style.top = near.dataset.y + '%';
-        }
       }
 
       planet.addEventListener('pointerup', endDrag);

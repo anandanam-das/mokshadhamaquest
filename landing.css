@@ -553,19 +553,6 @@ main {
   height: 53.5%;
 }
 
-.house-zone {
-  position: absolute;
-  width: 15%;
-  height: 15%;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-}
-
-.house-zone.drag-over {
-  background: rgba(249, 174, 56, 0.25);
-  box-shadow: 0 0 0 2px rgba(249, 174, 56, 0.5);
-}
-
 .draggable-planet {
   position: absolute;
   cursor: grab;
