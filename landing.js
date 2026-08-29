@@ -96,10 +96,10 @@
     // split by the diagonal running through that corner. Computed analytically
     // as percentages of the chart's own square (0-100 on each axis).
     const houseCenters = [
-      { x: 25, y: 8.33 }, // top-left corner, upper triangle
+      { x: 25, y: 12 }, // top-left corner, upper triangle
       { x: 8.33, y: 25 }, // top-left corner, lower triangle
       { x: 50, y: 25 }, // top kite
-      { x: 75, y: 8.33 }, // top-right corner, upper triangle
+      { x: 75, y: 12 }, // top-right corner, upper triangle
       { x: 91.67, y: 25 }, // top-right corner, lower triangle
       { x: 75, y: 50 }, // right kite
       { x: 91.67, y: 75 }, // bottom-right corner, upper triangle
