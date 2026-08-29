@@ -232,8 +232,8 @@ main {
   padding-left: var(--hero-container-pad);
   padding-right: var(--hero-container-pad-right);
   display: grid;
-  grid-template-columns: minmax(400px, 560px) 1fr;
-  gap: clamp(14px, 5vw, 72px);
+  grid-template-columns: minmax(340px, min(560px, 44vw)) 1fr;
+  gap: clamp(10px, 2.5vw, 40px);
   align-items: start;
 }
 
@@ -338,7 +338,7 @@ main {
   animation: hero-float 7s ease-in-out infinite;
   transform-origin: 50% 85%;
   will-change: transform;
-  justify-self: end;
+  justify-self: start;
 }
 
 @keyframes hero-float {
