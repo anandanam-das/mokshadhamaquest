@@ -173,37 +173,56 @@
     const LEFT = { path: 50, surya: 64 };
     const FRAME_MS = 170; // walk-cycle frame duration
 
+    const HOLD_AFTER_MEET = 2600; // pause on the finished meeting before looping
     const lerp = (a, b, p) => a + (b - a) * Math.max(0, Math.min(1, p));
 
+    // put every sprite back to its start-of-walk state
+    function resetSprites() {
+      chandra.style.display = '';
+      chandra.style.opacity = '1';
+      chandra.style.zIndex = '3';
+      chandra.style.top = TOP.start + '%';
+      chandra.style.left = LEFT.path + '%';
+      chandra.src = walkFrames[0];
+      if (surya) {
+        surya.style.display = '';
+        surya.style.opacity = '1';
+      }
+      meet.style.opacity = '0';
+    }
+
     let started = false;
-    function startScene() {
-      if (started) return;
-      started = true;
+    let bubblesQueued = false;
+
+    // One walk-through: down the road, into the castle, out to Surya, meeting.
+    // The callouts fire only on the very first pass; the walk itself loops.
+    function runPass() {
+      resetSprites();
       const t0 = performance.now();
 
       let walkTimer = setInterval(() => {
+        if (chandra.style.opacity === '0') return; // hidden inside the castle
         const i = Math.floor((performance.now() - t0) / FRAME_MS) % walkFrames.length;
         chandra.src = walkFrames[i];
       }, 40);
 
-      T.bubble.forEach((sec, i) => {
-        setTimeout(() => bubbles[i] && bubbles[i].classList.add('is-shown'), sec * 1000);
-      });
+      if (!bubblesQueued) {
+        bubblesQueued = true;
+        T.bubble.forEach((sec, i) => {
+          setTimeout(() => bubbles[i] && bubbles[i].classList.add('is-shown'), sec * 1000);
+        });
+      }
 
       let meetSwapped = false;
       function frame(now) {
         const t = (now - t0) / 1000;
 
         if (t < T.reachCastle) {
-          // walking down toward the castle
           chandra.style.opacity = '1';
           chandra.style.top = lerp(TOP.start, TOP.castleEnter, t / T.reachCastle) + '%';
         } else if (t < T.emergeAt) {
-          // stepped inside — gone
-          chandra.style.opacity = '0';
+          chandra.style.opacity = '0'; // stepped inside — gone
         } else if (t < T.reachSurya) {
-          // walking out of the doorway — now drawn in front of the castle,
-          // curving toward her spot beside Surya
           const p = (t - T.emergeAt) / (T.reachSurya - T.emergeAt);
           chandra.style.opacity = '1';
           chandra.style.zIndex = '7';
@@ -211,47 +230,89 @@
           chandra.style.left = lerp(LEFT.path, LEFT.surya, p) + '%';
         }
 
+        if (t >= T.reachSurya && !meetSwapped) {
+          meetSwapped = true;
+          clearInterval(walkTimer);
+          walkTimer = null;
+          meet.style.opacity = '1';
+          chandra.style.opacity = '0';
+          if (surya) surya.style.opacity = '0';
+          setTimeout(() => {
+            chandra.style.display = 'none';
+            if (surya) surya.style.display = 'none';
+          }, 450);
+        }
         if (t >= T.reachSurya) {
-          if (!meetSwapped) {
-            meetSwapped = true;
-            if (walkTimer) {
-              clearInterval(walkTimer);
-              walkTimer = null;
-            }
-            // crossfade the two standalone sprites into the meeting frame so
-            // nothing pops or jumps
-            meet.style.opacity = '1';
-            chandra.style.opacity = '0';
-            if (surya) surya.style.opacity = '0';
-            setTimeout(() => {
-              chandra.style.display = 'none';
-              if (surya) surya.style.display = 'none';
-            }, 450);
-          }
           const mi = Math.min(meetFrames.length - 1, Math.floor((t - T.reachSurya) / 0.6));
           meet.src = meetFrames[mi];
         }
 
-        if (t < T.end) requestAnimationFrame(frame);
+        if (t < T.end) {
+          requestAnimationFrame(frame);
+        } else {
+          setTimeout(runPass, HOLD_AFTER_MEET); // loop
+        }
       }
       requestAnimationFrame(frame);
     }
 
-    if ('IntersectionObserver' in window) {
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              startScene();
-              io.disconnect();
-            }
-          });
-        },
-        { threshold: 0.3 }
-      );
-      io.observe(chooseScene);
-    } else {
-      startScene();
+    function startScene() {
+      if (started) return;
+      started = true;
+      runPass();
     }
+
+    // Start strictly when the block has scrolled into the upper part of the
+    // viewport — i.e. the user has actually reached it.
+    function maybeStart() {
+      if (started) return;
+      const r = chooseScene.getBoundingClientRect();
+      if (r.top < window.innerHeight * 0.55 && r.bottom > window.innerHeight * 0.1) {
+        startScene();
+        window.removeEventListener('scroll', maybeStart);
+      }
+    }
+    window.addEventListener('scroll', maybeStart, { passive: true });
+    maybeStart();
+  }
+
+  /* ---- Teacher portrait: endless gentle idle (blink + gaze drift) ---- */
+  const teacherHead = document.getElementById('teacher-head');
+  if (teacherHead) {
+    const dir = teacherHead.dataset.headDir || '/assets/illustrations/';
+    // 1..9 and back — a ping-pong loop through the frames
+    const seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2];
+    // per-frame dwell (ms); the blink frames (2, 3) flick past, gaze frames linger
+    const hold = { 1: 700, 2: 80, 3: 60, 4: 240, 5: 400, 6: 280, 7: 320, 8: 200, 9: 600 };
+    seq.forEach((n) => {
+      const img = new Image();
+      img.src = `${dir}head-${n}.png`;
+    });
+
+    let i = 0;
+    function tick() {
+      const n = seq[i];
+      teacherHead.src = `${dir}head-${n}.png`;
+      i = (i + 1) % seq.length;
+      setTimeout(tick, hold[n] || 220);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTimeout(tick, 300);
+    }
+  }
+
+  /* ---- FAQ: single-open accordion ---- */
+  const faqList = document.getElementById('faq-list');
+  if (faqList) {
+    const items = [...faqList.querySelectorAll('.faq-item')];
+    items.forEach((item) => {
+      item.addEventListener('toggle', () => {
+        if (!item.open) return;
+        items.forEach((other) => {
+          if (other !== item) other.open = false;
+        });
+      });
+    });
   }
 })();

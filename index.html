@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css?v=85" />
+    <link rel="stylesheet" href="landing.css?v=93" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
@@ -338,31 +338,236 @@
         </div>
       </section>
 
-      <!-- Teacher placeholder -->
-      <section class="section placeholder-section" id="teacher">
+      <!-- Teacher -->
+      <section class="section teacher-section" id="teacher">
         <div class="section-inner">
-          <p class="eyebrow eyebrow-alt">О преподавателе</p>
-          <h2 class="pixel-heading" style="color:#fff; text-shadow:0 2px 6px rgba(19,42,68,.35); font-size:clamp(1.1rem,2.6vw,1.6rem);">
-            Блок в&nbsp;разработке
-          </h2>
-          <div class="placeholder-card">
-            <img src="/assets/illustrations/sun-emblem.png" alt="" />
-            <p>Здесь появится рассказ о&nbsp;преподавателе: фото, опыт, философия обучения.</p>
+          <div class="teacher-grid">
+            <div class="teacher-portrait reveal">
+              <span class="teacher-portrait-glow" aria-hidden="true"></span>
+              <img
+                id="teacher-head"
+                class="teacher-head"
+                src="/assets/illustrations/head-1.png"
+                alt="Артём Руденко — Ананда Нам дас, преподаватель курса"
+                loading="lazy"
+                data-head-dir="/assets/illustrations/"
+              />
+            </div>
+
+            <div class="teacher-copy">
+              <p class="eyebrow eyebrow-alt">О преподавателе</p>
+              <h2 class="pixel-heading teacher-name">
+                Артём Руденко<br />
+                <span class="teacher-name-alt">Ананда Нам дас</span>
+              </h2>
+
+              <div class="teacher-stats">
+                <div class="teacher-stat">
+                  <b>с&nbsp;2010</b><span>на&nbsp;духовном пути</span>
+                </div>
+                <div class="teacher-stat">
+                  <b>5000+</b><span>консультаций</span>
+                </div>
+                <div class="teacher-stat">
+                  <b>120+</b><span>учеников по&nbsp;миру</span>
+                </div>
+              </div>
+
+              <p class="teacher-text">
+                С&nbsp;2010 года следует духовному пути в&nbsp;традиции ученической
+                преемственности под руководством признанного духовного учителя.
+                <span class="hl">Два года жил в&nbsp;ашраме</span>, изучал
+                ведическую философию, астрологию, священные писания и&nbsp;учился
+                применять их&nbsp;мудрость в&nbsp;повседневной жизни.
+              </p>
+              <p class="teacher-text">
+                С&nbsp;2012 года провёл <span class="hl">более 5000&nbsp;консультаций</span>
+                для людей разных возрастов, вероисповеданий и&nbsp;социальных
+                кругов. Выступал как лектор, астролог и&nbsp;артист
+                на&nbsp;фестивалях и&nbsp;крупных мероприятиях, участвовал
+                в&nbsp;творческих, мистических и&nbsp;организационных проектах.
+              </p>
+              <p class="teacher-text">
+                Обучил <span class="hl">более 120&nbsp;учеников</span>
+                по&nbsp;всему миру, многие из&nbsp;которых сегодня самостоятельно
+                консультируют и&nbsp;продолжают передавать ведическое знание.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Pricing placeholder -->
-      <section class="section placeholder-section" id="pricing">
+      <!-- FAQ -->
+      <section class="section faq-section" id="faq">
         <div class="section-inner">
-          <p class="eyebrow">Начать приключение</p>
-          <h2 class="pixel-heading" style="color:#fff; text-shadow:0 2px 6px rgba(19,42,68,.35); font-size:clamp(1.1rem,2.6vw,1.6rem);">
-            Блок в&nbsp;разработке
-          </h2>
-          <div class="placeholder-card">
-            <p>Здесь появятся варианты входа в&nbsp;обучение — с&nbsp;какого блока и&nbsp;уровня начать.</p>
+          <p class="eyebrow eyebrow-alt">Частые вопросы</p>
+          <h2 class="pixel-heading faq-heading">Коротко о&nbsp;главном</h2>
+
+          <div class="faq-list" id="faq-list">
+            <details class="faq-item">
+              <summary>
+                <span class="faq-q">Сколько перерыв между блоками в&nbsp;обучении?</span>
+                <span class="faq-mark" aria-hidden="true"></span>
+              </summary>
+              <div class="faq-a">
+                <p>
+                  От&nbsp;месяца до&nbsp;двух. Нам нужно успеть подготовить презентации
+                  для лекций и&nbsp;разработать домашние задания на&nbsp;нашей игровой
+                  обучающей платформе.
+                </p>
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span class="faq-q">Подходит ли&nbsp;обучение тем, кто начинает с&nbsp;самого начала?</span>
+                <span class="faq-mark" aria-hidden="true"></span>
+              </summary>
+              <div class="faq-a">
+                <p>
+                  Да. Мы идём прямо с&nbsp;нуля — обучение подходит для самых
+                  начинающих. Начинаем с&nbsp;самой базы и&nbsp;постепенно доходим
+                  до&nbsp;очень глубоких тем.
+                </p>
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span class="faq-q">Какие дополнительные условия нужно соблюдать, помимо оплаты обучения?</span>
+                <span class="faq-mark" aria-hidden="true"></span>
+              </summary>
+              <div class="faq-a">
+                <p>
+                  На&nbsp;время обучения рекомендуется отказаться от&nbsp;употребления
+                  продуктов животного происхождения — мяса, рыбы, курицы
+                  и&nbsp;т.&nbsp;п. Это поможет сохранять более тонкое восприятие
+                  и&nbsp;ясность ума, которые будут особенно важны во&nbsp;время
+                  обучения.
+                </p>
+                <p>
+                  Также я&nbsp;буду давать дополнительные рекомендации по&nbsp;духовным
+                  практикам, в&nbsp;частности по&nbsp;слушанию мантр. Это часть моей
+                  специфики и&nbsp;подхода к&nbsp;обучению.
+                </p>
+              </div>
+            </details>
+
+            <details class="faq-item">
+              <summary>
+                <span class="faq-q">В&nbsp;какие дни и&nbsp;сколько лекций в&nbsp;неделю будет проходить?</span>
+                <span class="faq-mark" aria-hidden="true"></span>
+              </summary>
+              <div class="faq-a">
+                <p>Две лекции в&nbsp;неделю.</p>
+              </div>
+            </details>
           </div>
-          <a href="/quest/" class="btn btn-primary btn-large" style="margin-top:24px;">Начать обучение</a>
+        </div>
+      </section>
+
+      <!-- Roadmap / pricing -->
+      <section class="section roadmap-section" id="pricing">
+        <div class="section-inner">
+          <p class="eyebrow">Начать обучение</p>
+          <h2 class="pixel-heading roadmap-heading">Дорожная карта обучения</h2>
+          <p class="roadmap-lead">
+            Обучение идёт последовательно: каждая ступень открывает следующую.
+            Сейчас доступна запись на&nbsp;первую — «Планеты», остальные откроются
+            по&nbsp;мере прохождения курса.
+          </p>
+
+          <ol class="roadmap">
+            <li class="roadmap-step is-open">
+              <span class="roadmap-num">1</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">Планеты</h3>
+                <p class="roadmap-desc">
+                  Природа девяти планет-грах: характер, роль и&nbsp;влияние каждой.
+                </p>
+                <span class="roadmap-status roadmap-status--open">Открыта запись</span>
+                <a href="/quest/" class="btn btn-primary roadmap-cta">Записаться на&nbsp;курс</a>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">2</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Знаки <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  Двенадцать знаков-раши: стихии, качества и&nbsp;планеты-управители.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">3</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Дома <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  Двенадцать домов-бхав: сферы жизни и&nbsp;как их&nbsp;читать в&nbsp;карте.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">4</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Связи <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  Аспекты, соединения и&nbsp;взаимодействие планет между собой.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">5</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Накшатры <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  27&nbsp;лунных стоянок — тонкий слой характера и&nbsp;событий.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">6</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Навамша <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  Карта D9: сила планет, глубина натуры и&nbsp;тема партнёрства.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+
+            <li class="roadmap-step is-locked">
+              <span class="roadmap-num">7</span>
+              <div class="roadmap-card">
+                <h3 class="roadmap-name">
+                  Практика <span class="roadmap-lock" aria-hidden="true"></span>
+                </h3>
+                <p class="roadmap-desc">
+                  Разбор реальных карт и&nbsp;собственный опыт самостоятельного чтения.
+                </p>
+                <span class="roadmap-status">Откроется позже</span>
+              </div>
+            </li>
+          </ol>
         </div>
       </section>
     </main>
@@ -372,6 +577,6 @@
       <span>MOKSHA EDUCATION</span>
     </footer>
 
-    <script src="landing.js?v=16"></script>
+    <script src="landing.js?v=23"></script>
   </body>
 </html>

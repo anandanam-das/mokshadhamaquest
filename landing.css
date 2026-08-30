@@ -1057,6 +1057,398 @@ main {
   }
 }
 
+/* Teacher */
+
+.teacher-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.teacher-portrait {
+  position: relative;
+  align-self: start;
+}
+
+.teacher-portrait-glow {
+  position: absolute;
+  inset: 4% 2% 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 42%, rgba(96, 197, 255, 0.55), rgba(96, 197, 255, 0) 68%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.teacher-head {
+  position: relative;
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 20px 34px rgba(10, 26, 46, 0.42));
+  animation: teacher-float 6.5s ease-in-out infinite;
+}
+
+@keyframes teacher-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.teacher-name {
+  font-size: clamp(1.05rem, 2.5vw, 1.5rem);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
+  line-height: 1.55;
+  margin: 6px 0 22px;
+}
+
+.teacher-name-alt {
+  color: var(--accent);
+}
+
+.teacher-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.teacher-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 112px;
+  padding: 12px 16px;
+  background: rgba(247, 236, 211, 0.95);
+  border: 2px solid var(--cream-border);
+  border-radius: 14px;
+  box-shadow: 0 4px 0 rgba(20, 20, 30, 0.22);
+}
+
+.teacher-stat b {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.8rem;
+  color: var(--navy);
+  white-space: nowrap;
+}
+
+.teacher-stat span {
+  margin-top: 7px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-align: center;
+}
+
+.teacher-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
+  margin: 0 0 16px;
+  max-width: 640px;
+}
+
+.teacher-text .hl {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teacher-head {
+    animation: none;
+  }
+}
+
+/* FAQ */
+
+.faq-section {
+  text-align: center;
+}
+
+.faq-heading {
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
+  margin-bottom: 30px;
+}
+
+.faq-list {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.faq-item {
+  background: rgba(247, 236, 211, 0.96);
+  border: 2px solid var(--cream-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 0 rgba(20, 20, 30, 0.2);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+
+.faq-item summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  font-weight: 700;
+  color: var(--navy);
+  transition: background 0.15s ease;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.faq-q {
+  flex: 1;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.faq-mark {
+  flex-shrink: 0;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent);
+  box-shadow: 0 3px 0 rgba(20, 20, 30, 0.22);
+}
+
+.faq-mark::before,
+.faq-mark::after {
+  content: '';
+  position: absolute;
+  inset: 50% 4px auto 4px;
+  height: 2.5px;
+  background: #ffffff;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.faq-mark::after {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+.faq-item[open] .faq-mark::after {
+  transform: translateY(-50%) rotate(90deg) scaleX(0);
+  opacity: 0;
+}
+
+.faq-a {
+  padding: 0 20px 20px;
+}
+
+.faq-a p {
+  margin: 0 0 12px;
+  font-size: 0.96rem;
+  line-height: 1.65;
+  color: var(--muted);
+}
+
+.faq-a p:last-child {
+  margin-bottom: 0;
+}
+
+.faq-item[open] summary .faq-q {
+  color: var(--gold);
+}
+
+/* Roadmap */
+
+.roadmap-section {
+  text-align: center;
+}
+
+.roadmap-heading {
+  font-size: clamp(1.1rem, 2.6vw, 1.6rem);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
+  margin-bottom: 16px;
+}
+
+.roadmap-lead {
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
+}
+
+.roadmap {
+  list-style: none;
+  max-width: 640px;
+  margin: 40px auto 0;
+  padding: 0 0 0 62px;
+  text-align: left;
+  position: relative;
+}
+
+/* the winding path */
+.roadmap::before {
+  content: '';
+  position: absolute;
+  left: 23px;
+  top: 14px;
+  bottom: 26px;
+  border-left: 3px dotted rgba(249, 174, 56, 0.5);
+}
+
+.roadmap-step {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.roadmap-num {
+  position: absolute;
+  left: -62px;
+  top: 0;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.78rem;
+  z-index: 1;
+}
+
+.is-open .roadmap-num {
+  background: var(--accent);
+  color: var(--navy);
+  box-shadow: 0 0 0 5px rgba(249, 174, 56, 0.22), 0 4px 0 rgba(20, 20, 30, 0.28);
+}
+
+.is-locked .roadmap-num {
+  background: var(--navy-soft);
+  color: rgba(255, 255, 255, 0.55);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+}
+
+.roadmap-card {
+  background: rgba(247, 236, 211, 0.96);
+  border: 2px solid var(--cream-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 0 rgba(20, 20, 30, 0.2);
+}
+
+.is-open .roadmap-card {
+  border-color: var(--accent);
+  box-shadow: 0 0 24px rgba(249, 174, 56, 0.3), 0 4px 0 rgba(20, 20, 30, 0.26);
+}
+
+.is-locked .roadmap-card {
+  background: rgba(247, 236, 211, 0.55);
+}
+
+.roadmap-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 5px;
+  font-size: 1.06rem;
+  color: var(--navy);
+}
+
+.is-locked .roadmap-name {
+  color: rgba(28, 33, 56, 0.55);
+}
+
+.roadmap-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.is-locked .roadmap-desc {
+  color: rgba(28, 33, 56, 0.5);
+}
+
+/* small drawn padlock */
+.roadmap-lock {
+  width: 13px;
+  height: 11px;
+  position: relative;
+  display: inline-block;
+  background: currentColor;
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.roadmap-lock::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 9px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  transform: translateX(-50%);
+}
+
+.roadmap-status {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: rgba(28, 33, 56, 0.45);
+}
+
+.roadmap-status--open {
+  color: #2f7d33;
+}
+
+.roadmap-cta {
+  margin-top: 14px;
+  padding: 12px 24px;
+  font-size: 0.82rem;
+  background: var(--accent);
+  color: var(--navy);
+  border-color: var(--cream-border);
+  box-shadow: 0 5px 0 rgba(20, 20, 30, 0.28);
+}
+
+.roadmap-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 0 rgba(20, 20, 30, 0.28);
+}
+
+@media (max-width: 640px) {
+  .roadmap {
+    padding-left: 52px;
+  }
+
+  .roadmap::before {
+    left: 19px;
+  }
+
+  .roadmap-num {
+    left: -52px;
+    width: 40px;
+    height: 40px;
+    font-size: 0.68rem;
+  }
+}
+
 /* Practice carousel */
 
 .practice-heading {
@@ -1335,6 +1727,26 @@ main {
 
   .iceberg-visual {
     margin-top: 8px;
+  }
+
+  .teacher-grid {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .teacher-portrait {
+    width: min(260px, 66%);
+  }
+
+  .teacher-stats {
+    justify-content: center;
+  }
+
+  .teacher-text {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .carousel-slide {
