@@ -465,8 +465,25 @@ main {
 .difference-grid {
   display: grid;
   grid-template-columns: 1fr 320px;
-  gap: 30px;
+  grid-template-areas:
+    "heading key"
+    "copy    key";
+  column-gap: 30px;
   align-items: center;
+}
+
+.difference-grid .difference-heading {
+  grid-area: heading;
+  align-self: end;
+}
+
+.difference-copy {
+  grid-area: copy;
+  align-self: start;
+}
+
+.difference-grid .key-wrap {
+  grid-area: key;
 }
 
 .difference-heading {
@@ -700,8 +717,26 @@ main {
 .depth-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-areas:
+    "intro  ice"
+    "outro  ice";
+  column-gap: 48px;
+  row-gap: 24px;
   align-items: center;
+}
+
+.depth-intro {
+  grid-area: intro;
+  align-self: end;
+}
+
+.depth-outro {
+  grid-area: outro;
+  align-self: start;
+}
+
+.iceberg-visual {
+  grid-area: ice;
 }
 
 .depth-heading {
@@ -801,6 +836,215 @@ main {
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
   pointer-events: none;
+}
+
+/* Character choice — scroll-driven animated scene */
+
+.choose-heading {
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  color: #ffffff;
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
+}
+
+.choose-subheading {
+  margin: 12px 0 0;
+  font-size: clamp(0.72rem, 1.6vw, 1rem);
+  color: var(--accent);
+  text-shadow: 0 2px 6px rgba(19, 42, 68, 0.35);
+}
+
+.choose-intro {
+  max-width: 620px;
+  margin: 20px auto 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(19, 42, 68, 0.25);
+}
+
+.choose-scene {
+  position: relative;
+  max-width: 900px;
+  margin: 44px auto 0;
+}
+
+.choose-road {
+  position: relative;
+  width: clamp(180px, 40vw, 280px);
+  margin: 0 auto;
+}
+
+.choose-road-img {
+  width: 100%;
+  display: block;
+}
+
+.choose-castle,
+.choose-surya,
+.choose-chandra,
+.choose-meet {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: none; /* allow the castle / meeting frame to overflow the road width */
+}
+
+.choose-castle {
+  top: 20%;
+  width: 130%;
+  z-index: 5;
+}
+
+/* Surya waits on the grassy clearing at the foot of the road. Sized and
+   offset so she lines up pixel-for-pixel with the Surya figure inside the
+   chandra-surya meeting frame — the swap to that frame must not shift or
+   resize her. (Her figure sits left-of-centre in the meeting art.) */
+.choose-surya {
+  top: 76%;
+  left: 38%;
+  width: 44%;
+  z-index: 2;
+  image-rendering: pixelated;
+  transition: opacity 0.4s ease;
+}
+
+.choose-chandra {
+  top: 2%;
+  width: 44%;
+  z-index: 3;
+  image-rendering: pixelated;
+  transition: opacity 0.35s ease;
+}
+
+/* Chandra + Surya meeting: the two figures kept at the walking-sprite scale
+   (the source art places them side by side, so the frame is ~2x as wide).
+   The source art leaves ~18% empty space below the figures' feet, so the
+   frame sits higher than its nominal top to land them on the clearing. */
+.choose-meet {
+  top: 72%;
+  width: 62%;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  image-rendering: pixelated;
+}
+
+.choose-bubble {
+  position: absolute;
+  width: clamp(210px, 30%, 290px);
+  margin: 0;
+  padding: 14px 16px;
+  background: rgba(247, 236, 211, 0.96);
+  border: 2px solid var(--cream-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lift);
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  pointer-events: none;
+}
+
+.choose-bubble.is-shown {
+  opacity: 1;
+  transform: none;
+}
+
+.choose-bubble--right {
+  right: 0;
+  transform: translateX(28px) translateY(10px);
+}
+
+.choose-bubble--left {
+  left: 0;
+  transform: translateX(-28px) translateY(10px);
+}
+
+#choose-bubble-1 { top: 4%; }
+#choose-bubble-2 { top: 40%; }
+#choose-bubble-3 { top: 74%; }
+
+.choose-bubble-title {
+  font-size: 0.62rem;
+  line-height: 1.4;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.choose-bubble p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--navy);
+}
+
+@media (max-width: 760px) {
+  /* On a phone there's no room for callouts flanking the road, and pushing
+     them off-screen clips them (body has overflow-x: hidden). Instead the two
+     opening callouts sit side by side in a strip above the scene, and the
+     closing one sits under the meeting — all fully on-screen, none covering
+     the artwork or the walking character. */
+  .choose-scene {
+    padding-top: 132px;
+    padding-bottom: 92px;
+  }
+
+  .choose-road {
+    width: min(240px, 66vw);
+  }
+
+  .choose-bubble {
+    width: 49%;
+    padding: 10px 11px;
+    background: rgba(247, 236, 211, 0.97);
+  }
+
+  .choose-bubble-title {
+    font-size: 0.52rem;
+    margin-bottom: 5px;
+  }
+
+  .choose-bubble p {
+    font-size: 0.78rem;
+    line-height: 1.42;
+  }
+
+  .choose-bubble--right {
+    right: 0;
+    left: auto;
+    transform: translateY(12px);
+  }
+
+  .choose-bubble--left {
+    left: 0;
+    right: auto;
+    transform: translateY(12px);
+  }
+
+  #choose-bubble-1,
+  #choose-bubble-2 {
+    top: 0;
+  }
+
+  #choose-bubble-3 {
+    top: auto;
+    bottom: 6px;
+    left: 50%;
+    right: auto;
+    width: 74%;
+    transform: translateX(-50%) translateY(12px);
+  }
+
+  #choose-bubble-3.is-shown {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choose-bubble {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 /* Practice carousel */
@@ -1042,7 +1286,21 @@ main {
 
   .difference-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "heading"
+      "key"
+      "copy";
     text-align: center;
+  }
+
+  .difference-grid .difference-heading,
+  .difference-copy {
+    align-self: auto;
+  }
+
+  .difference-grid .key-wrap {
+    width: min(240px, 70%);
+    justify-self: center;
   }
 
   .difference-text {
@@ -1050,12 +1308,18 @@ main {
     margin-right: auto;
   }
 
-  .key-wrap {
-    order: -1;
-  }
-
   .depth-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "intro"
+      "ice"
+      "outro";
+    text-align: center;
+  }
+
+  .depth-intro,
+  .depth-outro {
+    align-self: auto;
   }
 
   .carousel-slide {

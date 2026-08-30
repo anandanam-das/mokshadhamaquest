@@ -129,4 +129,125 @@
       planet.addEventListener('pointercancel', endDrag);
     });
   }
+
+  /* ---- Character-choice scene: Chandra walks the road, callouts pop in ---- */
+  const chooseScene = document.getElementById('choose-scene');
+  if (chooseScene) {
+    const BASE = '/assets/illustrations/choose person/';
+    const chandra = document.getElementById('choose-chandra');
+    const meet = document.getElementById('choose-meet');
+    const surya = chooseScene.querySelector('.choose-surya');
+    const bubbles = [
+      document.getElementById('choose-bubble-1'),
+      document.getElementById('choose-bubble-2'),
+      document.getElementById('choose-bubble-3'),
+    ];
+
+    const walkFrames = [1, 2, 3, 4].map((n) => `${BASE}chandra-step${n}.png`);
+    const meetFrames = [1, 2, 3, 4, 5, 6].map((n) => `${BASE}chandra-surya${n}.png`);
+    [...walkFrames, ...meetFrames].forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+
+    // Timeline constants (seconds) — tweak these to retime the scene.
+    const T = {
+      reachCastle: 3.5, // reaches the castle and vanishes into it
+      emergeAt: 4.3, // reappears already down the road, past the castle
+      reachSurya: 8.8, // arrives on the clearing next to Surya
+      end: 13,
+      bubble: [1.0, 3.9, 9.2], // when each callout pops in
+    };
+    // Vertical waypoints along the road, as % of the road height.
+    //  castleEnter — top edge of the castle, where she slips inside and vanishes
+    //  emerge      — the castle doorway, where she reappears walking out
+    //  surya       — where she stops, just short of Surya (must NOT overlap her)
+    const TOP = { start: 2, castleEnter: 26, emerge: 56, surya: 76 };
+    // Horizontal position (% — matches CSS `left`). She walks down the centre,
+    // then drifts to Chandra's spot in the meeting art so she ends up beside
+    // Surya (who stands left of centre) rather than on top of her.
+    const LEFT = { path: 50, surya: 64 };
+    const FRAME_MS = 170; // walk-cycle frame duration
+
+    const lerp = (a, b, p) => a + (b - a) * Math.max(0, Math.min(1, p));
+
+    let started = false;
+    function startScene() {
+      if (started) return;
+      started = true;
+      const t0 = performance.now();
+
+      let walkTimer = setInterval(() => {
+        const i = Math.floor((performance.now() - t0) / FRAME_MS) % walkFrames.length;
+        chandra.src = walkFrames[i];
+      }, 40);
+
+      T.bubble.forEach((sec, i) => {
+        setTimeout(() => bubbles[i] && bubbles[i].classList.add('is-shown'), sec * 1000);
+      });
+
+      let meetSwapped = false;
+      function frame(now) {
+        const t = (now - t0) / 1000;
+
+        if (t < T.reachCastle) {
+          // walking down toward the castle
+          chandra.style.opacity = '1';
+          chandra.style.top = lerp(TOP.start, TOP.castleEnter, t / T.reachCastle) + '%';
+        } else if (t < T.emergeAt) {
+          // stepped inside — gone
+          chandra.style.opacity = '0';
+        } else if (t < T.reachSurya) {
+          // walking out of the doorway — now drawn in front of the castle,
+          // curving toward her spot beside Surya
+          const p = (t - T.emergeAt) / (T.reachSurya - T.emergeAt);
+          chandra.style.opacity = '1';
+          chandra.style.zIndex = '7';
+          chandra.style.top = lerp(TOP.emerge, TOP.surya, p) + '%';
+          chandra.style.left = lerp(LEFT.path, LEFT.surya, p) + '%';
+        }
+
+        if (t >= T.reachSurya) {
+          if (!meetSwapped) {
+            meetSwapped = true;
+            if (walkTimer) {
+              clearInterval(walkTimer);
+              walkTimer = null;
+            }
+            // crossfade the two standalone sprites into the meeting frame so
+            // nothing pops or jumps
+            meet.style.opacity = '1';
+            chandra.style.opacity = '0';
+            if (surya) surya.style.opacity = '0';
+            setTimeout(() => {
+              chandra.style.display = 'none';
+              if (surya) surya.style.display = 'none';
+            }, 450);
+          }
+          const mi = Math.min(meetFrames.length - 1, Math.floor((t - T.reachSurya) / 0.6));
+          meet.src = meetFrames[mi];
+        }
+
+        if (t < T.end) requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              startScene();
+              io.disconnect();
+            }
+          });
+        },
+        { threshold: 0.3 }
+      );
+      io.observe(chooseScene);
+    } else {
+      startScene();
+    }
+  }
 })();

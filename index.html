@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css?v=67" />
+    <link rel="stylesheet" href="landing.css?v=80" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
@@ -56,7 +56,7 @@
               loading="eager"
             />
           </div>
-          <a href="/quest/create-character.html" class="btn btn-primary btn-large hero-cta">Выбрать персонажа</a>
+          <a href="#choose" class="btn btn-primary btn-large hero-cta">Выбрать персонажа</a>
         </div>
 
         <div class="hero-cat-strip">
@@ -117,13 +117,17 @@
       <section class="section">
         <div class="section-inner">
           <div class="difference-grid">
-            <div>
-              <h2 class="pixel-heading difference-heading">
-                <span class="hl">Главная сложность —</span><br />
-                соединить знания<br />
-                <span class="hl">в&nbsp;целостную трактовку</span>
-              </h2>
+            <h2 class="pixel-heading difference-heading">
+              <span class="hl">Главная сложность —</span><br />
+              соединить знания<br />
+              <span class="hl">в&nbsp;целостную трактовку</span>
+            </h2>
 
+            <div class="key-wrap reveal">
+              <img src="/assets/illustrations/key-ribbon.png" alt="Золотой ключ джйотиш" loading="lazy" />
+            </div>
+
+            <div class="difference-copy">
               <p class="difference-text">
                 Можно выучить значения планет, знаков, домов и&nbsp;накшатр, но&nbsp;при открытии
                 реальной карты всё равно не&nbsp;понимать, как связать их&nbsp;между собой.
@@ -132,10 +136,6 @@
                 В&nbsp;результате <span class="hl">знания остаются разрозненными</span>, а&nbsp;уверенности
                 в&nbsp;самостоятельном чтении карты так и&nbsp;не&nbsp;появляется.
               </p>
-            </div>
-
-            <div class="key-wrap reveal">
-              <img src="/assets/illustrations/key-ribbon.png" alt="Золотой ключ джйотиш" loading="lazy" />
             </div>
           </div>
         </div>
@@ -181,20 +181,20 @@
       <section class="section" id="depth">
         <div class="section-inner">
           <div class="depth-grid">
-            <div>
+            <div class="depth-intro">
               <h2 class="pixel-heading depth-heading">
-                Единый путь от&nbsp;основ к&nbsp;глубокому чтению карты
+                От&nbsp;основ<br />к&nbsp;глубине карты
               </h2>
-              <p class="depth-text">Вместо разрозненных знаний — одна последовательная система.</p>
               <p class="depth-text">
-                Вы шаг за&nbsp;шагом погружаетесь в&nbsp;джйотиш: каждый новый уровень опирается на
-                предыдущий и&nbsp;открывает более глубокий слой натальной карты.
-              </p>
-              <p class="depth-text">
-                Как у&nbsp;<strong>айсберга</strong>: сначала вы осваиваете то,&nbsp;что лежит на&nbsp;поверхности,
-                затем постепенно учитесь видеть скрытые уровни и&nbsp;соединять их&nbsp;в&nbsp;целостную трактовку.
+                Вы изучаете джйотиш последовательно: каждый новый уровень опирается на
+                предыдущий и&nbsp;открывает более глубокий слой карты.
               </p>
             </div>
+
+            <p class="depth-text depth-outro">
+              Как у&nbsp;<strong>айсберга</strong>: сначала видна основа, затем открываются
+              скрытые связи&nbsp;— и&nbsp;отдельные знания складываются в&nbsp;целостную трактовку.
+            </p>
 
             <div class="iceberg-visual reveal">
               <div class="iceberg-swing">
@@ -213,6 +213,84 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Character choice -->
+      <section class="section section-center" id="choose">
+        <div class="section-inner">
+          <h2 class="pixel-heading choose-heading">Выбор персонажа</h2>
+          <p class="pixel-heading choose-subheading">Почему он&nbsp;так важен?</p>
+          <p class="choose-intro">
+            В&nbsp;основе курса — философия личности души. Чтобы служить осознанно,
+            важно узнать личность: её&nbsp;характер, настроение, предпочтения
+            и&nbsp;отношения с&nbsp;другими.
+          </p>
+
+          <div class="choose-scene" id="choose-scene">
+            <div class="choose-road">
+              <img
+                class="choose-road-img"
+                src="/assets/illustrations/choose person/road.png"
+                alt=""
+              />
+              <img
+                class="choose-castle"
+                src="/assets/illustrations/choose person/castle.png"
+                alt="Обитель персонажа"
+              />
+              <img
+                class="choose-surya"
+                src="/assets/illustrations/choose person/surya.png"
+                alt="Сурья"
+              />
+              <img
+                class="choose-chandra"
+                id="choose-chandra"
+                src="/assets/illustrations/choose person/chandra-step1.png"
+                alt="Чандра идёт по&nbsp;дороге"
+              />
+              <img
+                class="choose-meet"
+                id="choose-meet"
+                src="/assets/illustrations/choose person/chandra-surya1.png"
+                alt="Встреча Чандры и&nbsp;Сурьи"
+              />
+            </div>
+
+            <figure class="choose-bubble choose-bubble--right" id="choose-bubble-1">
+              <figcaption class="choose-bubble-title pixel-heading">
+                Общение с&nbsp;персонажем
+              </figcaption>
+              <p>
+                Выбранный персонаж сопровождает вас по&nbsp;курсу и&nbsp;отвечает
+                фразами, отражающими его&nbsp;характер, настроение
+                и&nbsp;предпочтения.
+              </p>
+            </figure>
+
+            <figure class="choose-bubble choose-bubble--left" id="choose-bubble-2">
+              <figcaption class="choose-bubble-title pixel-heading">
+                Обители и&nbsp;квесты
+              </figcaption>
+              <p>
+                У&nbsp;каждого персонажа своя обитель. Выполняя квесты,
+                вы&nbsp;учитесь чувствовать влияние планет и&nbsp;видеть
+                их&nbsp;роль в&nbsp;своей жизни.
+              </p>
+            </figure>
+
+            <figure class="choose-bubble choose-bubble--right" id="choose-bubble-3">
+              <figcaption class="choose-bubble-title pixel-heading">
+                Отношения планет
+              </figcaption>
+              <p>
+                Вы&nbsp;поймёте, почему планеты дружат, враждуют или&nbsp;сохраняют
+                нейтралитет, и&nbsp;научитесь видеть эти&nbsp;отношения
+                в&nbsp;жизни.
+              </p>
+            </figure>
           </div>
         </div>
       </section>
@@ -294,6 +372,6 @@
       <span>MOKSHA EDUCATION</span>
     </footer>
 
-    <script src="landing.js?v=9"></script>
+    <script src="landing.js?v=15"></script>
   </body>
 </html>
