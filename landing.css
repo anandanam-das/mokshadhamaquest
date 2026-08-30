@@ -931,14 +931,16 @@ main {
 
 .choose-bubble {
   position: absolute;
+  z-index: 10; /* above the castle (5) and the meeting frame (6) */
   width: clamp(210px, 30%, 290px);
   margin: 0;
   padding: 14px 16px;
-  background: rgba(247, 236, 211, 0.96);
+  background: rgba(247, 236, 211, 0.98);
   border: 2px solid var(--cream-border);
   border-radius: 14px;
   box-shadow: var(--shadow-lift);
   text-align: center;
+  overflow-wrap: break-word;
   opacity: 0;
   transition: opacity 0.55s ease, transform 0.55s ease;
   pointer-events: none;
@@ -964,10 +966,14 @@ main {
 #choose-bubble-3 { top: 74%; }
 
 .choose-bubble-title {
-  font-size: 0.62rem;
-  line-height: 1.4;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.98rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
   color: var(--gold);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .choose-bubble p {
@@ -978,51 +984,55 @@ main {
 }
 
 @media (max-width: 760px) {
-  /* On a phone there's no room for callouts flanking the road, and pushing
-     them off-screen clips them (body has overflow-x: hidden). Instead the two
-     opening callouts sit side by side in a strip above the scene, and the
-     closing one sits under the meeting — all fully on-screen, none covering
-     the artwork or the walking character. */
+  /* Callouts staggered down the sides, each next to its own stop on the road
+     (like the desktop layout): start → upper right, castle → left, meeting →
+     bottom centre. They overlap the artwork but never sit off-screen (body
+     has overflow-x: hidden), and the pixel road is narrow enough that each
+     side still shows. */
   .choose-scene {
-    padding-top: 132px;
+    padding-top: 12px;
     padding-bottom: 92px;
   }
 
   .choose-road {
-    width: min(240px, 66vw);
+    width: min(240px, 62vw);
   }
 
   .choose-bubble {
-    width: 49%;
-    padding: 10px 11px;
+    width: 54%;
+    padding: 11px 12px;
     background: rgba(247, 236, 211, 0.97);
   }
 
   .choose-bubble-title {
-    font-size: 0.52rem;
-    margin-bottom: 5px;
+    font-size: 0.78rem;
+    letter-spacing: 0.01em;
+    margin-bottom: 6px;
   }
 
   .choose-bubble p {
-    font-size: 0.78rem;
-    line-height: 1.42;
+    font-size: 0.76rem;
+    line-height: 1.4;
   }
 
   .choose-bubble--right {
     right: 0;
     left: auto;
-    transform: translateY(12px);
+    transform: translateX(16px) translateY(10px);
   }
 
   .choose-bubble--left {
     left: 0;
     right: auto;
-    transform: translateY(12px);
+    transform: translateX(-16px) translateY(10px);
   }
 
-  #choose-bubble-1,
+  #choose-bubble-1 {
+    top: 2%;
+  }
+
   #choose-bubble-2 {
-    top: 0;
+    top: 34%;
   }
 
   #choose-bubble-3 {
@@ -1314,12 +1324,17 @@ main {
       "intro"
       "ice"
       "outro";
+    row-gap: 40px;
     text-align: center;
   }
 
   .depth-intro,
   .depth-outro {
     align-self: auto;
+  }
+
+  .iceberg-visual {
+    margin-top: 8px;
   }
 
   .carousel-slide {

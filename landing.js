@@ -156,7 +156,11 @@
       emergeAt: 4.3, // reappears already down the road, past the castle
       reachSurya: 8.8, // arrives on the clearing next to Surya
       end: 13,
-      bubble: [1.0, 3.9, 9.2], // when each callout pops in
+      // when each callout pops in:
+      //  [0] as Chandra nears the castle
+      //  [1] as she walks out of the castle toward Surya
+      //  [2] when she reaches Surya
+      bubble: [3.0, 6.2, 9.2],
     };
     // Vertical waypoints along the road, as % of the road height.
     //  castleEnter — top edge of the castle, where she slips inside and vanishes
