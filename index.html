@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css?v=94" />
+    <link rel="stylesheet" href="landing.css?v=95" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
@@ -472,108 +472,83 @@
           <p class="eyebrow">Начать обучение</p>
           <h2 class="pixel-heading roadmap-heading">Дорожная карта обучения</h2>
           <p class="roadmap-lead">
-            Обучение идёт последовательно: каждая ступень открывает следующую.
-            Сейчас доступна запись на&nbsp;первую — «Планеты», остальные откроются
-            по&nbsp;мере прохождения курса.
+            Курс идёт по&nbsp;ступеням: каждая открывает следующую. Сейчас доступна
+            запись на&nbsp;первую — «Планеты».
           </p>
 
-          <ol class="roadmap">
-            <li class="roadmap-step is-open">
-              <span class="roadmap-num">1</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">Планеты</h3>
-                <p class="roadmap-desc">
-                  Природа девяти планет-грах: характер, роль и&nbsp;влияние каждой.
-                </p>
-                <span class="roadmap-status roadmap-status--open">Открыта запись</span>
-                <a
-                  href="https://t.me/moksha_support?text=Привет!%20Хочу%20купить%20обучение%20по%20Джйотиш%20про%20Планеты%20🪐"
-                  target="_blank"
-                  rel="noopener"
-                  class="btn btn-primary roadmap-cta"
-                  >Записаться на&nbsp;курс</a
-                >
-              </div>
-            </li>
+          <!-- compact stage track -->
+          <div class="roadmap-track-wrap">
+            <ol class="roadmap-track">
+              <li class="roadmap-node is-open">
+                <span class="roadmap-node-dot">1</span>
+                <span class="roadmap-node-name">Планеты</span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">2</span>
+                <span class="roadmap-node-name">Знаки</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">3</span>
+                <span class="roadmap-node-name">Дома</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">4</span>
+                <span class="roadmap-node-name">Связи</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">5</span>
+                <span class="roadmap-node-name">Накшатры</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">6</span>
+                <span class="roadmap-node-name">Навамша</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+              <li class="roadmap-node is-locked">
+                <span class="roadmap-node-dot">7</span>
+                <span class="roadmap-node-name">Практика</span>
+                <span class="roadmap-node-lock" aria-hidden="true"></span>
+              </li>
+            </ol>
+          </div>
 
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">2</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Знаки <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  Двенадцать знаков-раши: стихии, качества и&nbsp;планеты-управители.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
+          <!-- featured offer: first stage -->
+          <div class="roadmap-offer">
+            <div class="roadmap-offer-main">
+              <span class="roadmap-offer-badge">Ступень 1 · доступна</span>
+              <h3 class="roadmap-offer-title">Планеты</h3>
+              <p class="roadmap-offer-desc">
+                Природа девяти планет-грах: характер, роль и&nbsp;влияние каждой —
+                фундамент, на&nbsp;котором строится всё чтение карты.
+              </p>
+              <ul class="roadmap-offer-list">
+                <li>Две лекции в&nbsp;неделю с&nbsp;разбором каждой планеты</li>
+                <li>Практические задания на&nbsp;игровой платформе MOKSHA</li>
+                <li>Личные рекомендации по&nbsp;практикам и&nbsp;сопровождение</li>
+              </ul>
+            </div>
 
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">3</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Дома <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  Двенадцать домов-бхав: сферы жизни и&nbsp;как их&nbsp;читать в&nbsp;карте.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
-
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">4</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Связи <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  Аспекты, соединения и&nbsp;взаимодействие планет между собой.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
-
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">5</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Накшатры <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  27&nbsp;лунных стоянок — тонкий слой характера и&nbsp;событий.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
-
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">6</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Навамша <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  Карта D9: сила планет, глубина натуры и&nbsp;тема партнёрства.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
-
-            <li class="roadmap-step is-locked">
-              <span class="roadmap-num">7</span>
-              <div class="roadmap-card">
-                <h3 class="roadmap-name">
-                  Практика <span class="roadmap-lock" aria-hidden="true"></span>
-                </h3>
-                <p class="roadmap-desc">
-                  Разбор реальных карт и&nbsp;собственный опыт самостоятельного чтения.
-                </p>
-                <span class="roadmap-status">Откроется позже</span>
-              </div>
-            </li>
-          </ol>
+            <div class="roadmap-offer-buy">
+              <span class="roadmap-offer-price">
+                <b>180&nbsp;$</b>
+                <span>за&nbsp;ступень</span>
+              </span>
+              <a
+                href="https://t.me/moksha_support?text=Привет!%20Хочу%20купить%20обучение%20по%20Джйотиш%20про%20Планеты%20🪐"
+                target="_blank"
+                rel="noopener"
+                class="btn btn-primary roadmap-offer-cta"
+                >Записаться на&nbsp;курс</a
+              >
+              <span class="roadmap-offer-note">
+                Следующие ступени открываются по&nbsp;мере прохождения курса.
+              </span>
+            </div>
+          </div>
         </div>
       </section>
     </main>
