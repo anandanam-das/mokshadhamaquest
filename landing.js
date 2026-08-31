@@ -143,8 +143,8 @@
       document.getElementById('choose-bubble-3'),
     ];
 
-    const walkFrames = [1, 2, 3, 4].map((n) => `${BASE}chandra-step${n}.png`);
-    const meetFrames = [1, 2, 3, 4, 5, 6].map((n) => `${BASE}chandra-surya${n}.png`);
+    const walkFrames = [1, 2, 3, 4].map((n) => `${BASE}chandra-step${n}.webp`);
+    const meetFrames = [1, 2, 3, 4, 5, 6].map((n) => `${BASE}chandra-surya${n}.webp`);
     [...walkFrames, ...meetFrames].forEach((src) => {
       const img = new Image();
       img.src = src;
@@ -286,13 +286,13 @@
     const hold = { 1: 700, 2: 80, 3: 60, 4: 240, 5: 400, 6: 280, 7: 320, 8: 200, 9: 600 };
     seq.forEach((n) => {
       const img = new Image();
-      img.src = `${dir}head-${n}.png`;
+      img.src = `${dir}head-${n}.webp`;
     });
 
     let i = 0;
     function tick() {
       const n = seq[i];
-      teacherHead.src = `${dir}head-${n}.png`;
+      teacherHead.src = `${dir}head-${n}.webp`;
       i = (i + 1) % seq.length;
       setTimeout(tick, hold[n] || 220);
     }
