@@ -26,7 +26,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let access;
   if (isLocalDev) {
-    access = { hasPlanetsAccess: true, hasSignsAccess: true, hasNakshatrasAccess: true };
+    access = {
+      telegramId: state.telegramId || 'local-dev',
+      hasPlanetsAccess: true,
+      hasSignsAccess: true,
+      hasNakshatrasAccess: true,
+    };
   } else {
     try {
       access = await checkSubscription(state.telegramId);
