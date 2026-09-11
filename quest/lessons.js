@@ -48,6 +48,7 @@ const LECTURE_TASK = { id: 'watch_lecture', type: 'lecture_checkbox', title: 'С
 
 const INTRO_TASKS = [
   LECTURE_TASK,
+  { id: 'task_gunas', type: 'guna_sort_rounds', title: 'Одна энергия — три пути' },
   { id: 'task_1', type: 'matching', title: 'Пять мостов' },
   { id: 'task_2', type: 'find_error', title: 'Сад двух миров' },
   { id: 'task_3', type: 'drag_to_container', title: 'Гений кулинарии' },

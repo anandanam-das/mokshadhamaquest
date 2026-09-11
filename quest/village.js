@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     drag_to_container: '🍲',
     layered_map: '🎯',
     guided_tour: '🗺️',
+    guna_sort_rounds: '⚡',
   };
 
   const stage = document.getElementById('villageStage');
@@ -1318,10 +1319,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const step = document.createElement('div');
       step.className = 'engine-step';
       stage.appendChild(step);
+      // По умолчанию — общие формулировки причины (одни на все планеты),
+      // но задание может переопределить их через data.reasonOptions, если
+      // нужны варианты, завязанные на сюжет конкретных клипов.
+      const reasonOptions = data.reasonOptions || GUNA_REASON_OPTIONS;
       renderChoiceButtons(
         step,
         'Почему именно эта гуна?',
-        shuffle(GUNA_REASON_OPTIONS.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
+        shuffle(reasonOptions.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
         () => showStepC(clip)
       );
     };
@@ -1760,6 +1765,178 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // "Одна энергия — три пути" (guna_sort_rounds) — 5 раундов: одна ситуация,
+  // три реакции без подписи гуны, перетащить (или тап+тап) каждую в одну
+  // из трёх фиксированных зон. Та же drag/tap-механика и вёрстка (map-match-*),
+  // что у "Карты звёздного покровителя", но зоны фиксированы на весь урок,
+  // а не собираются из data.categories — и пул из 3 карточек на раунд,
+  // а не общий пул на всё задание.
+  const GUNA_SORT_ZONES = [
+    { id: 'tamas', label: 'ТАМАС — НЕВЕЖЕСТВО', guna: 'Тамас' },
+    { id: 'rajas', label: 'РАДЖАС — СТРАСТЬ', guna: 'Раджас' },
+    { id: 'sattva', label: 'САТТВА — БЛАГОСТЬ', guna: 'Саттва' },
+  ];
+
+  const renderGunaSortTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = data.introText;
+
+    const progress = document.createElement('p');
+    progress.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(intro, progress, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const rounds = shuffle(data.rounds);
+    let index = 0;
+
+    const showFinal = () => {
+      stage.innerHTML = '';
+      progress.textContent = '';
+      const final = document.createElement('p');
+      final.className = 'task-content-feedback';
+      final.textContent = data.finalMessage;
+      stage.appendChild(final);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary';
+      btn.textContent = 'Дальше';
+      btn.addEventListener('click', () => {
+        completeTask(lessonKey, task.id);
+        reactToTaskComplete();
+        rerenderCurrentLesson();
+      });
+      stage.appendChild(btn);
+    };
+
+    const showRound = () => {
+      stage.innerHTML = '';
+      progress.textContent = `${index + 1} из ${rounds.length}`;
+      const round = rounds[index];
+
+      const situation = document.createElement('p');
+      situation.className = 'engine-step-question';
+      situation.textContent = round.prompt;
+      stage.appendChild(situation);
+
+      const zonesEl = document.createElement('div');
+      zonesEl.className = 'map-match-categories';
+
+      const poolEl = document.createElement('div');
+      poolEl.className = 'map-match-pool';
+
+      stage.append(zonesEl, poolEl);
+
+      const filled = new Set();
+      let selectedUid = null;
+      const cardEls = {};
+      const slotEls = {};
+
+      const clearSelection = () => {
+        selectedUid = null;
+        Object.values(cardEls).forEach((el) => el.classList.remove('map-match-card-selected'));
+      };
+
+      const cards = round.reactions.map((r, i) => ({ uid: `r${i}`, text: r.text, guna: r.guna }));
+
+      const attemptPlace = (uid, zoneId) => {
+        if (!uid || filled.has(zoneId) || !cardEls[uid]) return;
+        const card = cards.find((c) => c.uid === uid);
+        const zone = GUNA_SORT_ZONES.find((z) => z.id === zoneId);
+
+        if (card.guna === zone.guna) {
+          filled.add(zoneId);
+          const slot = slotEls[zoneId];
+          slot.classList.add('map-match-slot-filled');
+          const valueEl = slot.querySelector('.map-match-slot-value');
+          valueEl.textContent = card.text;
+          valueEl.hidden = false;
+          cardEls[uid].remove();
+          delete cardEls[uid];
+          clearSelection();
+
+          if (filled.size === GUNA_SORT_ZONES.length) {
+            index += 1;
+            setTimeout(index < rounds.length ? showRound : showFinal, 700);
+          }
+        } else {
+          const slot = slotEls[zoneId];
+          slot.classList.remove('map-match-slot-shake');
+          // eslint-disable-next-line no-void
+          void slot.offsetWidth;
+          slot.classList.add('map-match-slot-shake');
+          clearSelection();
+        }
+      };
+
+      GUNA_SORT_ZONES.forEach((zone) => {
+        const slot = document.createElement('div');
+        slot.className = 'map-match-slot';
+
+        const label = document.createElement('div');
+        label.className = 'map-match-slot-label';
+        label.textContent = zone.label;
+
+        const value = document.createElement('div');
+        value.className = 'map-match-slot-value';
+        value.hidden = true;
+
+        slot.append(label, value);
+
+        slot.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          if (!filled.has(zone.id)) slot.classList.add('map-match-slot-hover');
+        });
+        slot.addEventListener('dragleave', () => slot.classList.remove('map-match-slot-hover'));
+        slot.addEventListener('drop', (e) => {
+          e.preventDefault();
+          slot.classList.remove('map-match-slot-hover');
+          attemptPlace(e.dataTransfer.getData('text/plain'), zone.id);
+        });
+        slot.addEventListener('click', () => {
+          if (filled.has(zone.id) || !selectedUid) return;
+          attemptPlace(selectedUid, zone.id);
+        });
+
+        slotEls[zone.id] = slot;
+        zonesEl.appendChild(slot);
+      });
+
+      shuffle(cards).forEach((card) => {
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'map-match-card';
+        el.textContent = card.text;
+        el.draggable = true;
+        el.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', card.uid);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        el.addEventListener('click', () => {
+          if (selectedUid === card.uid) {
+            clearSelection();
+            return;
+          }
+          clearSelection();
+          selectedUid = card.uid;
+          el.classList.add('map-match-card-selected');
+        });
+        cardEls[card.uid] = el;
+        poolEl.appendChild(el);
+      });
+    };
+
+    showRound();
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -1800,6 +1977,8 @@ document.addEventListener('DOMContentLoaded', () => {
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
+    } else if (task.id === 'task_gunas' && task.type === 'guna_sort_rounds') {
+      renderGunaSortTask(lessonKey, task, taskGunaSortData);
     } else if (task.id === 'task_1' && task.type === 'matching') {
       renderMatchingTask(lessonKey, task);
     } else if (task.id === 'task_2' && task.type === 'find_error') {
