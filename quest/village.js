@@ -1788,16 +1788,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const progress = document.createElement('p');
     progress.className = 'quiz-progress';
 
+    // Живёт вне stage (не пересоздаётся на каждый раунд/реролл), как в
+    // "Саде двух миров" и "Взгляде астролога" — та же .flower-feedback.
+    const feedbackEl = document.createElement('div');
+    feedbackEl.className = 'flower-feedback';
+    feedbackEl.hidden = true;
+
+    const showFeedback = (text, isWarning) => {
+      feedbackEl.hidden = false;
+      feedbackEl.textContent = text;
+      feedbackEl.classList.toggle('flower-feedback-warning', !!isWarning);
+    };
+
+    const hideFeedback = () => {
+      feedbackEl.hidden = true;
+      feedbackEl.classList.remove('flower-feedback-warning');
+    };
+
     const stage = document.createElement('div');
     stage.className = 'engine-stage';
 
-    wrap.append(intro, progress, stage);
+    wrap.append(intro, progress, feedbackEl, stage);
     taskContentPanel.appendChild(wrap);
 
     const rounds = shuffle(data.rounds);
+    // 3 ошибки на раунд ещё можно, 4-я пересобирает раунд заново (те же
+    // 3 карточки, новая перетасовка) — как maxWrongPlucks у task_2.
+    const MAX_WRONG_ATTEMPTS = data.maxWrongAttempts || 4;
     let index = 0;
 
     const showFinal = () => {
+      hideFeedback();
       stage.innerHTML = '';
       progress.textContent = '';
       const final = document.createElement('p');
@@ -1818,9 +1839,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showRound = () => {
+      hideFeedback();
       stage.innerHTML = '';
       progress.textContent = `${index + 1} из ${rounds.length}`;
       const round = rounds[index];
+      let wrongAttempts = 0;
+      let settled = false;
 
       const situation = document.createElement('p');
       situation.className = 'engine-step-question';
@@ -1828,7 +1852,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.appendChild(situation);
 
       const zonesEl = document.createElement('div');
-      zonesEl.className = 'map-match-categories';
+      zonesEl.className = 'guna-sort-zones';
 
       const poolEl = document.createElement('div');
       poolEl.className = 'map-match-pool';
@@ -1848,7 +1872,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cards = round.reactions.map((r, i) => ({ uid: `r${i}`, text: r.text, guna: r.guna }));
 
       const attemptPlace = (uid, zoneId) => {
-        if (!uid || filled.has(zoneId) || !cardEls[uid]) return;
+        if (settled || !uid || filled.has(zoneId) || !cardEls[uid]) return;
         const card = cards.find((c) => c.uid === uid);
         const zone = GUNA_SORT_ZONES.find((z) => z.id === zoneId);
 
@@ -1862,8 +1886,10 @@ document.addEventListener('DOMContentLoaded', () => {
           cardEls[uid].remove();
           delete cardEls[uid];
           clearSelection();
+          hideFeedback();
 
           if (filled.size === GUNA_SORT_ZONES.length) {
+            settled = true;
             index += 1;
             setTimeout(index < rounds.length ? showRound : showFinal, 700);
           }
@@ -1874,6 +1900,15 @@ document.addEventListener('DOMContentLoaded', () => {
           void slot.offsetWidth;
           slot.classList.add('map-match-slot-shake');
           clearSelection();
+
+          wrongAttempts += 1;
+          if (wrongAttempts >= MAX_WRONG_ATTEMPTS) {
+            settled = true;
+            showFeedback(GUNA_SORT_RESET_TEXT, true);
+            setTimeout(showRound, 1200);
+          } else {
+            showFeedback(GUNA_SORT_WARNING_TEXT, true);
+          }
         }
       };
 
