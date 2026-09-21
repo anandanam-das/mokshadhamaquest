@@ -3745,6 +3745,11 @@ h3 {
   }
 }
 
+/* Длинное имя переносится в 2-3 строки вместо одной широкой ленты —
+   иначе у зданий ближе к краю карты (например "Ремесленный двор" на
+   западе) подпись вылезала за пределы сцены и обрезалась её overflow.
+   Единое правило для всех зданий, а не точечное — чтобы стиль подписи
+   не менялся от здания к зданию. */
 .village-building-label {
   font-size: 0.66rem;
   font-weight: 700;
@@ -3752,11 +3757,6 @@ h3 {
   text-align: center;
   background: rgba(255, 255, 255, 0.7);
   padding: 2px 8px;
-  border-radius: 999px;
-}
-
-/* Длинное имя — в две строки, а не одной широкой лентой через полкарты. */
-.village-building-label-layer[data-building-id="chandra"] .village-building-label {
   max-width: 100px;
   white-space: normal;
   overflow-wrap: break-word;
@@ -3901,6 +3901,7 @@ h3 {
   display: grid;
   gap: 18px;
   width: 100%;
+  min-width: 0;
   max-width: 720px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -4130,6 +4131,7 @@ h3 {
 
 .engine-detail-text {
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .engine-detail-note {
@@ -4138,6 +4140,36 @@ h3 {
   color: var(--muted);
   font-size: 0.92rem;
   font-style: italic;
+}
+
+@media (max-width: 560px) {
+  /* На узком экране мark+текст+note в одну flex-строку не помещались —
+     note сжималась в узкую колонку и вместе с текстом вылезала за
+     пределы карточки. Переносим note под текст отдельной строкой. */
+  .engine-detail-item {
+    flex-wrap: wrap;
+    padding: 10px 14px;
+  }
+
+  .engine-detail-note {
+    flex-basis: 100%;
+    margin-left: 26px;
+  }
+
+  /* Чуть меньше кегль и text-wrap: pretty (где поддерживается) — при
+     полноразмерном тексте на узкой карточке было много переносов с
+     повисшими предлогами/короткими хвостами строк. */
+  .engine-detail-text {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .engine-detail-note {
+    font-size: 0.86rem;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
 }
 
 .engine-details-hint {

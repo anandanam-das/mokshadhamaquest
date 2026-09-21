@@ -103,9 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Точечный сдвиг подписи (в % от сцены) относительно её обычного места
   // "под картинкой" — когда для конкретного здания этого недостаточно.
   const LABEL_OFFSET_PCT = {
-    rahu: { dx: -6, dy: -8 },
-    ketu: { dx: -11, dy: -9 },
-    chandra: { dx: 1, dy: 1.5 },
+    rahu: { dx: -3, dy: -8 },
+    ketu: { dx: -17, dy: -9 },
+    chandra: { dx: 7, dy: 1.5 },
+    // Шани (запад, x:12) и Гуру (восток, x:89) стоят достаточно близко к
+    // краю сцены, чтобы даже подпись в две строки задевала его — сдвигаем
+    // каждую немного к центру карты. Мангала (юг, y:86) — то же самое по
+    // вертикали: без сдвига подпись оказывалась почти у самого нижнего края.
+    shani: { dx: 7, dy: 1.5 },
+    guru: { dx: -6, dy: 1.5 },
+    mangala: { dx: 0, dy: -3 },
   };
 
   stage.style.width = '100%';
@@ -121,8 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentLessonTasks = null;
 
   // --- Персонаж-покровитель: зафиксирован на экране (не на странице),
-  // всегда в углу снизу, можно скрыть и показать снова. Когда появляется
-  // реплика — виджет автоматически разворачивается, даже если был скрыт.
+  // всегда в углу снизу, можно скрыть и показать снова. Раньше при новой
+  // реплике виджет автоматически разворачивался, даже если пользователь
+  // его только что скрыл, — сейчас скрытие уважается: пока пользователь
+  // сам не нажмёт "показать", реплики просто не всплывают.
 
   const patronWidget = document.getElementById('patronWidget');
   const patronSpeechBubble = document.getElementById('patronSpeechBubble');
@@ -149,7 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const showPatronSpeech = (message) => {
-    showPatronWidget();
+    // Пользователь сам скрыл виджет — не разворачиваем его обратно без
+    // спроса, реплика просто не показывается, пока он не нажмёт "показать".
+    if (patronWidget.classList.contains('patron-widget-hidden')) return;
     patronSpeechBubble.textContent = message;
     patronSpeechBubble.hidden = false;
     patronSpeechBubble.classList.add('speech-bubble-visible');
@@ -192,6 +203,34 @@ document.addEventListener('DOMContentLoaded', () => {
       copy[j] = tmp;
     }
     return copy;
+  };
+
+  // Обычный shuffle() иногда сваливает все "correct" пункты подряд —
+  // тогда задание превращается в "тапай всё по порядку, не читая".
+  // Раскладываем по видам (correct/trap/distractor/neutral), внутри
+  // каждого вида мешаем отдельно, а собираем результат по кругу — один
+  // пункт от каждого вида за проход, — так одинаковые виды не идут
+  // длинными сериями подряд.
+  const shuffleInterleaved = (array) => {
+    const buckets = {};
+    array.forEach((item) => {
+      (buckets[item.kind] = buckets[item.kind] || []).push(item);
+    });
+    const kinds = shuffle(Object.keys(buckets));
+    kinds.forEach((kind) => { buckets[kind] = shuffle(buckets[kind]); });
+
+    const result = [];
+    let added = true;
+    while (added) {
+      added = false;
+      kinds.forEach((kind) => {
+        if (buckets[kind].length) {
+          result.push(buckets[kind].shift());
+          added = true;
+        }
+      });
+    }
+    return result;
   };
 
   const pickNoRepeat = (bagKey, pool) => {
@@ -1127,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     list.className = 'engine-details-list';
     container.appendChild(list);
 
-    const shuffled = shuffle(details);
+    const shuffled = shuffleInterleaved(details);
     const correctTotal = shuffled.filter((d) => d.kind === 'correct').length;
 
     const hint = document.createElement('p');
