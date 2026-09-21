@@ -4183,6 +4183,25 @@ h3 {
   display: none;
 }
 
+.engine-details-warning {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(226, 104, 95, 0.14);
+  border: 1px solid rgba(226, 104, 95, 0.5);
+  color: #b23a30;
+  text-align: center;
+  font-weight: 700;
+}
+
+.engine-details-warning[hidden] {
+  display: none;
+}
+
+.engine-details-warning-reset {
+  background: rgba(226, 104, 95, 0.22);
+}
+
 .engine-details-next {
   justify-self: center;
 }
@@ -4328,6 +4347,12 @@ h3 {
   background: rgba(145, 226, 178, 0.16);
 }
 
+.map-match-slot-selected {
+  border-color: #5bd1a0;
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+  cursor: pointer;
+}
+
 .map-match-slot-shake {
   animation: map-match-slot-shake 0.4s ease;
 }
@@ -4379,4 +4404,53 @@ h3 {
   border-color: #5bd1a0;
   box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
   transform: translateY(-2px);
+}
+
+/* Плашка с текстом текущего выбора — между категориями и пулом. */
+.map-match-selected-indicator {
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #eafaf2;
+  border: 1px solid #5bd1a0;
+  box-shadow: 0 6px 16px rgba(94, 209, 158, 0.25);
+  color: #2f6f44;
+  font-weight: 700;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  /* 8 категорий одна под другой + отдельный пул карточек ниже — на
+     телефоне это огромный список, приходится всё время скроллить вверх-
+     вниз между категорией и нужной карточкой. Сжимаем категории в 2
+     колонки (вдвое короче список) и чуть уменьшаем сами карточки —
+     меньше скроллить, больше видно одновременно. */
+  .map-match-categories {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .map-match-slot {
+    padding: 10px 10px;
+    min-height: 56px;
+    gap: 4px;
+  }
+
+  .map-match-slot-label {
+    font-size: 0.68rem;
+  }
+
+  .map-match-slot-value {
+    font-size: 0.88rem;
+  }
+
+  .map-match-pool {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .map-match-card {
+    padding: 8px 12px;
+    font-size: 0.88rem;
+  }
 }

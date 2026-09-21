@@ -206,29 +206,41 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Обычный shuffle() иногда сваливает все "correct" пункты подряд —
-  // тогда задание превращается в "тапай всё по порядку, не читая".
-  // Раскладываем по видам (correct/trap/distractor/neutral), внутри
-  // каждого вида мешаем отдельно, а собираем результат по кругу — один
-  // пункт от каждого вида за проход, — так одинаковые виды не идут
-  // длинными сериями подряд.
+  // тогда задание превращается в "тапай всё по порядку, не читая". Но
+  // раскладывать по видам и собирать строго по кругу (первая версия этой
+  // функции) — другая крайность: когда видов всего два поровну (4
+  // correct + 4 trap, как почти везде), круговой сбор даёт железную
+  // шахматку "верно-неверно-верно-неверно" КАЖДЫЙ раз — тоже угадываемый
+  // порядок, просто другой. Вместо этого берём честный shuffle() и чиним
+  // ТОЛЬКО серии длиной 3+ подряд одного вида — меняем местами с
+  // произвольной позицией другого вида и проверяем заново, пока таких
+  // серий не останется. Редкие пары одного вида подряд — это нормальная
+  // случайность и остаются как есть; длинных серий или шахматки не будет.
+  const MAX_SAME_KIND_RUN = 2;
   const shuffleInterleaved = (array) => {
-    const buckets = {};
-    array.forEach((item) => {
-      (buckets[item.kind] = buckets[item.kind] || []).push(item);
-    });
-    const kinds = shuffle(Object.keys(buckets));
-    kinds.forEach((kind) => { buckets[kind] = shuffle(buckets[kind]); });
+    const result = shuffle(array);
 
-    const result = [];
-    let added = true;
-    while (added) {
-      added = false;
-      kinds.forEach((kind) => {
-        if (buckets[kind].length) {
-          result.push(buckets[kind].shift());
-          added = true;
+    const findBadRunIndex = () => {
+      for (let i = MAX_SAME_KIND_RUN; i < result.length; i += 1) {
+        if (result.slice(i - MAX_SAME_KIND_RUN, i + 1).every((item) => item.kind === result[i].kind)) {
+          return i;
         }
+      }
+      return -1;
+    };
+
+    let guard = 0;
+    let badIndex = findBadRunIndex();
+    while (badIndex !== -1 && guard < 50) {
+      const candidates = [];
+      result.forEach((item, idx) => {
+        if (item.kind !== result[badIndex].kind) candidates.push(idx);
       });
+      if (!candidates.length) break;
+      const swapIndex = candidates[Math.floor(Math.random() * candidates.length)];
+      [result[badIndex], result[swapIndex]] = [result[swapIndex], result[badIndex]];
+      guard += 1;
+      badIndex = findBadRunIndex();
     }
     return result;
   };
@@ -1161,16 +1173,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const renderDetailsReveal = (container, details, onDone) => {
+  // Раньше можно было просто протапать все пункты подряд без всякого
+  // риска — ни один неверный тап ничего не стоил. Теперь неверные тапы
+  // считаются, и когда их остаётся допустить не больше одного до конца
+  // всего "неверного" пула — задание пересобирается заново с нуля.
+  // Лимит считаем от РЕАЛЬНОГО числа неверных пунктов в конкретном
+  // наборе (allow all-but-one), а не фиксированным числом: у видео/картинок
+  // обычно 4 неверных (лимит 3), у аудио — 3 (лимит 2). Фиксированное "3"
+  // для аудио-наборов означало бы, что штраф срабатывает только тогда,
+  // когда пользователь уже протыкал вообще ВСЕ неверные варианты — то
+  // есть штрафа по факту не было бы вовсе.
+  // onWrongLimit ведёт назад к началу клипа (пересмотреть/переслушать
+  // отрывок или картинку), а не просто тасует те же пункты на месте:
+  // штраф должен возвращать к источнику, а не превращаться в ещё одну
+  // попытку угадать.
+  const ENGINE_DETAILS_WARNING_TEXT = 'Это не признак — присмотрись внимательнее.';
+  const ENGINE_DETAILS_RESET_TEXT = 'Слишком много ошибок — пересмотри отрывок ещё раз.';
+  const ENGINE_DETAILS_RESET_DELAY_MS = 1400;
+
+  const renderDetailsReveal = (container, details, onDone, onWrongLimit) => {
     const list = document.createElement('div');
     list.className = 'engine-details-list';
     container.appendChild(list);
 
     const shuffled = shuffleInterleaved(details);
     const correctTotal = shuffled.filter((d) => d.kind === 'correct').length;
+    const wrongTotal = shuffled.length - correctTotal;
+    const maxWrongTaps = Math.max(1, wrongTotal - 1);
 
     const hint = document.createElement('p');
     hint.className = 'engine-details-hint';
+
+    const warning = document.createElement('p');
+    warning.className = 'engine-details-warning';
+    warning.hidden = true;
 
     const nextBtn = document.createElement('button');
     nextBtn.type = 'button';
@@ -1179,6 +1215,8 @@ document.addEventListener('DOMContentLoaded', () => {
     nextBtn.disabled = true;
 
     let revealedCorrectCount = 0;
+    let wrongTaps = 0;
+    let settled = false;
     const updateHint = () => {
       hint.textContent =
         revealedCorrectCount === correctTotal
@@ -1197,7 +1235,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item.appendChild(text);
 
       item.addEventListener('click', () => {
-        if (item.classList.contains('revealed')) return;
+        if (settled || item.classList.contains('revealed')) return;
         item.classList.add('revealed', `kind-${detail.kind}`);
         const mark = document.createElement('span');
         mark.className = 'engine-detail-mark';
@@ -1209,14 +1247,32 @@ document.addEventListener('DOMContentLoaded', () => {
           note.textContent = detail.note;
           item.appendChild(note);
         }
-        if (detail.kind === 'correct') revealedCorrectCount += 1;
+
+        if (detail.kind === 'correct') {
+          revealedCorrectCount += 1;
+          warning.hidden = true;
+        } else {
+          wrongTaps += 1;
+          if (wrongTaps >= maxWrongTaps) {
+            settled = true;
+            warning.hidden = false;
+            warning.textContent = ENGINE_DETAILS_RESET_TEXT;
+            warning.classList.add('engine-details-warning-reset');
+            nextBtn.disabled = true;
+            setTimeout(() => onWrongLimit && onWrongLimit(), ENGINE_DETAILS_RESET_DELAY_MS);
+            return;
+          }
+          warning.hidden = false;
+          warning.textContent = ENGINE_DETAILS_WARNING_TEXT;
+          warning.classList.remove('engine-details-warning-reset');
+        }
         updateHint();
         if (revealedCorrectCount === correctTotal) nextBtn.disabled = false;
       });
       list.appendChild(item);
     });
 
-    container.append(hint, nextBtn);
+    container.append(hint, warning, nextBtn);
     nextBtn.addEventListener('click', onDone);
   };
 
@@ -1393,16 +1449,24 @@ document.addEventListener('DOMContentLoaded', () => {
         stage.appendChild(ref);
       }
 
-      renderDetailsReveal(stage, clip.details, () => {
-        index += 1;
-        if (index < clips.length) {
-          showClip();
-        } else {
-          completeTask(lessonKey, task.id);
-          reactToTaskComplete();
-          rerenderCurrentLesson();
-        }
-      });
+      renderDetailsReveal(
+        stage,
+        clip.details,
+        () => {
+          index += 1;
+          if (index < clips.length) {
+            showClip();
+          } else {
+            completeTask(lessonKey, task.id);
+            reactToTaskComplete();
+            rerenderCurrentLesson();
+          }
+        },
+        // Штраф за слишком много ошибок — не пересобрать те же карточки на
+        // месте, а вернуть к началу клипа, чтобы пересмотреть/переслушать
+        // отрывок заново перед новой попыткой.
+        () => showClip()
+      );
     };
 
     showClip();
@@ -1513,16 +1577,22 @@ document.addEventListener('DOMContentLoaded', () => {
       label.textContent = 'Разбери детали изображения:';
       stage.appendChild(label);
 
-      renderDetailsReveal(stage, card.details, () => {
-        index += 1;
-        if (index < cards.length) {
-          showCard();
-        } else {
-          completeTask(lessonKey, task.id);
-          reactToTaskComplete();
-          rerenderCurrentLesson();
-        }
-      });
+      renderDetailsReveal(
+        stage,
+        card.details,
+        () => {
+          index += 1;
+          if (index < cards.length) {
+            showCard();
+          } else {
+            completeTask(lessonKey, task.id);
+            reactToTaskComplete();
+            rerenderCurrentLesson();
+          }
+        },
+        // Штраф — вернуться к самой картинке, пересмотреть её заново.
+        () => showCard()
+      );
     };
 
     showCard();
@@ -1695,7 +1765,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const intro = document.createElement('p');
     intro.className = 'quiz-intro';
     intro.textContent =
-      'Собери карту звёздного покровителя: перетащи (или тапни, затем тапни категорию) верную карточку на её место. Среди карточек есть и чужие — ответы других планет.';
+      'Собери карту звёздного покровителя: перетащи верную карточку на её место (или тапни карточку и категорию — в любом порядке). Среди карточек есть и чужие — ответы других планет.';
 
     const categoriesEl = document.createElement('div');
     categoriesEl.className = 'map-match-categories';
@@ -1703,7 +1773,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const poolEl = document.createElement('div');
     poolEl.className = 'map-match-pool';
 
-    wrap.append(intro, categoriesEl, poolEl);
+    // Плашка с текстом текущего выбора — чтобы не терять его из виду,
+    // пока ищешь нужную категорию среди восьми.
+    const selectedIndicator = document.createElement('div');
+    selectedIndicator.className = 'map-match-selected-indicator';
+    selectedIndicator.hidden = true;
+
+    // Сначала все 8 категорий (что нужно заполнить), потом пул карточек
+    // (откуда выбирать) — обзор задачи целиком перед тем, как нырять в
+    // сам пул.
+    wrap.append(intro, categoriesEl, selectedIndicator, poolEl);
     taskContentPanel.appendChild(wrap);
 
     let cardSeq = 0;
@@ -1716,13 +1795,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const filled = new Set();
+    // Можно выбрать сначала карточку, потом категорию — или наоборот,
+    // сначала категорию, потом карточку. selectedUid и selectedCategoryId
+    // взаимоисключающие: как только выбрано и то, и другое, пара тут же
+    // проверяется через attemptPlace, а не ждёт отдельного действия.
     let selectedUid = null;
+    let selectedCategoryId = null;
     const cardEls = {};
     const slotEls = {};
 
     const clearSelection = () => {
       selectedUid = null;
+      selectedCategoryId = null;
       Object.values(cardEls).forEach((el) => el.classList.remove('map-match-card-selected'));
+      Object.values(slotEls).forEach((el) => el.classList.remove('map-match-slot-selected'));
+      selectedIndicator.hidden = true;
     };
 
     const attemptPlace = (uid, categoryId) => {
@@ -1780,8 +1867,23 @@ document.addEventListener('DOMContentLoaded', () => {
         attemptPlace(e.dataTransfer.getData('text/plain'), cat.id);
       });
       slot.addEventListener('click', () => {
-        if (filled.has(cat.id) || !selectedUid) return;
-        attemptPlace(selectedUid, cat.id);
+        if (filled.has(cat.id)) return;
+        if (selectedUid) {
+          // Карточка уже выбрана снизу — тап по категории завершает пару.
+          attemptPlace(selectedUid, cat.id);
+          return;
+        }
+        if (selectedCategoryId === cat.id) {
+          clearSelection();
+          return;
+        }
+        // Ничего ещё не выбрано — тап по категории запоминает её первой,
+        // следующий тап по карточке в пуле завершит пару.
+        clearSelection();
+        selectedCategoryId = cat.id;
+        slot.classList.add('map-match-slot-selected');
+        selectedIndicator.textContent = `Выбрана категория: ${cat.label}`;
+        selectedIndicator.hidden = false;
       });
 
       slotEls[cat.id] = slot;
@@ -1799,6 +1901,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.dataTransfer.effectAllowed = 'move';
       });
       el.addEventListener('click', () => {
+        if (selectedCategoryId) {
+          // Категория уже выбрана сверху — тап по карточке завершает пару.
+          attemptPlace(card.uid, selectedCategoryId);
+          return;
+        }
         if (selectedUid === card.uid) {
           clearSelection();
           return;
@@ -1806,6 +1913,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearSelection();
         selectedUid = card.uid;
         el.classList.add('map-match-card-selected');
+        selectedIndicator.textContent = `Выбрано: ${card.text}`;
+        selectedIndicator.hidden = false;
       });
       cardEls[card.uid] = el;
       poolEl.appendChild(el);
