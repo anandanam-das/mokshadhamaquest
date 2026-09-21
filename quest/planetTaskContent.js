@@ -26,7 +26,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Король',
           source: '«Король» / «The King» (2019), принц Хэл в начале фильма',
-          videoUrl: 'https://player.mediadelivery.net/play/726439/fb12727f-acd1-4838-a72c-4ecc87bd0d22',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/sun-tamas.mp4',
           details: [
             { text: 'Пьёт с утра и продолжает вести беспорядочный образ жизни.', kind: 'correct' },
             { text: 'Игнорирует просьбу тяжело больного отца прийти к нему.', kind: 'correct' },
@@ -58,7 +58,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: '300 спартанцев',
           source: '«300 спартанцев» (2006), Ксеркс',
-          videoUrl: 'https://player.mediadelivery.net/play/726439/bc56b16d-3108-4a95-bcb8-28f0113ab1d8',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/sun-rajas.mp4',
           details: [
             {
               text: 'прибывает на золотом троне, который несут на спинах десятки рабов — само появление построено как зрелище',
@@ -100,7 +100,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Гладиатор',
           source: '«Гладиатор» (2000)',
-          videoUrl: 'https://player.mediadelivery.net/play/726439/5c67fc71-469c-4a19-88e2-ec8cf908036d',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/sun-sattva.mp4',
           details: [
             {
               text: 'солдаты выражают ему почтение, а он отвечает простым жестом — хлопает по плечу, не дистанцируется',
@@ -514,7 +514,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Милдред Пирс',
           source: '«Милдред Пирс» / «Mildred Pierce» (2011, HBO), Веда отвергает мать',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/moon-tamas.mp4',
           details: [
             { text: 'Веда обвиняет мать в том, что та вышла замуж за её отца и родила её ради денег.', kind: 'correct' },
             {
@@ -546,7 +546,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Белая королева',
           source: '«Белая королева» / «The White Queen» (2013), Маргарет Бофорт',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/moon-rajas.mp4',
           details: [
             { text: 'Неоднократно подчёркивает: «Генри — мой сын. Он мой».', kind: 'correct' },
             {
@@ -578,7 +578,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Мария из Назарета',
           source: '«Мария из Назарета» / «Mary of Nazareth» (2012)',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/moon-sattva.mp4',
           details: [
             {
               text: 'Когда окружающие говорят, что Иисус якобы отверг её, она не обижается и отвечает: «Он мой Господь».',
@@ -931,7 +931,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Чёрные паруса',
           source: '«Чёрные паруса» / «Black Sails» (2014), Нед Лоу',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/mars-tamas.mp4',
           details: [
             {
               text: 'Лоу рассказывает о совершённых им жестокостях и прямо говорит, что не испытывает из-за них никакого сожаления.',
@@ -960,7 +960,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Александр',
           source: '«Александр» / «Alexander» (2004)',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/mars-rajas.mp4',
           details: [
             {
               text: 'Александр мечтает превзойти Ахилла и Геракла и говорит, что, достигнув края мира, повернёт обратно и завоюет то, что находится напротив.',
@@ -995,7 +995,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Царство небесное',
           source: '«Царство небесное» / «Kingdom of Heaven» (2005), Балиан',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/mars-sattva.mp4',
           details: [
             { text: 'В рыцарской клятве соединяются бесстрашие и запрет творить зло.', kind: 'correct' },
             { text: 'Получает обязанность защищать беззащитных и нуждающихся.', kind: 'correct' },
@@ -1352,7 +1352,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Будучи там',
           source: '«Будучи там» / «Being There» (1979), Чэнс',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/budha-tamas.mp4',
           details: [
             {
               text: 'Когда ему сообщают о смерти хозяина и объясняют произошедшее, Чэнс с трудом понимает смысл ситуации.',
@@ -1393,7 +1393,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Распутник',
           source: '«Распутник» / «The Libertine» (2004), Рочестер',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/budha-rajas.mp4',
           details: [
             {
               text: 'Использует своё остроумие и литературный талант, чтобы впечатлить короля и весь двор.',
@@ -1431,7 +1431,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Человек, который познал бесконечность',
           source: '«Человек, который познал бесконечность» / «The Man Who Knew Infinity» (2015), Рамануджан',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/budha-sattva.mp4',
           details: [
             {
               text: 'Выполняет вычисления в уме быстрее, чем другие успевают сделать их с помощью счёт.',
@@ -1834,7 +1834,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Агора',
           source: '«Агора» / «Agora» (2009), Аммоний',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/guru-tamas.mp4',
           details: [
             {
               text: 'Публично высмеивает чужие религиозные убеждения и относится к их последователям с явным пренебрежением.',
@@ -1875,7 +1875,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Оскар и Люсинда',
           source: '«Оскар и Люсинда» / «Oscar and Lucinda» (1997), Оскар Хопкинс',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/guru-rajas.mp4',
           details: [
             {
               text: 'Не может отказаться от азартных игр и признаётся, что готов делать ставки практически на что угодно.',
@@ -1916,7 +1916,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'О богах и людях',
           source: '«О богах и людях» / «Of Gods and Men» (2010), брат Люк',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/guru-sattva.mp4',
           details: [
             {
               text: 'Регулярно помогает местным жителям как врач, соединяя своё монашеское служение и веру с реальной заботой о каждом, кто приходит к нему за помощью.',
@@ -2362,7 +2362,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Моя кузина Рейчел',
           source: '«Моя кузина Рейчел» / «My Cousin Rachel» (2017), Филип Эшли',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shukra-tamas.mp4',
           details: [
             {
               text: 'После близости мужчина сам решает, что женщина станет его женой, хотя она на это не соглашалась.',
@@ -2403,7 +2403,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Дориан Грей',
           source: '«Дориан Грей» / «Dorian Gray» (2009)',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shukra-rajas.mp4',
           details: [
             {
               text: 'Мужчина активно использует внешность и обаяние, чтобы привлекать к себе внимание женщин.',
@@ -2438,7 +2438,7 @@ const PLANET_TASK_CONTENT = {
           // Тайм-коды сцен для монтажа (в версии 02:01:55 / 23.976 fps):
           // 00:34:09–00:36:43, 00:44:51–00:46:00, 00:46:32–00:47:52,
           // 00:49:05–00:49:28, 01:16:00–01:24:00.
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shukra-sattva.mp4',
           details: [
             {
               text: 'Женщина внимательно выслушивает человека, оказавшегося в трудной ситуации, и относится к нему мягко.',
@@ -2873,7 +2873,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Имя розы',
           source: '«Имя розы» / «The Name of the Rose», Хорхе Бургосский',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shani-tamas.mp4',
           details: [
             {
               text: 'Объясняя опасность запрещённой книги, Хорхе говорит, что смех уничтожает страх, а без страха больше не будет веры, поэтому считает необходимым сохранять страх в людях.',
@@ -2922,7 +2922,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Нефть',
           source: '«Нефть» / «There Will Be Blood», Дэниел Плейнвью',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shani-rajas.mp4',
           details: [
             {
               text: 'Дэниел самостоятельно занимается тяжёлой работой в шахте и на первых скважинах, получает травмы, но снова возвращается к работе и годами продолжает развивать нефтяное дело.',
@@ -2971,7 +2971,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Последний самурай',
           source: '«Последний самурай» / «The Last Samurai», Кацумото',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/shani-sattva.mp4',
           details: [
             {
               text: 'Кацумото и самураи каждый день следуют строгому распорядку и постоянно совершенствуют своё мастерство; наблюдая за ними, Алгрен прямо отмечает их исключительную дисциплину.',
@@ -3446,7 +3446,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Сид и Нэнси',
           source: '«Сид и Нэнси» / «Sid and Nancy» (1986), Сид Вишес',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/rahu-tamas.mp4',
           details: [
             {
               text: 'Сид и Нэнси находятся среди полного бытового хаоса, но их внимание сосредоточено на наркотиках: они требуют вернуть их и обсуждают дальнейшее употребление.',
@@ -3493,7 +3493,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Элвис',
           source: '«Элвис» / «Elvis» (2022), Элвис Пресли',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/rahu-rajas.mp4',
           details: [
             {
               text: 'Он выходит перед огромной аудиторией и буквально захватывает её внимание: движения и выступление вызывают крики и бурную эмоциональную реакцию толпы.',
@@ -3540,7 +3540,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Игра в имитацию',
           source: '«Игра в имитацию» / «The Imitation Game» (2014), Алан Тьюринг',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/rahu-sattva.mp4',
           details: [
             {
               text: 'Вместо того чтобы перебирать шифры привычным способом вместе со всеми, он предлагает принципиально другой подход: создать машину, которая будет бороться с другой машиной.',
@@ -3961,7 +3961,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Тамас',
           title: 'Солист',
           source: '«Солист» / «The Soloist» (2009), Нэтэниэл Эйрс',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/ketu-tamas.mp4',
           details: [
             {
               text: 'Он упорно отказывается переезжать с улицы в квартиру и настаивает, что ему лучше оставаться в привычном тоннеле.',
@@ -4002,7 +4002,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Раджас',
           title: 'Найти Форрестера',
           source: '«Найти Форрестера» / «Finding Forrester» (2000), Уильям Форрестер',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/ketu-rajas.mp4',
           details: [
             {
               text: 'Он много лет живёт затворником в одной квартире, почти не участвуя в жизни окружающего общества.',
@@ -4043,7 +4043,7 @@ const PLANET_TASK_CONTENT = {
           guna: 'Саттва',
           title: 'Весна, лето, осень, зима… и снова весна',
           source: '«Весна, лето, осень, зима… и снова весна» / «Spring, Summer, Fall, Winter… and Spring» (2003), Старый мастер',
-          videoUrl: '',
+          videoUrl: 'https://mokshapay.duckdns.org/videos/ketu-sattva.mp4',
           details: [
             {
               text: 'Он замечает едва различимое отличие между двумя похожими растениями и точно определяет, какое из них лекарственное, а какое опасное.',
