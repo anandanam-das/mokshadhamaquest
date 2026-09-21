@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <h3 class="dossier-title">${character.title} — ${character.epithet}</h3>
       <div class="dossier-archetype">Архетип: ${character.archetype}</div>
       <p class="dossier-text">${character.description}</p>
+      <p class="dossier-text dossier-downside">${character.downside}</p>
       <p class="dossier-fit">${character.fit}</p>
     `;
   };

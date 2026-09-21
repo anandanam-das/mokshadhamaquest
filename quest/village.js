@@ -1865,7 +1865,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const poolEl = document.createElement('div');
       poolEl.className = 'map-match-pool';
 
-      stage.append(zonesEl, poolEl);
+      // Сначала сами реакции (что сортируем), потом зоны-гуны (куда) — на
+      // мобильном, где зоны идут одна под другой на всю ширину, обратный
+      // порядок (сперва три высокие пустые зоны, а сами карточки только
+      // после долгого скролла) сбивал с толку.
+      stage.append(poolEl, zonesEl);
 
       const filled = new Set();
       let selectedUid = null;
@@ -2100,6 +2104,11 @@ document.addEventListener('DOMContentLoaded', () => {
           activeTaskId = task.id;
           renderLessonPanel(lessonKey, heading, rawTasks);
           renderTaskContentPanel(lessonKey, tasks.find((t) => t.id === activeTaskId));
+          // На мобильном список заданий длинный — после выбора самого
+          // задания панель с открывшимся контентом может быть ниже экрана,
+          // и незаметно, что вообще что-то произошло. Слегка подскролливаем
+          // к ней, чтобы сразу было видно открывшееся задание.
+          taskContentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
       }
 

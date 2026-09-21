@@ -292,8 +292,12 @@ h3 {
   color: var(--text);
 }
 
+.character-dossier .dossier-downside {
+  font-weight: 700;
+}
+
 .character-dossier .dossier-fit {
-  margin: 0;
+  margin: 10px 0 0;
   background: #eef6e4;
   border: 2px solid rgba(122, 163, 96, 0.22);
   border-radius: 16px;
@@ -801,6 +805,7 @@ h3 {
 
 .flower-task {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -808,9 +813,9 @@ h3 {
 }
 
 .flower-game {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 100%;
-  overflow-x: auto;
 }
 
 .flower-sidebar {
@@ -837,10 +842,13 @@ h3 {
 
 .flower-instruction {
   margin: 0;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.78rem;
-  line-height: 2;
-  color: var(--accent-2);
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(240, 201, 217, 0.28);
+  border: 1px solid rgba(240, 201, 217, 0.65);
+  color: #8a3f5c;
+  font-size: 1rem;
+  line-height: 1.5;
 }
 
 /* Номер цветка — теперь в сайдбаре, а не над самим цветком, и стоит
@@ -1238,10 +1246,55 @@ h3 {
 }
 
 @media (max-width: 560px) {
+  /* stretch (базовое значение) в паре с flex-wrap заставлял .flower-game
+     подстраиваться под высоту .flower-sidebar в той же линии вместо
+     собственной, из-за чего цветок обрезался/наезжал на текст снизу. */
+  .flower-task {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  /* Разгоняем цветок за паддинги карточки (22px с каждой стороны) —
+     иначе потолок его размера — это ширина ВНУТРИ отступов панели
+     (~287px), заметно меньше, чем можно было бы дать под сам рисунок. */
+  .flower-game {
+    width: calc(100% + 44px);
+    max-width: calc(100% + 44px);
+    margin: 0 -22px;
+  }
+
+  .flower-stage {
+    container-type: inline-size;
+    position: relative;
+    /* Фиксированное (не процентное) базовое значение — со 100% ширина
+       считалась неопределённой на проходе, где flex определяет
+       flex-basis .flower-game, и .flower-game "сжимался" до крошечного
+       intrinsic-размера ещё до того, как aspect-ratio успевал сработать. */
+    width: 340px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin: 0 auto;
+  }
+
+  /* Масштаб считаем от РЕАЛЬНОЙ ширины .flower-stage через контейнерные
+     единицы (100cqw = вся её ширина), а не захардкоженным числом — раньше
+     scale(0.46) был откалиброван под другую ширину, чем реально доставалась
+     стейджу во flex-раскладке, и цветок обрезало снизу-справа. */
   .flower-container {
-    transform: scale(0.46);
-    transform-origin: top center;
-    margin-bottom: -324px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 600px;
+    max-width: none;
+    height: 600px;
+    transform-origin: top left;
+    transform: scale(calc(100cqw / 600px));
+  }
+
+  .flower-petal-text {
+    font-size: 0.8rem;
+    line-height: 1.2;
   }
 }
 
@@ -1652,6 +1705,7 @@ h3 {
 
 .matching-task {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -1659,7 +1713,8 @@ h3 {
 }
 
 .matching-game {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-width: 0;
   max-width: 100%;
   overflow-x: auto;
 }
@@ -1667,6 +1722,7 @@ h3 {
 .matching-stage {
   position: relative;
   width: fit-content;
+  max-width: 100%;
   display: flex;
   align-items: stretch;
   overflow: hidden;
@@ -1854,9 +1910,8 @@ h3 {
   flex: 1 1 240px;
   min-width: 220px;
   padding-top: 8px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 0.62rem;
-  line-height: 2;
+  font-size: 1rem;
+  line-height: 1.65;
   color: var(--muted);
 }
 
@@ -1947,33 +2002,38 @@ h3 {
   .matching-strip-grass,
   .matching-strip-sand,
   .matching-strip-water {
-    background-size: 40px 40px;
+    background-size: 32px 32px;
   }
 
   .matching-strip-grass {
-    width: 16px;
+    width: 12px;
   }
 
   .matching-strip-sand {
-    width: 14px;
+    width: 10px;
   }
 
   .matching-strip-transition {
-    width: 18px;
-    background-size: 18px 40px;
+    width: 14px;
+    background-size: 14px 32px;
   }
 
   .matching-strip-water {
-    width: 36px;
+    width: 26px;
   }
 
   .matching-column {
-    padding: 8px 10px;
+    padding: 8px 6px;
+    gap: 8px;
   }
 
   .matching-item {
-    font-size: 0.9rem;
-    padding: 10px 16px;
+    font-size: 0.82rem;
+    padding: 8px 12px;
+  }
+
+  .matching-sidebar {
+    font-size: 0.92rem;
   }
 }
 
