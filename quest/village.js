@@ -1287,6 +1287,14 @@ document.addEventListener('DOMContentLoaded', () => {
       progress.textContent = `${index + 1} из ${clips.length}`;
       const clip = clips[index];
 
+      // Название фильма — только у видео-клипов (у аудио-монологов clip.title нет).
+      if (clip.title) {
+        const mediaTitle = document.createElement('p');
+        mediaTitle.className = 'engine-media-title';
+        mediaTitle.textContent = clip.title;
+        stage.appendChild(mediaTitle);
+      }
+
       const media = document.createElement('div');
       media.className = 'engine-media';
       renderMediaPlayer(media, clip, mediaKind);
@@ -2225,10 +2233,37 @@ document.addEventListener('DOMContentLoaded', () => {
         highlightedEl = stage.querySelector(`.village-building[data-building-id="${step.highlightId}"]`);
         if (highlightedEl) {
           highlightedEl.classList.add('onboarding-highlight');
-          const rect = highlightedEl.getBoundingClientRect();
-          tooltip.style.top = `${rect.bottom + 18}px`;
-          tooltip.style.left = `${rect.left + rect.width / 2}px`;
-          tooltip.style.transform = 'translateX(-50%)';
+          // Пока не отпозиционировали — не показываем на старом (центрированном)
+          // месте, чтобы не было прыжка.
+          tooltip.style.visibility = 'hidden';
+
+          const positionTooltip = () => {
+            const rect = highlightedEl.getBoundingClientRect();
+            const margin = 12;
+            const tooltipWidth = tooltip.offsetWidth || 272;
+            const tooltipHeight = tooltip.offsetHeight || 160;
+
+            let top = rect.bottom + 18;
+            top = Math.min(top, window.innerHeight - tooltipHeight - margin);
+            top = Math.max(top, margin);
+
+            let left = rect.left + rect.width / 2;
+            left = Math.min(left, window.innerWidth - tooltipWidth / 2 - margin);
+            left = Math.max(left, tooltipWidth / 2 + margin);
+
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+            tooltip.style.transform = 'translateX(-50%)';
+            tooltip.style.visibility = 'visible';
+          };
+
+          // На мобильном к этому шагу страница часто уже проскроллена вниз
+          // (к списку заданий) — без прокрутки подсвеченное здание оказывается
+          // выше видимой области, rect уходит в минус, и подсказку уносит за
+          // пределы экрана. scrollIntoView применяется не мгновенно, поэтому
+          // считаем координаты только на следующем кадре, после прокрутки.
+          highlightedEl.scrollIntoView({ block: 'center', behavior: 'auto' });
+          setTimeout(positionTooltip, 50);
         }
       }
 

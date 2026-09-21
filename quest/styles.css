@@ -3843,6 +3843,12 @@ h3 {
   font-style: italic;
 }
 
+.engine-media-title {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: var(--text);
+}
+
 .engine-step {
   width: 100%;
   display: grid;
