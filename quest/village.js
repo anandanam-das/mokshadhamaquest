@@ -289,7 +289,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const reactToTaskComplete = () => {
+  // Разовая реплика на переход между планетами — звучит вместо обычной
+  // taskComplete ровно один раз за игру, в момент, когда последнее из 7
+  // заданий планеты закрывает её здание. Фиксированный текст (не пул),
+  // потому что переход всегда один и тот же (порядок открытия жёстко
+  // задан UNLOCK_ORDER) — упоминает и то, что только что открыто, и
+  // куда идти дальше. Не завязано на голос конкретного покровителя
+  // (говорит тот, кого выбрал игрок) — общие фразы для любого перехода.
+  const PLANET_COMPLETE_MESSAGES = {
+    surya: 'Отлично! Мы открыли Ратушу — сердце нашей обители. Теперь идём дальше, познакомиться с Чандрой.',
+    chandra: 'Дом Божественной Матери пробудился. Дальше нас ждёт Воинский зал — время встретить Мангалу.',
+    mangala: 'Воинский зал взят! Теперь путь лежит в Торговую гильдию — там нас ждёт Буддха.',
+    budha: 'Торговая гильдия открыта. Следующая остановка — Храм мудрости, где живёт Гуру.',
+    guru: 'Храм мудрости больше не спит. Теперь заглянем в Чертоги Шукры.',
+    shukra: 'Чертоги Шукры раскрыты! Дальше — Ремесленный двор, там ждёт Шани.',
+    shani: 'Ремесленный двор ожил. Теперь путь лежит к Побережью — там кроется Раху.',
+    rahu: 'Побережье открыто. Остался последний шаг — Гималаи, обитель Кету.',
+    ketu: 'Гималаи покорены — все девять уголков обители пробуждены. Васту Пуруша свободен!',
+  };
+
+  const reactToTaskComplete = (lessonKey) => {
+    if (lessonKey && UNLOCK_ORDER.includes(lessonKey) && isPlanetFullyDone(lessonKey)) {
+      const message = PLANET_COMPLETE_MESSAGES[lessonKey];
+      if (message) {
+        showPatronSpeech(message);
+        return;
+      }
+    }
     showPatronSpeech(pickPooledReaction('taskComplete'));
   };
 
@@ -464,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (matched.size === pairs.length) {
           completeTask(lessonKey, task.id);
-          reactToTaskComplete();
+          reactToTaskComplete(lessonKey);
           playMagicCompletionEffect(rerenderCurrentLesson);
         }
       } else {
@@ -654,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
               setTimeout(() => {
                 if (isLast) {
                   completeTask(lessonKey, task.id);
-                  reactToTaskComplete();
+                  reactToTaskComplete(lessonKey);
                   rerenderCurrentLesson();
                 } else {
                   flowerIndex += 1;
@@ -736,7 +762,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const filled = new Set();
+    // Как и в "Карте звёздного покровителя": можно выбрать сначала
+    // карточку, потом ёмкость — или наоборот, сначала ёмкость, потом
+    // карточку. Раньше клик по ёмкости без выбранной карточки просто
+    // ничего не делал, без всякой подсветки — казалось, что клик не
+    // сработал вообще.
     let selectedId = null;
+    let selectedContainerId = null;
     const cardEls = {};
     const containerEls = {};
     const vesselEls = {};
@@ -766,7 +798,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const clearSelection = () => {
       selectedId = null;
+      selectedContainerId = null;
       Object.values(cardEls).forEach((el) => el.classList.remove('cook-card-selected'));
+      Object.values(containerEls).forEach((el) => el.classList.remove('cook-container-selected'));
     };
 
     const attemptPlace = (cardId, containerId) => {
@@ -787,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (filled.size === pairs.length) {
           completeTask(lessonKey, task.id);
-          reactToTaskComplete();
+          reactToTaskComplete(lessonKey);
           rerenderCurrentLesson();
         }
       } else {
@@ -818,6 +852,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.dataTransfer.effectAllowed = 'move';
       });
       card.addEventListener('click', () => {
+        if (selectedContainerId) {
+          // Ёмкость уже выбрана сверху — тап по карточке завершает пару.
+          attemptPlace(id, selectedContainerId);
+          return;
+        }
         if (selectedId === id) {
           clearSelection();
           return;
@@ -868,8 +907,21 @@ document.addEventListener('DOMContentLoaded', () => {
         attemptPlace(e.dataTransfer.getData('text/plain'), id);
       });
       containerEl.addEventListener('click', () => {
-        if (filled.has(id) || !selectedId) return;
-        attemptPlace(selectedId, id);
+        if (filled.has(id)) return;
+        if (selectedId) {
+          // Карточка уже выбрана в лотке — тап по ёмкости завершает пару.
+          attemptPlace(selectedId, id);
+          return;
+        }
+        if (selectedContainerId === id) {
+          clearSelection();
+          return;
+        }
+        // Ничего не выбрано — запоминаем эту ёмкость первой, следующий
+        // тап по карточке в лотке завершит пару.
+        clearSelection();
+        selectedContainerId = id;
+        containerEl.classList.add('cook-container-selected');
       });
 
       containerEls[id] = containerEl;
@@ -1011,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
           if (isLast) {
             completeTask(lessonKey, task.id);
-            reactToTaskComplete();
+            reactToTaskComplete(lessonKey);
             rerenderCurrentLesson();
           } else {
             questionIndex += 1;
@@ -1403,6 +1455,19 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.appendChild(continueBtn);
     };
 
+    // На шагах "Гуна"/"Причина"/"Детали" отрывок больше не виден — а
+    // свериться с ним снова иногда правда нужно, не дожидаясь штрафа за
+    // ошибки в деталях. Кнопка просто возвращает к тому же клипу
+    // (index не меняется), без каких-либо потерь прогресса по заданию.
+    const appendRewatchButton = (container) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'engine-rewatch-btn';
+      btn.textContent = mediaKind === 'video' ? '↺ Пересмотреть отрывок' : '↺ Переслушать отрывок';
+      btn.addEventListener('click', () => showClip());
+      container.appendChild(btn);
+    };
+
     const showStepA = (clip) => {
       stage.innerHTML = '';
       const step = document.createElement('div');
@@ -1415,6 +1480,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shuffle(GUNA_ORDER.map((g) => ({ text: g, correct: g === clip.guna }))),
         () => showStepB(clip)
       );
+      appendRewatchButton(step);
     };
 
     const showStepB = (clip) => {
@@ -1432,6 +1498,7 @@ document.addEventListener('DOMContentLoaded', () => {
         shuffle(reasonOptions.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
         () => showStepC(clip)
       );
+      appendRewatchButton(step);
     };
 
     const showStepC = (clip) => {
@@ -1449,6 +1516,8 @@ document.addEventListener('DOMContentLoaded', () => {
         stage.appendChild(ref);
       }
 
+      appendRewatchButton(stage);
+
       renderDetailsReveal(
         stage,
         clip.details,
@@ -1458,7 +1527,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showClip();
           } else {
             completeTask(lessonKey, task.id);
-            reactToTaskComplete();
+            reactToTaskComplete(lessonKey);
             rerenderCurrentLesson();
           }
         },
@@ -1577,6 +1646,15 @@ document.addEventListener('DOMContentLoaded', () => {
       label.textContent = 'Разбери детали изображения:';
       stage.appendChild(label);
 
+      // Картинка на этом шаге больше не видна — можно вернуться и
+      // посмотреть на неё снова, не дожидаясь штрафа за ошибки.
+      const rewatchBtn = document.createElement('button');
+      rewatchBtn.type = 'button';
+      rewatchBtn.className = 'engine-rewatch-btn';
+      rewatchBtn.textContent = '↺ Посмотреть картинку ещё раз';
+      rewatchBtn.addEventListener('click', () => showCard());
+      stage.appendChild(rewatchBtn);
+
       renderDetailsReveal(
         stage,
         card.details,
@@ -1586,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showCard();
           } else {
             completeTask(lessonKey, task.id);
-            reactToTaskComplete();
+            reactToTaskComplete(lessonKey);
             rerenderCurrentLesson();
           }
         },
@@ -1628,7 +1706,7 @@ document.addEventListener('DOMContentLoaded', () => {
       finished = true;
       clearInterval(timerId);
       completeTask(lessonKey, task.id);
-      reactToTaskComplete();
+      reactToTaskComplete(lessonKey);
       rerenderCurrentLesson();
     };
 
@@ -1741,7 +1819,7 @@ document.addEventListener('DOMContentLoaded', () => {
               showQuestion();
             } else {
               completeTask(lessonKey, task.id);
-              reactToTaskComplete();
+              reactToTaskComplete(lessonKey);
               rerenderCurrentLesson();
             }
           });
@@ -1829,7 +1907,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (filled.size === data.categories.length) {
           completeTask(lessonKey, task.id);
-          reactToTaskComplete();
+          reactToTaskComplete(lessonKey);
           rerenderCurrentLesson();
         }
       } else {
@@ -1988,7 +2066,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Дальше';
       btn.addEventListener('click', () => {
         completeTask(lessonKey, task.id);
-        reactToTaskComplete();
+        reactToTaskComplete(lessonKey);
         rerenderCurrentLesson();
       });
       stage.appendChild(btn);
@@ -2168,7 +2246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Я посмотрел лекцию, готов приступать к практике';
       btn.addEventListener('click', () => {
         completeTask(lessonKey, task.id);
-        reactToTaskComplete();
+        reactToTaskComplete(lessonKey);
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
@@ -2205,7 +2283,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = 'Отметить выполненным';
       btn.addEventListener('click', () => {
         completeTask(lessonKey, task.id);
-        reactToTaskComplete();
+        reactToTaskComplete(lessonKey);
         rerenderCurrentLesson();
       });
       taskContentPanel.appendChild(btn);
@@ -2369,7 +2447,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tooltip.remove();
       tourActive = false;
       completeTask(lessonKey, task.id);
-      reactToTaskComplete();
+      reactToTaskComplete(lessonKey);
       rerenderCurrentLesson();
     };
 
