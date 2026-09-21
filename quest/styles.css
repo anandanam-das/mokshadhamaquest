@@ -1311,6 +1311,8 @@ h3 {
 
 .cook-game {
   flex: 1 1 460px;
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 24px;
 }
@@ -1441,6 +1443,55 @@ h3 {
   }
 }
 
+@media (max-width: 560px) {
+  /* Карточки-образы и ёмкости были рассчитаны на десктопный простор —
+     на телефоне каждая ёмкость занимала всю ширину, и чтобы увидеть все
+     пять, приходилось долго скроллить. Сжимаем иконки/текст и переводим
+     ёмкости на сетку 2 в ряд, чтобы весь набор было видно почти сразу. */
+  .cook-tray {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .cook-card {
+    gap: 6px;
+    padding: 6px 10px 6px 6px;
+    font-size: 0.85rem;
+  }
+
+  .cook-card-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .cook-containers {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .cook-container {
+    padding: 8px 4px;
+    gap: 4px;
+  }
+
+  .cook-vessel {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .cook-vessel-icon,
+  .cook-vessel-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .cook-container-label {
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+}
+
 .cook-garden-dish {
   width: 64px;
   height: 64px;
@@ -1494,6 +1545,8 @@ h3 {
 
 .map-game {
   flex: 1 1 380px;
+  min-width: 0;
+  max-width: 100%;
   display: grid;
   gap: 16px;
   justify-items: center;
@@ -1696,10 +1749,46 @@ h3 {
 }
 
 @media (max-width: 560px) {
+  /* Тот же приём, что и у .flower-stage: раньше scale(0.86) +
+     отрицательный margin-bottom были откалиброваны под другую ширину,
+     чем реально доставалась .map-game во flex-раскладке, и круг вылезал
+     за пределы карточки. Плюс "разгоняем" .map-game за паддинги панели,
+     чтобы под диаграмму досталось больше места, а тексту — меньше. */
+  .map-game {
+    width: calc(100% + 44px);
+    max-width: calc(100% + 44px);
+    margin: 0 -22px;
+  }
+
+  .map-stage {
+    container-type: inline-size;
+    position: relative;
+    width: 340px;
+    max-width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    padding: 0;
+    margin: 0 auto;
+  }
+
   .map-diagram {
-    transform: scale(0.86);
-    transform-origin: top center;
-    margin-bottom: -53px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 380px;
+    height: 380px;
+    margin: 0;
+    transform-origin: top left;
+    transform: scale(calc(100cqw / 380px));
+  }
+
+  .map-question {
+    font-size: 0.95rem;
+  }
+
+  .map-case-text {
+    font-size: 0.88rem;
+    line-height: 1.45;
   }
 }
 
