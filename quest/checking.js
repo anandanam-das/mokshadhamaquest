@@ -19,13 +19,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Локальная разработка: бэкенд может быть не запущен (нужны реальные
-  // Telegram credentials, см. server/README.md) — на localhost доступ
-  // считается всегда выданным, без обращения к серверу. На проде
-  // (не localhost) этот блок не выполняется, реальная проверка не меняется.
-  const isLocalDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-
+  // Telegram credentials, см. server/README.md) — на localhost (и при
+  // открытии dev-сервера с телефона по локальной сети, см. isLocalDevHost
+  // в state.js) доступ считается всегда выданным, без обращения к
+  // серверу. На проде этот блок не выполняется, реальная проверка не
+  // меняется.
   let access;
-  if (isLocalDev) {
+  if (isLocalDevHost()) {
     access = {
       telegramId: state.telegramId || 'local-dev',
       hasPlanetsAccess: true,

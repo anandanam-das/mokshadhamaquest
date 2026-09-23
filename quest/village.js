@@ -543,11 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- "Цветок трёх истин" (task_2): на каждом из 3 цветков 4 лепестка,
   // один лжёт (isError: true). Верный тап — лепесток срывается и улетает,
-  // оставшиеся три расцветают; неверный — лепесток просто трясётся,
-  // повторный тап не заблокирован. После срыва — пауза на анимацию, потом
-  // либо следующий цветок, либо (после третьего) финальная сцена.
-  const FLOWER_BLOOM_DELAY_MS = 1500;
-
+  // оставшиеся три остаются на месте; неверный — лепесток просто
+  // трясётся, повторный тап не заблокирован. После второй найденной лжи —
+  // сразу feedback и кнопка "Далее"/"Завершить"; сам цветок гаснет и
+  // происходит переход только по клику на неё (см. bloomPetalsThenRun).
   const renderFlowerTask = (lessonKey, task, data) => {
     let flowerIndex = 0;
 
@@ -563,6 +562,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const instructionEl = document.createElement('p');
     instructionEl.className = 'flower-instruction';
     instructionEl.textContent = TASK2_INSTRUCTION_TEXT;
+
+    // Заменяет собой intro+instruction, пока не нажата "Далее"/"Завершить" —
+    // вступительный текст задания нужен только пока ищешь лепестки, после
+    // того как обе лжи найдены, он только занимает место над фидбеком.
+    const correctLabel = document.createElement('p');
+    correctLabel.className = 'flower-correct-label';
+    correctLabel.textContent = 'Верно!';
+    correctLabel.hidden = true;
 
     const progressEl = document.createElement('p');
     progressEl.className = 'quiz-progress';
@@ -593,6 +600,65 @@ document.addEventListener('DOMContentLoaded', () => {
     // случай, если для другого набора вопросов лимит окажется другим.
     const MAX_WRONG_PLUCKS = data.maxWrongPlucks || 2;
     const FLOWER_WILT_DELAY_MS = 1200;
+    const FLOWER_BLOOM_DELAY_MS = 800;
+
+    // Лепестки, ещё реально видимые на экране у текущего цветка (без уже
+    // сорванных ошибок) — renderPetals держит её в актуальном состоянии.
+    // Нужна отдельно от querySelectorAll('.flower-petal'), потому что уже
+    // сорванные лепестки остаются в DOM (просто невидимы через forwards-
+    // анимацию .flower-petal-plucked), и добавление им ещё и .flower-
+    // petal-bloomed поверх заново запускало бы анимацию с её from{opacity:1}
+    // — то есть на миг возвращало бы уже убранный лепесток на экран.
+    let visiblePetalEls = [];
+
+    // И "Далее", и "Завершить" перед своим действием одинаково гасят
+    // весь цветок целиком — той же .flower-petal-bloomed, что раньше
+    // включалась автоматически сразу по нахождении обеих ошибок. Разница
+    // только в том, что теперь это происходит по клику на кнопку, а не
+    // само по себе вместе с текстом фидбека: лепестки остаются видны,
+    // пока пользователь не дочитает feedback и не нажмёт кнопку сам.
+    const bloomPetalsThenRun = (afterFn) => {
+      if (prefersReducedMotion) {
+        afterFn();
+      } else {
+        visiblePetalEls.forEach((el) => {
+          el.classList.add('flower-petal-bloomed');
+        });
+        setTimeout(afterFn, FLOWER_BLOOM_DELAY_MS);
+      }
+    };
+
+    // После последнего цветка не уходим на финальный экран сразу же —
+    // даём дочитать feedback последнего цветка и жмём "Завершить" сами,
+    // как и на последнем шаге других заданий (engine-details-next и т.п.).
+    const finishBtn = document.createElement('button');
+    finishBtn.type = 'button';
+    finishBtn.className = 'btn btn-primary flower-finish-btn';
+    finishBtn.textContent = 'Завершить';
+    finishBtn.hidden = true;
+    finishBtn.addEventListener('click', () => {
+      finishBtn.hidden = true;
+      bloomPetalsThenRun(() => {
+        completeTask(lessonKey, task.id);
+        reactToTaskComplete(lessonKey);
+        rerenderCurrentLesson();
+      });
+    });
+
+    // На не-последнем цветке — та же логика: не переключаемся на
+    // следующий цветок сами, а ждём клика "Далее".
+    const nextBtn = document.createElement('button');
+    nextBtn.type = 'button';
+    nextBtn.className = 'btn btn-primary flower-finish-btn';
+    nextBtn.textContent = 'Далее';
+    nextBtn.hidden = true;
+    nextBtn.addEventListener('click', () => {
+      nextBtn.hidden = true;
+      bloomPetalsThenRun(() => {
+        flowerIndex += 1;
+        loadFlower();
+      });
+    });
 
     const showFlowerFeedback = (text, isWarning) => {
       feedbackEl.hidden = false;
@@ -609,6 +675,9 @@ document.addEventListener('DOMContentLoaded', () => {
       feedbackEl.hidden = true;
       feedbackEl.classList.remove('flower-feedback-warning');
       feedbackEl.textContent = '';
+      introEl.hidden = false;
+      instructionEl.hidden = false;
+      correctLabel.hidden = true;
 
       // Пересобирает сами лепестки (перетасовывая заново) — вызывается и
       // при первом заходе на цветок, и при реролле после второй ошибки.
@@ -654,6 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
               // Найденная ложь увядает сразу же, не дожидаясь второй —
               // ощущение прогресса на полпути.
               plucked.add(opt.id);
+              visiblePetalEls = visiblePetalEls.filter((el) => el !== petal);
               if (prefersReducedMotion) {
                 orbit.style.display = 'none';
               } else {
@@ -662,12 +732,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
               if (plucked.size < ERRORS_NEEDED) return;
 
-              // Обе лжи найдены — расцветают все оставшиеся, ядро вспыхивает.
+              // Обе лжи найдены — ядро вспыхивает, но оставшиеся лепестки
+              // остаются на месте: пусть пользователь видит цветок целиком,
+              // пока не дочитает feedback и сам не нажмёт "Далее"/"Завершить"
+              // (там весь цветок опадёт разом — см. wiltPetalsAndProceed).
               settled = true;
+              introEl.hidden = true;
+              instructionEl.hidden = true;
+              correctLabel.hidden = false;
               if (!prefersReducedMotion) {
-                options.forEach((other) => {
-                  if (!plucked.has(other.id)) petalEls[other.id].classList.add('flower-petal-bloomed');
-                });
                 center.classList.remove('flower-center-pulse');
                 // eslint-disable-next-line no-void
                 void center.offsetWidth;
@@ -677,16 +750,11 @@ document.addEventListener('DOMContentLoaded', () => {
               showFlowerFeedback(flower.feedback, false);
 
               const isLast = flowerIndex === data.flowers.length - 1;
-              setTimeout(() => {
-                if (isLast) {
-                  completeTask(lessonKey, task.id);
-                  reactToTaskComplete(lessonKey);
-                  rerenderCurrentLesson();
-                } else {
-                  flowerIndex += 1;
-                  loadFlower();
-                }
-              }, FLOWER_BLOOM_DELAY_MS);
+              if (isLast) {
+                finishBtn.hidden = false;
+              } else {
+                nextBtn.hidden = false;
+              }
             } else {
               // Сорван верный (не ложный) лепесток — штраф. Первый раз —
               // только предупреждение, второй — цветок увядает целиком и
@@ -712,6 +780,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
               } else {
                 showFlowerFeedback(TASK2_WARNING_TEXT, true);
+                // Ошибочно сорванный (но верный) лепесток тоже пропадает с
+                // экрана насовсем — исключаем его из visiblePetalEls по той
+                // же причине, что и найденные ложные: иначе bloom при
+                // завершении цветка на миг вернул бы и его тоже.
+                visiblePetalEls = visiblePetalEls.filter((el) => el !== petal);
                 if (prefersReducedMotion) {
                   orbit.style.display = 'none';
                 } else {
@@ -722,6 +795,8 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           flowerContainer.appendChild(orbit);
         });
+
+        visiblePetalEls = Object.values(petalEls);
       };
 
       renderPetals();
@@ -737,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Описание задания справа.
     const sidebar = document.createElement('div');
     sidebar.className = 'flower-sidebar';
-    sidebar.append(introEl, instructionEl, feedbackEl);
+    sidebar.append(introEl, instructionEl, correctLabel, feedbackEl, nextBtn, finishBtn);
 
     wrap.append(gameEl, sidebar);
     taskContentPanel.appendChild(wrap);
@@ -1426,8 +1501,15 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(intro, progress, stage);
     taskContentPanel.appendChild(wrap);
 
-    const clips = shuffle(data.clips || data.recordings);
-    let index = 0;
+    const allClips = data.clips || data.recordings;
+    const saved = getTaskStepState(lessonKey, task.id);
+    const savedClips =
+      saved && Array.isArray(saved.order)
+        ? saved.order.map((id) => allClips.find((c) => c.id === id)).filter(Boolean)
+        : null;
+    const clips = savedClips && savedClips.length === allClips.length ? savedClips : shuffle(allClips);
+    let index = savedClips && savedClips.length === allClips.length ? Math.min(saved.index || 0, clips.length) : 0;
+    setTaskStepState(lessonKey, task.id, { order: clips.map((c) => c.id), index });
 
     const showClip = () => {
       stage.innerHTML = '';
@@ -1524,8 +1606,10 @@ document.addEventListener('DOMContentLoaded', () => {
         () => {
           index += 1;
           if (index < clips.length) {
+            setTaskStepState(lessonKey, task.id, { order: clips.map((c) => c.id), index });
             showClip();
           } else {
+            clearTaskStepState(lessonKey, task.id);
             completeTask(lessonKey, task.id);
             reactToTaskComplete(lessonKey);
             rerenderCurrentLesson();
@@ -1595,8 +1679,16 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(intro, progress, stage);
     taskContentPanel.appendChild(wrap);
 
-    const cards = shuffle(data.cards);
-    let index = 0;
+    const allCards = data.cards;
+    const savedImg = getTaskStepState(lessonKey, task.id);
+    const savedCards =
+      savedImg && Array.isArray(savedImg.order)
+        ? savedImg.order.map((id) => allCards.find((c) => c.id === id)).filter(Boolean)
+        : null;
+    const cards = savedCards && savedCards.length === allCards.length ? savedCards : shuffle(allCards);
+    let index =
+      savedCards && savedCards.length === allCards.length ? Math.min(savedImg.index || 0, cards.length) : 0;
+    setTaskStepState(lessonKey, task.id, { order: cards.map((c) => c.id), index });
 
     const showCard = () => {
       stage.innerHTML = '';
@@ -1661,8 +1753,10 @@ document.addEventListener('DOMContentLoaded', () => {
         () => {
           index += 1;
           if (index < cards.length) {
+            setTaskStepState(lessonKey, task.id, { order: cards.map((c) => c.id), index });
             showCard();
           } else {
+            clearTaskStepState(lessonKey, task.id);
             completeTask(lessonKey, task.id);
             reactToTaskComplete(lessonKey);
             rerenderCurrentLesson();
@@ -1773,8 +1867,19 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(progress, stage);
     taskContentPanel.appendChild(wrap);
 
-    const questions = shuffle(data.questions);
-    let index = 0;
+    const allQuestions = data.questions;
+    const savedErr = getTaskStepState(lessonKey, task.id);
+    const savedQuestions =
+      savedErr && Array.isArray(savedErr.order)
+        ? savedErr.order.map((id) => allQuestions.find((q) => q.id === id)).filter(Boolean)
+        : null;
+    const questions =
+      savedQuestions && savedQuestions.length === allQuestions.length ? savedQuestions : shuffle(allQuestions);
+    let index =
+      savedQuestions && savedQuestions.length === allQuestions.length
+        ? Math.min(savedErr.index || 0, questions.length)
+        : 0;
+    setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
 
     const showQuestion = () => {
       stage.innerHTML = '';
@@ -1816,8 +1921,10 @@ document.addEventListener('DOMContentLoaded', () => {
           nextBtn.addEventListener('click', () => {
             index += 1;
             if (index < questions.length) {
+              setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
               showQuestion();
             } else {
+              clearTaskStepState(lessonKey, task.id);
               completeTask(lessonKey, task.id);
               reactToTaskComplete(lessonKey);
               rerenderCurrentLesson();
@@ -2051,25 +2158,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const MAX_WRONG_ATTEMPTS = data.maxWrongAttempts || 4;
     let index = 0;
 
-    const showFinal = () => {
-      hideFeedback();
-      stage.innerHTML = '';
-      progress.textContent = '';
-      const final = document.createElement('p');
-      final.className = 'task-content-feedback';
-      final.textContent = data.finalMessage;
-      stage.appendChild(final);
-
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'btn btn-primary';
-      btn.textContent = 'Дальше';
-      btn.addEventListener('click', () => {
-        completeTask(lessonKey, task.id);
-        reactToTaskComplete(lessonKey);
-        rerenderCurrentLesson();
-      });
-      stage.appendChild(btn);
+    // Раунд завершает задание сразу по факту прохождения последнего шага —
+    // без отдельного экрана-подтверждения со своей кнопкой: итоговое
+    // сообщение (data.finalMessage) и так показывается следом, уже через
+    // общий блок "✓ выполнено" (TASK_COMPLETED_FEEDBACK.task_gunas в
+    // taskContent.js), и повторно дублировать его здесь же, с лишним
+    // кликом между двумя одинаковыми текстами, было ни к чему — так же,
+    // как ведут себя остальные однораундовые задания ("Пять мостов" и т.п.).
+    const finishTask = () => {
+      completeTask(lessonKey, task.id);
+      reactToTaskComplete(lessonKey);
+      rerenderCurrentLesson();
     };
 
     const showRound = () => {
@@ -2129,7 +2228,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (filled.size === GUNA_SORT_ZONES.length) {
             settled = true;
             index += 1;
-            setTimeout(index < rounds.length ? showRound : showFinal, 700);
+            setTimeout(index < rounds.length ? showRound : finishTask, 700);
           }
         } else {
           const slot = slotEls[zoneId];
@@ -2806,9 +2905,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   buildVillageStage();
 
-  if (!state.introCompleted) {
+  // Карта (и клики по зданиям) открывается сразу после "Взгляд астролога",
+  // раньше, чем гайд-тур "Знакомство с обителью" отмечается пройденным
+  // (см. isVillageMapUnlocked выше) — то есть можно успеть уйти вглубь
+  // игры, ни разу не досмотрев тур до конца, и тогда introCompleted так и
+  // останется false навсегда. Поэтому здесь решение принимается по тому
+  // же условию, что и видимость самой карты, а не по этому флагу — иначе
+  // при перезагрузке страницы прогресс не терялся бы, но человека всё
+  // равно откидывало бы обратно на "Введение".
+  if (!isVillageMapUnlocked()) {
     openLesson('intro', getLocationHeading('Введение'), INTRO_TASKS);
   } else {
+    if (!state.introCompleted) setUserState({ introCompleted: true });
     detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
     renderTaskContentPanel(null, null);
     // Деревня уже открыта — это не первый заход, а возвращение.

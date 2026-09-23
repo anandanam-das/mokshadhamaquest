@@ -828,6 +828,10 @@ h3 {
   gap: 18px;
 }
 
+.flower-finish-btn {
+  align-self: center;
+}
+
 .quiz-intro {
   margin: 0;
   color: var(--muted);
@@ -849,6 +853,13 @@ h3 {
   color: #8a3f5c;
   font-size: 1rem;
   line-height: 1.5;
+}
+
+.flower-correct-label {
+  margin: 0;
+  font-weight: 800;
+  font-size: 1.16rem;
+  color: #2f9e6e;
 }
 
 /* Номер цветка — теперь в сайдбаре, а не над самим цветком, и стоит
@@ -1117,7 +1128,7 @@ h3 {
 }
 
 .flower-petal-bloomed {
-  animation: flower-petal-bloom 0.8s ease 0.3s forwards;
+  animation: flower-petal-bloom 0.8s ease forwards;
   pointer-events: none;
 }
 
@@ -1252,6 +1263,14 @@ h3 {
   .flower-task {
     align-items: flex-start;
     gap: 10px;
+  }
+
+  /* На мобильном сайдбар переносится под цветок на отдельную строку —
+     max-width: 50% (десктопный расчёт на два столбца рядом) здесь смысла
+     не имеет и просто обрезает текст по центру экрана, оставляя пустое
+     поле справа. Разрешаем занять всю доступную ширину. */
+  .flower-sidebar {
+    max-width: 100%;
   }
 
   /* Разгоняем цветок за паддинги карточки (22px с каждой стороны) —
@@ -4106,7 +4125,12 @@ h3 {
 .engine-detail-item {
   font: inherit;
   display: flex;
-  align-items: flex-start;
+  /* baseline, не flex-start: у ответа и пояснения разный font-size, а
+     значит и разная "воздушная" полоса над буквами при выравнивании по
+     краю блока — тексты казались сдвинутыми друг относительно друга,
+     хотя сами блоки были выровнены. Baseline ровняет по первой строке
+     текста, а не по краю контейнера. */
+  align-items: baseline;
   gap: 10px;
   padding: 12px 16px;
   border-radius: 14px;
@@ -4156,14 +4180,19 @@ h3 {
 .engine-detail-text {
   flex: 1 1 auto;
   min-width: 0;
+  line-height: 1.4;
 }
 
 .engine-detail-note {
   display: block;
-  margin-top: 4px;
   color: var(--muted);
   font-size: 0.92rem;
   font-style: italic;
+  text-align: right;
+  /* Тот же line-height, что у .engine-detail-text — иначе при разных
+     font-size межстрочный интервал ("normal") получается разным в
+     пикселях, и строки ответа/пояснения визуально не совпадают по шагу. */
+  line-height: 1.4;
 }
 
 @media (max-width: 560px) {
@@ -4177,6 +4206,7 @@ h3 {
 
   .engine-detail-note {
     flex-basis: 100%;
+    margin-top: 4px;
     margin-left: 26px;
   }
 
@@ -4193,6 +4223,10 @@ h3 {
     font-size: 0.86rem;
     line-height: 1.4;
     text-wrap: pretty;
+    /* Здесь note лежит отдельной строкой на всю ширину карточки под
+       основным текстом — правое выравнивание там же, где нет соседней
+       колонки текста, только оторвало бы её от начала фразы. */
+    text-align: left;
   }
 }
 
