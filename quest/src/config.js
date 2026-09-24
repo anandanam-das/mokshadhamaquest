@@ -12,5 +12,5 @@ window.MOKSHA_CONFIG = {
   // admin access. Mirrored server-side in quest-api's ADMIN_TELEGRAM_IDS —
   // this array is only for frontend routing (which page to redirect to),
   // never trusted for actually protecting admin data.
-  adminTelegramIds: ['7019111128', '8254725055'],
+  adminTelegramIds: ['8254725055'],
 };
