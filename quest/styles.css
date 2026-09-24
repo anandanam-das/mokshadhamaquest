@@ -1436,11 +1436,6 @@ h3 {
   image-rendering: crisp-edges;
 }
 
-.cook-vessel-fill {
-  position: absolute;
-  font-size: 0.6rem;
-}
-
 .cook-container-label {
   font-weight: 700;
   color: var(--text);
@@ -1830,6 +1825,14 @@ h3 {
   min-width: 0;
   max-width: 100%;
   overflow-x: auto;
+  /* На широком экране .matching-game (flex-grow) получает куда больше
+     места, чем занимает сама игра (мосты/река фиксированной ширины) —
+     без центрирования она торчит прижатой к левому краю. На мобильном
+     эта коробка и так по размеру совпадает с контентом (align-items:
+     flex-start у родителя в колонку), так что центрирование там ничего
+     не меняет — правило одно на оба размера экрана. */
+  display: flex;
+  justify-content: center;
 }
 
 .matching-stage {
@@ -4125,11 +4128,11 @@ h3 {
 .engine-detail-item {
   font: inherit;
   display: flex;
-  /* baseline, не flex-start: у ответа и пояснения разный font-size, а
-     значит и разная "воздушная" полоса над буквами при выравнивании по
-     краю блока — тексты казались сдвинутыми друг относительно друга,
-     хотя сами блоки были выровнены. Baseline ровняет по первой строке
-     текста, а не по краю контейнера. */
+  /* Note всегда переносится на отдельную строку под текстом (flex-wrap
+     ниже) — единый стиль для верных/неверных/нейтральных пунктов и для
+     любой ширины экрана: mark, текст, потом пояснение — всё от левого
+     края, а не отдельной колонкой справа. */
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 10px;
   padding: 12px 16px;
@@ -4185,29 +4188,32 @@ h3 {
 
 .engine-detail-note {
   display: block;
+  flex-basis: 100%;
+  margin-top: 4px;
+  /* Отступ примерно под начало текста (после mark + gap), а не от
+     самого края карточки — визуально note продолжает текст, а не
+     начинается заново от края. */
+  margin-left: 26px;
   color: var(--muted);
   font-size: 0.92rem;
   font-style: italic;
-  text-align: right;
+  text-align: left;
   /* Тот же line-height, что у .engine-detail-text — иначе при разных
      font-size межстрочный интервал ("normal") получается разным в
      пикселях, и строки ответа/пояснения визуально не совпадают по шагу. */
   line-height: 1.4;
 }
 
-@media (max-width: 560px) {
-  /* На узком экране мark+текст+note в одну flex-строку не помещались —
-     note сжималась в узкую колонку и вместе с текстом вылезала за
-     пределы карточки. Переносим note под текст отдельной строкой. */
-  .engine-detail-item {
-    flex-wrap: wrap;
-    padding: 10px 14px;
-  }
+/* У нейтральных пунктов нет mark'а (см. village.js) — сам текст начинается
+   от самого левого края, без отступа под галочку/крестик, поэтому note
+   тоже должна начинаться от края, а не быть в стороне от текста. */
+.engine-detail-item.kind-neutral .engine-detail-note {
+  margin-left: 0;
+}
 
-  .engine-detail-note {
-    flex-basis: 100%;
-    margin-top: 4px;
-    margin-left: 26px;
+@media (max-width: 560px) {
+  .engine-detail-item {
+    padding: 10px 14px;
   }
 
   /* Чуть меньше кегль и text-wrap: pretty (где поддерживается) — при
@@ -4223,10 +4229,6 @@ h3 {
     font-size: 0.86rem;
     line-height: 1.4;
     text-wrap: pretty;
-    /* Здесь note лежит отдельной строкой на всю ширину карточки под
-       основным текстом — правое выравнивание там же, где нет соседней
-       колонки текста, только оторвало бы её от начала фразы. */
-    text-align: left;
   }
 }
 

@@ -611,12 +611,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // — то есть на миг возвращало бы уже убранный лепесток на экран.
     let visiblePetalEls = [];
 
-    // И "Далее", и "Завершить" перед своим действием одинаково гасят
-    // весь цветок целиком — той же .flower-petal-bloomed, что раньше
-    // включалась автоматически сразу по нахождении обеих ошибок. Разница
-    // только в том, что теперь это происходит по клику на кнопку, а не
-    // само по себе вместе с текстом фидбека: лепестки остаются видны,
-    // пока пользователь не дочитает feedback и не нажмёт кнопку сам.
+    // Весь цветок разом гаснет той же .flower-petal-bloomed, что и
+    // раньше — но теперь снова само по себе, без клика по кнопке: даём
+    // секунду-две дочитать feedback (FLOWER_READ_DELAY_MS), потом бутоны
+    // опадают (FLOWER_BLOOM_DELAY_MS) и сам собой подгружается следующий
+    // цветок или завершается задание.
+    const FLOWER_READ_DELAY_MS = 1800;
+
     const bloomPetalsThenRun = (afterFn) => {
       if (prefersReducedMotion) {
         afterFn();
@@ -627,38 +628,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(afterFn, FLOWER_BLOOM_DELAY_MS);
       }
     };
-
-    // После последнего цветка не уходим на финальный экран сразу же —
-    // даём дочитать feedback последнего цветка и жмём "Завершить" сами,
-    // как и на последнем шаге других заданий (engine-details-next и т.п.).
-    const finishBtn = document.createElement('button');
-    finishBtn.type = 'button';
-    finishBtn.className = 'btn btn-primary flower-finish-btn';
-    finishBtn.textContent = 'Завершить';
-    finishBtn.hidden = true;
-    finishBtn.addEventListener('click', () => {
-      finishBtn.hidden = true;
-      bloomPetalsThenRun(() => {
-        completeTask(lessonKey, task.id);
-        reactToTaskComplete(lessonKey);
-        rerenderCurrentLesson();
-      });
-    });
-
-    // На не-последнем цветке — та же логика: не переключаемся на
-    // следующий цветок сами, а ждём клика "Далее".
-    const nextBtn = document.createElement('button');
-    nextBtn.type = 'button';
-    nextBtn.className = 'btn btn-primary flower-finish-btn';
-    nextBtn.textContent = 'Далее';
-    nextBtn.hidden = true;
-    nextBtn.addEventListener('click', () => {
-      nextBtn.hidden = true;
-      bloomPetalsThenRun(() => {
-        flowerIndex += 1;
-        loadFlower();
-      });
-    });
 
     const showFlowerFeedback = (text, isWarning) => {
       feedbackEl.hidden = false;
@@ -750,11 +719,18 @@ document.addEventListener('DOMContentLoaded', () => {
               showFlowerFeedback(flower.feedback, false);
 
               const isLast = flowerIndex === data.flowers.length - 1;
-              if (isLast) {
-                finishBtn.hidden = false;
-              } else {
-                nextBtn.hidden = false;
-              }
+              setTimeout(() => {
+                bloomPetalsThenRun(() => {
+                  if (isLast) {
+                    completeTask(lessonKey, task.id);
+                    reactToTaskComplete(lessonKey);
+                    rerenderCurrentLesson();
+                  } else {
+                    flowerIndex += 1;
+                    loadFlower();
+                  }
+                });
+              }, FLOWER_READ_DELAY_MS);
             } else {
               // Сорван верный (не ложный) лепесток — штраф. Первый раз —
               // только предупреждение, второй — цветок увядает целиком и
@@ -812,7 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Описание задания справа.
     const sidebar = document.createElement('div');
     sidebar.className = 'flower-sidebar';
-    sidebar.append(introEl, instructionEl, correctLabel, feedbackEl, nextBtn, finishBtn);
+    sidebar.append(introEl, instructionEl, correctLabel, feedbackEl);
 
     wrap.append(gameEl, sidebar);
     taskContentPanel.appendChild(wrap);
@@ -849,7 +825,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const vesselEls = {};
     const vesselIconEls = {};
     const vesselImgEls = {};
-    const containerFillEls = {};
 
     const wrap = document.createElement('div');
     wrap.className = 'cook-task';
@@ -887,8 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
         vesselIconEls[containerId].hidden = true;
         vesselImgEls[containerId].src = TASK3_ICONS[cardId];
         vesselImgEls[containerId].hidden = false;
-        containerFillEls[containerId].textContent = byId[cardId].image;
-        containerFillEls[containerId].hidden = false;
         containerEls[containerId].classList.add('cook-container-filled');
         cardEls[cardId].remove();
         delete cardEls[cardId];
@@ -958,10 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
       vesselImg.className = 'cook-vessel-img';
       vesselImg.alt = '';
       vesselImg.hidden = true;
-      const fillText = document.createElement('span');
-      fillText.className = 'cook-vessel-fill';
-      fillText.hidden = true;
-      vessel.append(vesselIcon, vesselImg, fillText);
+      vessel.append(vesselIcon, vesselImg);
 
       const label = document.createElement('div');
       label.className = 'cook-container-label';
@@ -1003,7 +973,6 @@ document.addEventListener('DOMContentLoaded', () => {
       vesselEls[id] = vessel;
       vesselIconEls[id] = vesselIcon;
       vesselImgEls[id] = vesselImg;
-      containerFillEls[id] = fillText;
       containersGrid.appendChild(containerEl);
     });
 
@@ -1364,10 +1333,14 @@ document.addEventListener('DOMContentLoaded', () => {
       item.addEventListener('click', () => {
         if (settled || item.classList.contains('revealed')) return;
         item.classList.add('revealed', `kind-${detail.kind}`);
-        const mark = document.createElement('span');
-        mark.className = 'engine-detail-mark';
-        mark.textContent = detail.kind === 'correct' ? '✓' : '✗';
-        item.prepend(mark);
+        // У нейтральных пунктов нет "верно"/"неверно" — галочка или
+        // крестик там был бы обманчив, поэтому mark вообще не рисуем.
+        if (detail.kind !== 'neutral') {
+          const mark = document.createElement('span');
+          mark.className = 'engine-detail-mark';
+          mark.textContent = detail.kind === 'correct' ? '✓' : '✗';
+          item.prepend(mark);
+        }
         if (detail.note) {
           const note = document.createElement('span');
           note.className = 'engine-detail-note';
@@ -1550,6 +1523,20 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(btn);
     };
 
+    // Клипы идут подряд с разными гунами — легко не заметить, что новый
+    // клип уже про другую гуну, и потом не понимать, почему верный на
+    // вид ответ на "Причина"/"Детали" на самом деле неверный. "Назад"
+    // возвращает на один шаг — перечитать сам вопрос, а не весь отрывок
+    // заново (для этого рядом есть отдельная "Пересмотреть отрывок").
+    const appendBackButton = (container, onClick) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'engine-rewatch-btn';
+      btn.textContent = '← Назад';
+      btn.addEventListener('click', onClick);
+      container.appendChild(btn);
+    };
+
     const showStepA = (clip) => {
       stage.innerHTML = '';
       const step = document.createElement('div');
@@ -1576,10 +1563,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const reasonOptions = data.reasonOptions || GUNA_REASON_OPTIONS;
       renderChoiceButtons(
         step,
-        'Почему именно эта гуна?',
+        `Почему именно гуна «${clip.guna}»?`,
         shuffle(reasonOptions.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
         () => showStepC(clip)
       );
+      appendBackButton(step, () => showStepA(clip));
       appendRewatchButton(step);
     };
 
@@ -1587,7 +1575,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.innerHTML = '';
       const label = document.createElement('p');
       label.className = 'engine-step-question';
-      label.textContent = 'Разбери детали — что подтверждает эту гуну, а что нет:';
+      label.textContent = `Разбери детали — что подтверждает гуну «${clip.guna}», а что нет:`;
       stage.appendChild(label);
 
       const refText = clip.transcript ? `«${clip.transcript}»` : clip.source;
@@ -1598,6 +1586,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stage.appendChild(ref);
       }
 
+      appendBackButton(stage, () => showStepB(clip));
       appendRewatchButton(stage);
 
       renderDetailsReveal(
@@ -1735,7 +1724,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.innerHTML = '';
       const label = document.createElement('p');
       label.className = 'engine-step-question';
-      label.textContent = 'Разбери детали изображения:';
+      label.textContent = `Разбери детали изображения — что подтверждает гуну «${card.guna}», а что нет:`;
       stage.appendChild(label);
 
       // Картинка на этом шаге больше не видна — можно вернуться и
