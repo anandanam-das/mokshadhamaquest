@@ -3762,6 +3762,16 @@ h3 {
   image-rendering: auto;
 }
 
+/* Мягкое свечение под цвет планеты (--building-glow, выставляется в
+   village.js из planetBuildings[...].glow) — drop-shadow идёт по
+   прозрачному силуэту самой картинки, а не по её прямоугольной рамке,
+   поэтому здание визуально отделяется от травы вокруг, а не просто
+   обрастает квадратной тенью. */
+.village-building-image {
+  filter: drop-shadow(0 0 10px var(--building-glow, transparent))
+    drop-shadow(0 0 22px var(--building-glow, transparent));
+}
+
 .village-building-rubble-clear {
   position: absolute;
   inset: 0;

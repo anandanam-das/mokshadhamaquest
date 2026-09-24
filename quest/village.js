@@ -2701,6 +2701,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = `assets/village/buildings/${building.file}.png`;
         img.alt = building.name;
         img.className = 'village-building-image';
+        if (building.glow) img.style.setProperty('--building-glow', building.glow);
         if (justUnlocked && !prefersReducedMotion) img.classList.add('village-building-reveal');
         art.appendChild(img);
       }
