@@ -67,6 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return PLANET_TASK_IDS.every((id) => progress[id]);
   };
 
+  const INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
+  const isIntroFullyDone = () => {
+    const progress = getTaskProgress('intro');
+    return INTRO_TASK_IDS.every((id) => progress[id]);
+  };
+
   // 'pending' — ещё не очередь (серое, статично, некликабельно)
   // 'active_pulse' — следующая цель (серое, пульсирует, кликабельно)
   // 'unlocked' — все 7 заданий пройдены (полный цвет, без пульсации)
@@ -151,10 +157,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const SPEECH_AUTO_HIDE_MS = 6000;
   let speechHideTimer = null;
 
+  // Переход между зданиями (конец Введения → Сурья, конец планеты →
+  // следующая) — единственный случай, когда реплика обязана появиться,
+  // даже если пользователь свернул виджет: это не рядовая болтовня, а
+  // отметка о продвижении по сюжету. Разворачиваем виджет и гасим экран
+  // на время реплики, а если он был свёрнут — сворачиваем обратно, когда
+  // реплика уйдёт, чтобы не отменять выбор пользователя навсегда.
+  let transitionOverlay = null;
+  let transitionWasHidden = false;
+
+  const clearTransitionOverlay = () => {
+    if (!transitionOverlay) return;
+    const overlay = transitionOverlay;
+    transitionOverlay = null;
+    overlay.classList.remove('transition-overlay-visible');
+    setTimeout(() => overlay.remove(), 600);
+    if (transitionWasHidden) hidePatronWidget();
+  };
+
   const hidePatronSpeech = () => {
     clearTimeout(speechHideTimer);
     patronSpeechBubble.classList.remove('speech-bubble-visible');
     patronSpeechBubble.hidden = true;
+    clearTransitionOverlay();
+  };
+
+  const bumpPatronImage = () => {
+    const img = document.getElementById('patronWidgetImage');
+    img.classList.remove('patron-react');
+    // eslint-disable-next-line no-void
+    void img.offsetWidth;
+    img.classList.add('patron-react');
+    img.addEventListener('animationend', () => img.classList.remove('patron-react'), { once: true });
   };
 
   const showPatronSpeech = (message) => {
@@ -167,13 +201,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearTimeout(speechHideTimer);
     speechHideTimer = setTimeout(hidePatronSpeech, SPEECH_AUTO_HIDE_MS);
+    bumpPatronImage();
+  };
 
-    const img = document.getElementById('patronWidgetImage');
-    img.classList.remove('patron-react');
+  const TRANSITION_HOLD_MS = 5000;
+
+  const showTransitionMoment = (message) => {
+    transitionWasHidden = patronWidget.classList.contains('patron-widget-hidden');
+    if (transitionWasHidden) showPatronWidget();
+
+    const overlay = document.createElement('div');
+    overlay.className = 'transition-overlay';
+    document.body.appendChild(overlay);
+    transitionOverlay = overlay;
     // eslint-disable-next-line no-void
-    void img.offsetWidth;
-    img.classList.add('patron-react');
-    img.addEventListener('animationend', () => img.classList.remove('patron-react'), { once: true });
+    void overlay.offsetWidth;
+    overlay.classList.add('transition-overlay-visible');
+
+    patronSpeechBubble.textContent = message;
+    patronSpeechBubble.hidden = false;
+    patronSpeechBubble.classList.add('speech-bubble-visible');
+
+    clearTimeout(speechHideTimer);
+    speechHideTimer = setTimeout(hidePatronSpeech, TRANSITION_HOLD_MS);
+    bumpPatronImage();
   };
 
   patronSpeechBubble.addEventListener('click', hidePatronSpeech);
@@ -308,11 +359,18 @@ document.addEventListener('DOMContentLoaded', () => {
     ketu: 'Гималаи покорены — все девять уголков обители пробуждены. Васту Пуруша свободен!',
   };
 
+  const INTRO_COMPLETE_MESSAGE =
+    'Обитель богов пробудилась! Теперь пора познакомиться с Сурьей — загляни в Ратушу.';
+
   const reactToTaskComplete = (lessonKey) => {
+    if (lessonKey === 'intro' && isIntroFullyDone()) {
+      showTransitionMoment(INTRO_COMPLETE_MESSAGE);
+      return;
+    }
     if (lessonKey && UNLOCK_ORDER.includes(lessonKey) && isPlanetFullyDone(lessonKey)) {
       const message = PLANET_COMPLETE_MESSAGES[lessonKey];
       if (message) {
-        showPatronSpeech(message);
+        showTransitionMoment(message);
         return;
       }
     }
