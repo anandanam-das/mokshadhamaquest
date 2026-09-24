@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Регистрация — MOKSHA Quest</title>
+    <meta name="description" content="Создание личного кабинета MOKSHA Quest." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <main class="auth-main">
+      <section class="section auth-section login-gate-section">
+        <div class="section-heading login-heading">
+          <h2>MOKSHA DHAMA QUEST</h2>
+          <p class="section-subheading">Создай личный кабинет</p>
+        </div>
+
+        <form id="profileForm" class="login-panel registration-actions">
+          <input
+            id="firstNameInput"
+            type="text"
+            name="firstName"
+            placeholder="Имя"
+            autocomplete="given-name"
+            required
+          />
+          <input
+            id="lastNameInput"
+            type="text"
+            name="lastName"
+            placeholder="Фамилия"
+            autocomplete="family-name"
+            required
+          />
+          <input
+            id="emailInput"
+            type="email"
+            name="email"
+            placeholder="Почта"
+            autocomplete="email"
+            required
+          />
+          <button type="submit" class="btn btn-primary" id="profileSubmitBtn">Продолжить</button>
+          <p class="login-gate-hint" id="profileStatus"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="src/config.js"></script>
+    <script src="questApi.js"></script>
+    <script src="profile-setup.js"></script>
+  </body>
+</html>

@@ -51,7 +51,11 @@ function getTaskProgress(lessonKey) {
 function completeTask(lessonKey, taskId) {
   const state = getUserState();
   const lessonProgress = { ...(state.taskProgress[lessonKey] || {}), [taskId]: true };
-  return setUserState({ taskProgress: { ...state.taskProgress, [lessonKey]: lessonProgress } });
+  const next = setUserState({ taskProgress: { ...state.taskProgress, [lessonKey]: lessonProgress } });
+  // Defined in questApi.js when it's loaded on the page; absent (e.g. on
+  // pages that don't need the cabinet) it's simply a no-op.
+  if (typeof window.syncProgressToQuestApi === 'function') window.syncProgressToQuestApi(next);
+  return next;
 }
 
 // Промежуточный прогресс внутри многошаговых заданий (N из M клипов/карточек/

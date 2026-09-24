@@ -12,7 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (isLocalDevHost()) {
     devBypassBtn.hidden = false;
     devBypassBtn.addEventListener('click', () => {
-      setUserState({ telegramId: 'dev-local-user' });
+      // Numeric, not a placeholder string like the old 'dev-local-user' —
+      // the quest-api users table has telegram_id as BIGINT, so a
+      // non-numeric id would fail every DB call in local dev.
+      setUserState({ telegramId: '900000001' });
       window.location.href = 'checking.html';
     });
   }

@@ -61,6 +61,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const updated = getUserState();
+
+  // Profile registration (email/имя/фамилия) gates the rest of the flow,
+  // same as the Telegram access check above — but it must never be a hard
+  // blocker: quest-api is separate infrastructure from the payment/access
+  // backend, and an outage there must not lock real users out of a course
+  // they already have access to. Admin ids skip it outright. Local dev
+  // skips it too — there's no Vercel function running locally to mint a
+  // quest-api token against.
+  if (!isLocalDevHost() && !isAdminTelegramId(updated.telegramId)) {
+    try {
+      const profile = await fetchQuestProfile();
+      if (!profile) {
+        window.location.href = 'profile-setup.html';
+        return;
+      }
+    } catch (error) {
+      console.warn('quest-api profile check failed (non-fatal, continuing):', error);
+    }
+  }
+
   if (!updated.character) {
     window.location.href = 'create-character.html';
   } else if (!updated.hasSeenPrologue) {

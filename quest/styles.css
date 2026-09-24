@@ -799,6 +799,10 @@ h3 {
   line-height: 1.6;
 }
 
+.task-practice-btn {
+  margin-top: 14px;
+}
+
 /* "Цветок трёх истин" (task_2) — тап-игра вместо обычного квиза: 4
    лепестка вокруг центра, один лепесток лжёт (find_error), остальные три
    расцветают, когда его срывают. */
@@ -4128,13 +4132,13 @@ h3 {
 .engine-detail-item {
   font: inherit;
   display: flex;
-  /* Note всегда переносится на отдельную строку под текстом (flex-wrap
-     ниже) — единый стиль для верных/неверных/нейтральных пунктов и для
-     любой ширины экрана: mark, текст, потом пояснение — всё от левого
-     края, а не отдельной колонкой справа. */
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 10px;
+  /* Текст вопроса сверху, галочка/крестик + пояснение — отдельной строкой
+     под ним (не мешаем мешать mark с текстом вопроса — mark относится к
+     пояснению, а не к вопросу, поэтому и стоит рядом с ним). Единый
+     стиль для верных/неверных/нейтральных пунктов и для любой ширины
+     экрана. */
+  flex-direction: column;
+  gap: 6px;
   padding: 12px 16px;
   border-radius: 14px;
   border: 1px dashed rgba(96, 197, 255, 0.3);
@@ -4181,19 +4185,18 @@ h3 {
 }
 
 .engine-detail-text {
-  flex: 1 1 auto;
-  min-width: 0;
   line-height: 1.4;
 }
 
+/* Контейнер для mark + пояснение — стоят рядом друг с другом, чтобы было
+   сразу видно, к какой отметке относится какой текст. */
 .engine-detail-note {
-  display: block;
-  flex-basis: 100%;
-  margin-top: 4px;
-  /* Отступ примерно под начало текста (после mark + gap), а не от
-     самого края карточки — визуально note продолжает текст, а не
-     начинается заново от края. */
-  margin-left: 26px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.engine-detail-note-text {
   color: var(--muted);
   font-size: 0.92rem;
   font-style: italic;
@@ -4202,13 +4205,6 @@ h3 {
      font-size межстрочный интервал ("normal") получается разным в
      пикселях, и строки ответа/пояснения визуально не совпадают по шагу. */
   line-height: 1.4;
-}
-
-/* У нейтральных пунктов нет mark'а (см. village.js) — сам текст начинается
-   от самого левого края, без отступа под галочку/крестик, поэтому note
-   тоже должна начинаться от края, а не быть в стороне от текста. */
-.engine-detail-item.kind-neutral .engine-detail-note {
-  margin-left: 0;
 }
 
 @media (max-width: 560px) {
@@ -4225,7 +4221,7 @@ h3 {
     text-wrap: pretty;
   }
 
-  .engine-detail-note {
+  .engine-detail-note-text {
     font-size: 0.86rem;
     line-height: 1.4;
     text-wrap: pretty;
@@ -4512,5 +4508,163 @@ h3 {
   .map-match-card {
     padding: 8px 12px;
     font-size: 0.88rem;
+  }
+}
+
+/* Личный кабинет */
+
+.cabinet-section {
+  max-width: 860px;
+}
+
+.cabinet-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.cabinet-progress-bar {
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(32, 59, 96, 0.12);
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.cabinet-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.cabinet-progress-text {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+}
+
+.cabinet-planet-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.cabinet-planet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.92rem;
+}
+
+.cabinet-planet-item.is-done {
+  background: rgba(141, 220, 125, 0.25);
+  font-weight: 700;
+}
+
+.cabinet-planet-mark {
+  font-weight: 800;
+}
+
+.cabinet-character-current {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  margin: 10px 0 14px;
+}
+
+.cabinet-character-current img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.cabinet-character-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.cabinet-character-option {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.cabinet-character-option img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.cabinet-character-option.is-current {
+  border-color: var(--accent-3);
+}
+
+.cabinet-character-option.is-selected {
+  border-color: var(--accent-2);
+  background: #eaf7ff;
+}
+
+.cabinet-character-preview {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  display: grid;
+  gap: 8px;
+}
+
+.cabinet-character-preview-reactions {
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.cabinet-certificate-panel {
+  margin-top: 18px;
+}
+
+.cabinet-certificate-panel:empty {
+  display: none;
+}
+
+.cabinet-certificate-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.cabinet-back {
+  display: inline-block;
+  margin-top: 20px;
+}
+
+@media (max-width: 720px) {
+  .cabinet-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cabinet-character-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }

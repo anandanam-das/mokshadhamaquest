@@ -1150,7 +1150,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Финальная сцена после третьего цветка: три расцветших цветка рядом
   // (лепесток-ложь у каждого уже "улетел", показаны только 3 правдивых)
   // плюс общая вспышка света.
-  const renderFlowerCompletionScene = (task) => {
+  // Позволяет пройти уже выполненное задание ещё раз, в чисто тренировочном
+  // режиме: рендерит тот же интерактив, что и для незавершённого задания
+  // (completeTask при повторном прохождении — идемпотентная операция, ничего
+  // не сбрасывает и не ломает).
+  const appendPracticeButton = (container, lessonKey, task) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-secondary task-practice-btn';
+    btn.textContent = '↺ Потренироваться ещё раз';
+    btn.addEventListener('click', () => {
+      renderTaskContentPanel(lessonKey, task, true);
+    });
+    container.appendChild(btn);
+  };
+
+  const renderFlowerCompletionScene = (lessonKey, task) => {
     const wrap = document.createElement('div');
     wrap.className = 'flower-garden';
 
@@ -1189,12 +1204,13 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.appendChild(finalText);
 
     taskContentPanel.appendChild(wrap);
+    appendPracticeButton(taskContentPanel, lessonKey, task);
   };
 
   // Финальная сцена после задания 3: все пять образов блюда — уже в виде
   // готовых "тарелок" — выстраиваются в ряд с плавным появлением по очереди,
   // плюс общая вспышка света (переиспользуем .flower-garden-flash).
-  const renderCookCompletionScene = (task) => {
+  const renderCookCompletionScene = (lessonKey, task) => {
     const wrap = document.createElement('div');
     wrap.className = 'flower-garden';
 
@@ -1228,6 +1244,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.appendChild(finalText);
 
     taskContentPanel.appendChild(wrap);
+    appendPracticeButton(taskContentPanel, lessonKey, task);
   };
 
   // --- 6 движков планетного урока (Солнце и далее — та же структура,
@@ -1333,18 +1350,26 @@ document.addEventListener('DOMContentLoaded', () => {
       item.addEventListener('click', () => {
         if (settled || item.classList.contains('revealed')) return;
         item.classList.add('revealed', `kind-${detail.kind}`);
-        // У нейтральных пунктов нет "верно"/"неверно" — галочка или
-        // крестик там был бы обманчив, поэтому mark вообще не рисуем.
-        if (detail.kind !== 'neutral') {
-          const mark = document.createElement('span');
-          mark.className = 'engine-detail-mark';
-          mark.textContent = detail.kind === 'correct' ? '✓' : '✗';
-          item.prepend(mark);
-        }
-        if (detail.note) {
+        // Галочка/крестик стоит прямо перед своим пояснением (не отдельно
+        // у текста вопроса) — иначе на карточке с несколькими пунктами
+        // непонятно, к чему именно относится отметка. У нейтральных
+        // пунктов нет "верно"/"неверно" — галочка или крестик там был бы
+        // обманчив, поэтому mark вообще не рисуем.
+        if (detail.kind !== 'neutral' || detail.note) {
           const note = document.createElement('span');
           note.className = 'engine-detail-note';
-          note.textContent = detail.note;
+          if (detail.kind !== 'neutral') {
+            const mark = document.createElement('span');
+            mark.className = 'engine-detail-mark';
+            mark.textContent = detail.kind === 'correct' ? '✓' : '✗';
+            note.appendChild(mark);
+          }
+          if (detail.note) {
+            const noteText = document.createElement('span');
+            noteText.className = 'engine-detail-note-text';
+            noteText.textContent = detail.note;
+            note.appendChild(noteText);
+          }
           item.appendChild(note);
         }
 
@@ -1455,8 +1480,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // "Три лика ..." (guna_video) и "Голос трёх начал" (guna_audio) — одна и
-  // та же 4-шаговая механика (медиа → Гуна → Причина → Детали), три клипа
-  // подряд в перемешанном порядке. mediaKind различает только сам плеер.
+  // та же 3-шаговая механика (медиа → Гуна → Детали), три клипа подряд в
+  // перемешанном порядке. mediaKind различает только сам плеер.
   const renderGunaMediaTask = (lessonKey, task, data, mediaKind) => {
     const wrap = document.createElement('div');
     wrap.className = 'engine-task';
@@ -1547,27 +1572,8 @@ document.addEventListener('DOMContentLoaded', () => {
         step,
         `Какая гуна проявлена в этом ${noun}?`,
         shuffle(GUNA_ORDER.map((g) => ({ text: g, correct: g === clip.guna }))),
-        () => showStepB(clip)
-      );
-      appendRewatchButton(step);
-    };
-
-    const showStepB = (clip) => {
-      stage.innerHTML = '';
-      const step = document.createElement('div');
-      step.className = 'engine-step';
-      stage.appendChild(step);
-      // По умолчанию — общие формулировки причины (одни на все планеты),
-      // но задание может переопределить их через data.reasonOptions, если
-      // нужны варианты, завязанные на сюжет конкретных клипов.
-      const reasonOptions = data.reasonOptions || GUNA_REASON_OPTIONS;
-      renderChoiceButtons(
-        step,
-        `Почему именно гуна «${clip.guna}»?`,
-        shuffle(reasonOptions.map((o) => ({ text: o.text, correct: o.guna === clip.guna }))),
         () => showStepC(clip)
       );
-      appendBackButton(step, () => showStepA(clip));
       appendRewatchButton(step);
     };
 
@@ -1575,7 +1581,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.innerHTML = '';
       const label = document.createElement('p');
       label.className = 'engine-step-question';
-      label.textContent = `Разбери детали — что подтверждает гуну «${clip.guna}», а что нет:`;
+      label.textContent = `Разбери детали — что подтверждает гуну «${clip.guna}»:`;
       stage.appendChild(label);
 
       const refText = clip.transcript ? `«${clip.transcript}»` : clip.source;
@@ -1586,7 +1592,7 @@ document.addEventListener('DOMContentLoaded', () => {
         stage.appendChild(ref);
       }
 
-      appendBackButton(stage, () => showStepB(clip));
+      appendBackButton(stage, () => showStepA(clip));
       appendRewatchButton(stage);
 
       renderDetailsReveal(
@@ -1724,7 +1730,7 @@ document.addEventListener('DOMContentLoaded', () => {
       stage.innerHTML = '';
       const label = document.createElement('p');
       label.className = 'engine-step-question';
-      label.textContent = `Разбери детали изображения — что подтверждает гуну «${card.guna}», а что нет:`;
+      label.textContent = `Разбери детали изображения — что подтверждает гуну «${card.guna}»:`;
       stage.appendChild(label);
 
       // Картинка на этом шаге больше не видна — можно вернуться и
@@ -2301,7 +2307,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
-  const renderTaskContentPanel = (lessonKey, task) => {
+  const renderTaskContentPanel = (lessonKey, task, practice) => {
     taskContentPanel.classList.remove('task-content-panel-enter');
 
     if (!task) {
@@ -2314,16 +2320,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     taskContentPanel.innerHTML = '';
 
-    if (task.status === 'completed' && task.id === 'task_2') {
-      renderFlowerCompletionScene(task);
-    } else if (task.status === 'completed' && task.id === 'task_3') {
-      renderCookCompletionScene(task);
-    } else if (task.status === 'completed') {
+    if (task.status === 'completed' && !practice && task.id === 'task_2') {
+      renderFlowerCompletionScene(lessonKey, task);
+    } else if (task.status === 'completed' && !practice && task.id === 'task_3') {
+      renderCookCompletionScene(lessonKey, task);
+    } else if (task.status === 'completed' && !practice) {
       const feedback = TASK_COMPLETED_FEEDBACK[task.id];
       taskContentPanel.innerHTML = `
         <p class="task-content-done">✓ «${task.title}» выполнено</p>
         ${feedback ? `<p class="task-content-feedback">${feedback}</p>` : ''}
       `;
+      // Гейт лекции и финальный тур деревни повторно проходить незачем —
+      // остальные типы заданий можно потренировать ещё раз.
+      if (task.type !== 'lecture_checkbox' && task.type !== 'guided_tour') {
+        appendPracticeButton(taskContentPanel, lessonKey, task);
+      }
     } else if (task.type === 'lecture_checkbox') {
       taskContentPanel.innerHTML = `
         <p class="task-content-text">Лекция пока доступна в Telegram-канале курса, здесь появится позже.</p>

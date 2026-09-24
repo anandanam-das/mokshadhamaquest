@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Личный кабинет — MOKSHA Quest</title>
+    <meta name="description" content="Прогресс обучения и покровитель в MOKSHA Quest." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <header class="app-nav">
+      <nav class="nav">
+        <div class="nav-links">
+          <a href="village.html" class="btn btn-secondary">← Обитель богов</a>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section cabinet-section">
+        <div class="section-heading">
+          <h2>Личный кабинет</h2>
+          <p class="section-subheading" id="cabinetGreeting">Загрузка…</p>
+        </div>
+
+        <div class="cabinet-layout">
+          <div class="panel cabinet-progress-panel">
+            <h3>Прогресс обучения</h3>
+            <p class="cabinet-progress-text" id="progressText"></p>
+            <div class="cabinet-progress-bar"><div class="cabinet-progress-fill" id="progressFill"></div></div>
+            <ul class="cabinet-planet-list" id="planetList"></ul>
+          </div>
+
+          <div class="panel cabinet-character-panel">
+            <h3>Покровитель</h3>
+            <div class="cabinet-character-current" id="currentCharacterBlock"></div>
+            <button id="changeCharacterBtn" type="button" class="btn btn-secondary">Сменить персонажа</button>
+            <div class="cabinet-character-grid" id="characterGrid" hidden></div>
+            <div class="cabinet-character-preview" id="characterPreview" hidden></div>
+          </div>
+        </div>
+
+        <div class="panel cabinet-certificate-panel" id="certificatePanel"></div>
+
+        <a href="village.html" class="btn btn-secondary cabinet-back">← Назад в обитель</a>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="src/config.js"></script>
+    <script src="questApi.js"></script>
+    <script src="characters.js"></script>
+    <script src="reactions.js"></script>
+    <script src="profile.js"></script>
+  </body>
+</html>
