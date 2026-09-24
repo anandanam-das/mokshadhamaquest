@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const updated = getUserState();
+  let updated = getUserState();
 
   // Profile registration (email/имя/фамилия) gates the rest of the flow,
   // same as the Telegram access check above — but it must never be a hard
@@ -76,6 +76,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = 'profile-setup.html';
         return;
       }
+      // The server copy is the one thing that survives a logout (which
+      // wipes localStorage) — without pulling it back in here, every
+      // fresh login looked like a brand new player: character gone,
+      // prologue unseen, all task progress reset to zero.
+      updated = setUserState({
+        character: profile.patron_planet ? { patronPlanet: profile.patron_planet } : updated.character,
+        hasSeenPrologue: profile.has_seen_prologue || updated.hasSeenPrologue,
+        taskProgress: Object.keys(profile.task_progress || {}).length ? profile.task_progress : updated.taskProgress,
+        stepProgress: Object.keys(profile.step_progress || {}).length ? profile.step_progress : updated.stepProgress,
+      });
     } catch (error) {
       console.warn('quest-api profile check failed (non-fatal, continuing):', error);
     }

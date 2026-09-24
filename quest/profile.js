@@ -109,7 +109,13 @@ function renderCharacterGrid(currentPlanetId, onPick) {
     option.type = 'button';
     option.className = `cabinet-character-option${character.id === currentPlanetId ? ' is-current' : ''}`;
     option.innerHTML = `<img src="${character.file}" alt="${character.title}" /><span>${character.title}</span>`;
-    option.addEventListener('click', () => onPick(character.id));
+    option.addEventListener('click', () => {
+      // Видимая подсветка того, что реально выбрано сейчас — иначе на
+      // телефоне непонятно, среагировал ли тап вообще.
+      grid.querySelectorAll('.cabinet-character-option').forEach((el) => el.classList.remove('is-selected'));
+      option.classList.add('is-selected');
+      onPick(character.id);
+    });
     grid.appendChild(option);
   });
 }
@@ -190,6 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
           grid.hidden = true;
           preview.hidden = true;
         });
+        // Превью с кнопкой подтверждения рисуется ниже сетки — на телефоне
+        // после тапа оно часто оказывается вне видимой области, и кажется,
+        // что тап ни на что не повлиял.
+        preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
     }
   });

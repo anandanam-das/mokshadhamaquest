@@ -116,6 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     setUserState({ hasSeenPrologue: true });
+    if (typeof saveQuestProfile === 'function') {
+      saveQuestProfile({ hasSeenPrologue: true }).catch((error) => {
+        console.warn('failed to sync prologue-seen flag (non-fatal):', error);
+      });
+    }
     window.location.href = 'village.html';
   });
 

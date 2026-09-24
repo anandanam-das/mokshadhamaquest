@@ -61,19 +61,22 @@ app.post(
   ah(async (req, res) => {
     // Partial update: a field omitted from the body (e.g. the cabinet only
     // sending patronPlanet when switching character) keeps its existing
-    // value instead of being wiped to null.
-    const { email, firstName, lastName, patronPlanet } = req.body || {};
+    // value instead of being wiped to null. hasSeenPrologue is a one-way
+    // flag — only `true` is ever written, so a page that doesn't know the
+    // current value can't accidentally flip it back to false.
+    const { email, firstName, lastName, patronPlanet, hasSeenPrologue } = req.body || {};
     const { rows } = await pool.query(
-      `INSERT INTO users (telegram_id, email, first_name, last_name, patron_planet)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (telegram_id, email, first_name, last_name, patron_planet, has_seen_prologue)
+       VALUES ($1, $2, $3, $4, $5, COALESCE($6, false))
        ON CONFLICT (telegram_id) DO UPDATE SET
          email = COALESCE(EXCLUDED.email, users.email),
          first_name = COALESCE(EXCLUDED.first_name, users.first_name),
          last_name = COALESCE(EXCLUDED.last_name, users.last_name),
          patron_planet = COALESCE(EXCLUDED.patron_planet, users.patron_planet),
+         has_seen_prologue = COALESCE(EXCLUDED.has_seen_prologue, users.has_seen_prologue),
          updated_at = now()
        RETURNING *`,
-      [req.telegramId, email || null, firstName || null, lastName || null, patronPlanet || null]
+      [req.telegramId, email || null, firstName || null, lastName || null, patronPlanet || null, hasSeenPrologue === true ? true : null]
     );
     res.json(rows[0]);
   })

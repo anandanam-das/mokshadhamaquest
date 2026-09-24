@@ -47,6 +47,14 @@ document.addEventListener('DOMContentLoaded', () => {
   createHeroBtn.addEventListener('click', () => {
     const character = getCharacter();
     const state = setUserState({ character: { patronPlanet: character.id } });
+    // Best-effort — if quest-api is unreachable, the choice still works
+    // locally for this session; it just won't survive a logout until the
+    // next successful sync.
+    if (typeof saveQuestProfile === 'function') {
+      saveQuestProfile({ patronPlanet: character.id }).catch((error) => {
+        console.warn('failed to sync patron choice (non-fatal):', error);
+      });
+    }
     window.location.href = state.hasSeenPrologue ? 'village.html' : 'prologue.html';
   });
 });
