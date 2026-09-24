@@ -17,6 +17,66 @@ function getCharacterById(id) {
   return MOKSHA_CHARACTERS.find((item) => item.id === id) || null;
 }
 
+// Учебные блоки платформы — каждый следующий назван через санскритский
+// термин "-таттва" (см. заметку в памяти проекта). Пока построен только
+// первый; следующие два показываем как "скоро", ещё не начатые.
+const TATTVA_BLOCKS = [
+  {
+    id: 'graha',
+    sanskrit: 'ग्रह तत्त्व',
+    title: 'Граха-таттва',
+    subtitle: 'Природа и взаимоотношения девяти грах',
+    achievementTitle: 'Граха-таттва-джня',
+    achievementSubtitle: 'Познавший природу грах',
+    locked: false,
+  },
+  {
+    id: 'rashi',
+    sanskrit: 'राशि तत्त्व',
+    title: 'Раши-таттва',
+    subtitle: 'Природа знаков зодиака',
+    locked: true,
+  },
+  {
+    id: 'bhava',
+    sanskrit: 'भाव तत्त्व',
+    title: 'Бхава-таттва',
+    subtitle: 'Природа домов',
+    locked: true,
+  },
+];
+
+function renderTattvaPath(percent, courseComplete) {
+  const container = document.getElementById('tattvaPath');
+  container.innerHTML = TATTVA_BLOCKS.map((block) => {
+    if (block.locked) {
+      return `
+        <div class="tattva-block is-locked">
+          <span class="tattva-block-lock">🔒</span>
+          <span class="tattva-block-sanskrit">${block.sanskrit}</span>
+          <strong class="tattva-block-title">${block.title}</strong>
+          <span class="tattva-block-subtitle">${block.subtitle}</span>
+          <span class="tattva-block-status">Откроется позже</span>
+        </div>
+      `;
+    }
+    const achievement = courseComplete
+      ? `<span class="tattva-block-achievement">🏅 ${block.achievementTitle}<br /><small>${block.achievementSubtitle}</small></span>`
+      : `
+        <div class="tattva-block-progress"><div class="tattva-block-progress-fill" style="width:${percent}%"></div></div>
+        <span class="tattva-block-status">${percent}%</span>
+      `;
+    return `
+      <div class="tattva-block is-active${courseComplete ? ' is-complete' : ''}">
+        <span class="tattva-block-sanskrit">${block.sanskrit}</span>
+        <strong class="tattva-block-title">${block.title}</strong>
+        <span class="tattva-block-subtitle">${block.subtitle}</span>
+        ${achievement}
+      </div>
+    `;
+  }).join('');
+}
+
 function renderProgress(state) {
   const progressText = document.getElementById('progressText');
   const progressFill = document.getElementById('progressFill');
@@ -59,7 +119,7 @@ function renderProgress(state) {
   progressFill.style.width = `${percent}%`;
   progressText.textContent = `Пройдено планет: ${donePlanets} из ${CABINET_UNLOCK_ORDER.length} · заданий: ${doneTasks} из ${totalTasks} (${percent}%)`;
 
-  return donePlanets === CABINET_UNLOCK_ORDER.length;
+  return { courseComplete: donePlanets === CABINET_UNLOCK_ORDER.length, percent };
 }
 
 function renderCertificatePanel(courseComplete) {
@@ -172,7 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const greeting = document.getElementById('cabinetGreeting');
-  const courseComplete = renderProgress(state);
+  const { courseComplete, percent } = renderProgress(state);
+  renderTattvaPath(percent, courseComplete);
   renderCurrentCharacter(state);
   renderCertificatePanel(courseComplete);
 
