@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Админ-панель — MOKSHA Quest</title>
+    <meta name="description" content="Статистика участников MOKSHA Quest." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="pixel-overlay"></div>
+
+    <header class="app-nav">
+      <nav class="nav">
+        <div class="nav-links">
+          <button id="logoutBtn" type="button" class="btn btn-secondary nav-logout">Выйти</button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="section admin-section">
+        <div class="section-heading">
+          <h2>Панель администратора</h2>
+          <p class="section-subheading" id="adminStatus">Загрузка…</p>
+        </div>
+
+        <div class="admin-summary" id="adminSummary" hidden>
+          <div class="panel admin-summary-card">
+            <span class="admin-summary-number" id="statTotalUsers">0</span>
+            <span class="admin-summary-label">участников</span>
+          </div>
+          <div class="panel admin-summary-card">
+            <span class="admin-summary-number" id="statCertificates">0</span>
+            <span class="admin-summary-label">сертификатов выдано</span>
+          </div>
+          <div class="panel admin-summary-card">
+            <span class="admin-summary-number" id="statAvgProgress">0%</span>
+            <span class="admin-summary-label">средний прогресс</span>
+          </div>
+        </div>
+
+        <div class="panel admin-table-panel" id="adminTableWrap" hidden>
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Telegram ID</th>
+                <th>Почта</th>
+                <th>Покровитель</th>
+                <th>Планет</th>
+                <th>Заданий</th>
+                <th>Сертификат</th>
+                <th>Регистрация</th>
+              </tr>
+            </thead>
+            <tbody id="adminTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="state.js"></script>
+    <script src="src/config.js"></script>
+    <script src="questApi.js"></script>
+    <script src="characters.js"></script>
+    <script src="admin.js"></script>
+    <script src="nav.js"></script>
+  </body>
+</html>

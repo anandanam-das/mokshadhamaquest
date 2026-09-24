@@ -75,6 +75,29 @@ async function issueQuestCertificate() {
   return { ok: true, ...data };
 }
 
+async function fetchAdminOverview() {
+  const response = await questApiFetch('/api/admin/overview');
+  if (!response.ok) throw new Error('fetch_admin_overview_failed');
+  return response.json();
+}
+
+async function updateAdminUser(telegramId, patch) {
+  const response = await questApiFetch(`/api/admin/users/${encodeURIComponent(telegramId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
+  if (!response.ok) throw new Error('update_admin_user_failed');
+  return response.json();
+}
+
+async function deleteAdminUser(telegramId) {
+  const response = await questApiFetch(`/api/admin/users/${encodeURIComponent(telegramId)}`, {
+    method: 'DELETE',
+  });
+  if (!response.ok) throw new Error('delete_admin_user_failed');
+  return response.json();
+}
+
 function isAdminTelegramId(telegramId) {
   return MOKSHA_CONFIG.adminTelegramIds.map(String).includes(String(telegramId));
 }

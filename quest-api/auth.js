@@ -18,4 +18,16 @@ function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { requireAuth };
+// Must run after requireAuth (needs req.telegramId already set). The
+// frontend's own admin check is only for routing (which page to show) —
+// this is the actual gate on admin data, checked against the server's own
+// env var so it can't be spoofed by editing client-side config.
+function requireAdmin(req, res, next) {
+  const adminIds = (process.env.ADMIN_TELEGRAM_IDS || '').split(',').map((id) => id.trim()).filter(Boolean);
+  if (!adminIds.includes(req.telegramId)) {
+    return res.status(403).json({ error: 'not_admin' });
+  }
+  next();
+}
+
+module.exports = { requireAuth, requireAdmin };

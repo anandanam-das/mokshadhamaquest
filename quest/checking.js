@@ -81,6 +81,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Admins skip the whole player onboarding (character, prologue, village)
+  // entirely — they have no game progress of their own, they go straight
+  // to the participants dashboard.
+  if (isAdminTelegramId(updated.telegramId)) {
+    window.location.href = 'admin.html';
+    return;
+  }
+
   if (!updated.character) {
     window.location.href = 'create-character.html';
   } else if (!updated.hasSeenPrologue) {

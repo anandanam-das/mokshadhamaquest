@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { pool } = require('./db');
-const { requireAuth } = require('./auth');
+const { requireAuth, requireAdmin } = require('./auth');
 const { generateCertificatePdf } = require('./certificate');
 
 const { PORT = 4000, ALLOWED_ORIGINS = '' } = process.env;
@@ -162,6 +162,98 @@ app.get(
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="moksha-quest-certificate-${cert.id}.pdf"`);
     res.send(Buffer.from(pdfBytes));
+  })
+);
+
+// Admin-only — server-side allowlist check (requireAdmin), independent of
+// whatever the frontend decided to show. Returns every user with a
+// computed progress summary rather than raw task_progress, so the admin
+// page doesn't need to duplicate the planet/task list itself.
+app.get(
+  '/api/admin/overview',
+  requireAuth,
+  requireAdmin,
+  ah(async (req, res) => {
+    const { rows: users } = await pool.query(
+      `SELECT u.telegram_id, u.email, u.first_name, u.last_name, u.patron_planet,
+              u.task_progress, u.created_at, u.updated_at,
+              c.id AS certificate_id, c.issued_at AS certificate_issued_at
+       FROM users u
+       LEFT JOIN certificates c ON c.telegram_id = u.telegram_id
+       ORDER BY u.created_at DESC`
+    );
+
+    const totalTasksPerUser = REQUIRED_PLANETS.length * REQUIRED_PLANET_TASK_IDS.length;
+    const summarized = users.map((u) => {
+      const progress = u.task_progress || {};
+      let donePlanets = 0;
+      let doneTasks = 0;
+      REQUIRED_PLANETS.forEach((planetId) => {
+        const planetProgress = progress[planetId] || {};
+        const completedCount = REQUIRED_PLANET_TASK_IDS.filter((taskId) => planetProgress[taskId]).length;
+        doneTasks += completedCount;
+        if (completedCount === REQUIRED_PLANET_TASK_IDS.length) donePlanets += 1;
+      });
+      return {
+        telegramId: u.telegram_id,
+        email: u.email,
+        firstName: u.first_name,
+        lastName: u.last_name,
+        patronPlanet: u.patron_planet,
+        donePlanets,
+        totalPlanets: REQUIRED_PLANETS.length,
+        doneTasks,
+        totalTasks: totalTasksPerUser,
+        hasCertificate: !!u.certificate_id,
+        certificateId: u.certificate_id,
+        certificateIssuedAt: u.certificate_issued_at,
+        createdAt: u.created_at,
+        updatedAt: u.updated_at,
+      };
+    });
+
+    res.json({
+      totalUsers: summarized.length,
+      totalCertificates: summarized.filter((u) => u.hasCertificate).length,
+      users: summarized,
+    });
+  })
+);
+
+app.patch(
+  '/api/admin/users/:telegramId',
+  requireAuth,
+  requireAdmin,
+  ah(async (req, res) => {
+    // Same "field not sent keeps old value" convention as the self-service
+    // POST /api/profile — the admin edit form always sends every field, so
+    // in practice this just applies whatever's in the form.
+    const { email, firstName, lastName, patronPlanet } = req.body || {};
+    const { rows } = await pool.query(
+      `UPDATE users SET
+         email = COALESCE($2, email),
+         first_name = COALESCE($3, first_name),
+         last_name = COALESCE($4, last_name),
+         patron_planet = COALESCE($5, patron_planet),
+         updated_at = now()
+       WHERE telegram_id = $1
+       RETURNING *`,
+      [req.params.telegramId, email ?? null, firstName ?? null, lastName ?? null, patronPlanet ?? null]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'not_found' });
+    res.json(rows[0]);
+  })
+);
+
+app.delete(
+  '/api/admin/users/:telegramId',
+  requireAuth,
+  requireAdmin,
+  ah(async (req, res) => {
+    await pool.query('DELETE FROM certificates WHERE telegram_id = $1', [req.params.telegramId]);
+    const { rowCount } = await pool.query('DELETE FROM users WHERE telegram_id = $1', [req.params.telegramId]);
+    if (!rowCount) return res.status(404).json({ error: 'not_found' });
+    res.json({ ok: true });
   })
 );
 
