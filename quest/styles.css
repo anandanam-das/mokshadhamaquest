@@ -3755,6 +3755,11 @@ h3 {
   height: auto;
   object-fit: contain;
   display: block;
+  /* Это нарисованная графика, не пиксель-арт — наследованный от body
+     image-rendering: pixelated даёт "рваное" масштабирование, особенно
+     заметное на зданиях с тонкими деталями (шпили, ветви). Возвращаем
+     обычное сглаженное масштабирование браузера только здесь. */
+  image-rendering: auto;
 }
 
 .village-building-rubble-clear {

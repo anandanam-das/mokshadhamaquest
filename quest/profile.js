@@ -12,6 +12,10 @@ const CABINET_PLANET_TASK_IDS = [
   'engine_map',
 ];
 const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
+// Блок Граха-таттва рассчитан на 11 уроков (Введение + 9 планет уже
+// построены, 11-й ещё в разработке) — держим знаменатель фиксированным на
+// будущее, а не только на то, что уже реально существует в игре.
+const GRAHA_TATTVA_LESSON_COUNT = 11;
 
 function getCharacterById(id) {
   return MOKSHA_CHARACTERS.find((item) => item.id === id) || null;
@@ -117,7 +121,8 @@ function renderProgress(state) {
 
   const percent = Math.round((doneTasks / totalTasks) * 100);
   progressFill.style.width = `${percent}%`;
-  progressText.textContent = `Пройдено планет: ${donePlanets} из ${CABINET_UNLOCK_ORDER.length} · заданий: ${doneTasks} из ${totalTasks} (${percent}%)`;
+  const doneLessons = donePlanets + (introDone === CABINET_INTRO_TASK_IDS.length ? 1 : 0);
+  progressText.textContent = `Пройдено уроков: ${doneLessons} из ${GRAHA_TATTVA_LESSON_COUNT} · заданий: ${doneTasks} из ${totalTasks} (${percent}%)`;
 
   return { courseComplete: donePlanets === CABINET_UNLOCK_ORDER.length, percent };
 }
