@@ -11,6 +11,7 @@ const CABINET_PLANET_TASK_IDS = [
   'engine_image',
   'engine_map',
 ];
+const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
 
 function getCharacterById(id) {
   return MOKSHA_CHARACTERS.find((item) => item.id === id) || null;
@@ -21,11 +22,22 @@ function renderProgress(state) {
   const progressFill = document.getElementById('progressFill');
   const planetList = document.getElementById('planetList');
 
-  let doneTasks = 0;
-  let donePlanets = 0;
-  const totalTasks = CABINET_UNLOCK_ORDER.length * CABINET_PLANET_TASK_IDS.length;
+  const totalTasks = CABINET_INTRO_TASK_IDS.length + CABINET_UNLOCK_ORDER.length * CABINET_PLANET_TASK_IDS.length;
 
   planetList.innerHTML = '';
+
+  const introProgress = (state.taskProgress && state.taskProgress.intro) || {};
+  const introDone = CABINET_INTRO_TASK_IDS.filter((taskId) => introProgress[taskId]).length;
+  let doneTasks = introDone;
+  let donePlanets = 0;
+  const introItem = document.createElement('li');
+  introItem.className = `cabinet-planet-item${introDone === CABINET_INTRO_TASK_IDS.length ? ' is-done' : ''}`;
+  introItem.innerHTML = `
+    <span>Введение</span>
+    <span class="cabinet-planet-mark">${introDone === CABINET_INTRO_TASK_IDS.length ? '✓' : `${introDone}/${CABINET_INTRO_TASK_IDS.length}`}</span>
+  `;
+  planetList.appendChild(introItem);
+
   CABINET_UNLOCK_ORDER.forEach((planetId) => {
     const progress = (state.taskProgress && state.taskProgress[planetId]) || {};
     const completedCount = CABINET_PLANET_TASK_IDS.filter((taskId) => progress[taskId]).length;

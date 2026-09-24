@@ -21,6 +21,12 @@ const REQUIRED_PLANET_TASK_IDS = [
   'engine_map',
 ];
 
+// The "Введение" (Семя) lesson — same idea as REQUIRED_PLANET_TASK_IDS but
+// for the intro block, which lives under taskProgress.intro rather than a
+// planet id. Not part of isCourseComplete (that's specifically the 9
+// planets), but it's still real progress and belongs in the admin stats.
+const INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
+
 function isCourseComplete(taskProgress) {
   return REQUIRED_PLANETS.every((planetId) => {
     const progress = taskProgress[planetId] || {};
@@ -186,11 +192,11 @@ app.get(
        ORDER BY u.created_at DESC`
     );
 
-    const totalTasksPerUser = REQUIRED_PLANETS.length * REQUIRED_PLANET_TASK_IDS.length;
+    const totalTasksPerUser = INTRO_TASK_IDS.length + REQUIRED_PLANETS.length * REQUIRED_PLANET_TASK_IDS.length;
     const summarized = users.map((u) => {
       const progress = u.task_progress || {};
       let donePlanets = 0;
-      let doneTasks = 0;
+      let doneTasks = (progress.intro && INTRO_TASK_IDS.filter((taskId) => progress.intro[taskId]).length) || 0;
       REQUIRED_PLANETS.forEach((planetId) => {
         const planetProgress = progress[planetId] || {};
         const completedCount = REQUIRED_PLANET_TASK_IDS.filter((taskId) => planetProgress[taskId]).length;
