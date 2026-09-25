@@ -2550,12 +2550,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // feedbackEl показывает сообщение о пересборке, restartFn пересобирает
   // раунд с нуля (новая выборка пар/раундов). Возвращает onWrong —
-  // подключается к renderChoiceButtons или дёргается вручную.
-  const createRoundPenalty = (feedbackEl, restartFn, warningClass) => {
+  // подключается к renderChoiceButtons или дёргается вручную. maxWrong —
+  // необязательный лимит ошибок для конкретного раунда (по умолчанию
+  // REL_ROUND_MAX_WRONG=3, как у остальных раундов экзамена).
+  const createRoundPenalty = (feedbackEl, restartFn, warningClass, maxWrong = REL_ROUND_MAX_WRONG) => {
     let wrongCount = 0;
     return () => {
       wrongCount += 1;
-      if (wrongCount >= REL_ROUND_MAX_WRONG) {
+      if (wrongCount >= maxWrong) {
         wrongCount = 0;
         if (feedbackEl) {
           feedbackEl.hidden = false;
@@ -3097,7 +3099,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const start = () => {
       feedback.hidden = true;
       const items = shuffle(REL_NEUTRAL_CASES);
-      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      // По просьбе — тут лимит строже, чем у остальных раундов: 2 ошибки
+      // вместо стандартных 3.
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning', 2);
       let idx = 0;
 
       const showStep = () => {
