@@ -3326,6 +3326,56 @@ h3 {
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
+/* Плавающая кнопка входа в экзамен — на противоположном (левом) краю
+   экрана от виджета покровителя, фиксированной позицией: полностью вне
+   карты и .village-layout, поэтому не зависит от тумана/облаков на карте
+   вообще, при любом их состоянии. */
+.shiva-exam-badge {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 500;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.shiva-exam-badge-image {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 214, 133, 0.35) 0%, transparent 70%);
+  filter: drop-shadow(0 0 10px rgba(255, 214, 133, 0.6));
+  animation: village-shiva-icon-glow 2.4s ease-in-out infinite;
+}
+
+.shiva-exam-badge:hover .shiva-exam-badge-image {
+  filter: drop-shadow(0 0 18px rgba(255, 214, 133, 1));
+}
+
+.shiva-exam-badge-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #6b3f00;
+  text-align: center;
+  background: rgba(255, 235, 190, 0.92);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .shiva-exam-badge-image {
+    width: 64px;
+    height: 64px;
+  }
+}
+
 .patron-widget-hidden {
   opacity: 0;
   transform: translateY(16px) scale(0.9);
@@ -3550,10 +3600,21 @@ h3 {
   max-width: 26ch;
 }
 
+/* Обёртка того же размера, что и сама сцена, но БЕЗ overflow:hidden —
+   нужна, чтобы что-то (иконка "Экзамен Шивы") могло сидеть у самого края
+   карты, не обрезаясь скруглённым углом/границей сцены вместе с туманом
+   и облаками, которые как раз обязаны обрезаться. Размер/позиция сцены
+   выставляются в village.js через inline-стили именно на эту обёртку. */
+.village-stage-wrap {
+  position: relative;
+}
+
 /* Ландшафт обители: один готовый квадратный слой на всю сцену — Васту
    Пуруша уже вклеен под ландшафтом в самой картинке. */
 .village-stage {
   position: relative;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background-color: #8ab26c;
   border: 2px solid rgba(106, 162, 130, 0.24);
@@ -3913,6 +3974,15 @@ h3 {
   box-shadow: 0 0 0 4px rgba(134, 184, 92, 0.28);
 }
 
+@keyframes village-shiva-icon-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(255, 214, 133, 0.55));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(255, 214, 133, 0.9));
+  }
+}
+
 @media (max-width: 980px) {
   .village-layout {
     grid-template-columns: 1fr;
@@ -4145,6 +4215,15 @@ h3 {
 }
 
 .engine-choice-correct {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.18);
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+}
+
+/* Переключаемый выбор в множественном списке (раунд "Раху и Кету") — тот
+   же зелёный, что и .engine-choice-correct, но это ТОЛЬКО факт "отмечено",
+   не подсказка о правильности (её тут нет до нажатия "Проверить"). */
+.engine-choice-selected {
   border-color: #5bd1a0;
   background: rgba(94, 209, 158, 0.18);
   box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
@@ -4429,6 +4508,11 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--accent-2);
+}
+
+.map-match-slot-values {
+  display: grid;
+  gap: 4px;
 }
 
 .map-match-slot-value {
@@ -4930,4 +5014,173 @@ h3 {
   .admin-summary {
     grid-template-columns: 1fr;
   }
+}
+
+/* --- Задание №11 "Взаимоотношения грах": пара портретов с направлением,
+   зоны воздействия (4 вместо 3 у guna-sort) и простая колонка-в-колонку
+   сверка для раунда "Как проявляется союз?". */
+
+.rel-round-title {
+  margin: 0;
+  font-weight: 800;
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.rel-pair-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.rel-round-body {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  width: 100%;
+}
+
+.rel-question-wrap {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: 100%;
+}
+
+.rel-pair-portrait {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.rel-pair-portrait img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #cadcec;
+  background: #e9f2fb;
+}
+
+.rel-pair-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.rel-pair-arrow {
+  font-size: 1.4rem;
+  color: var(--accent-2);
+  font-weight: 700;
+}
+
+.rel-impact-zones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .rel-impact-zones {
+    grid-template-columns: 1fr;
+  }
+}
+
+.rel-match-columns {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* На узких экранах .rel-match-columns переносит группы одну под другой
+   (см. flex-wrap выше) — тогда все 6 карточек визуально сливались в один
+   список, непонятно было, какие три с какими надо соединять. Разный цвет
+   + подпись над каждой группой держат это разделение при любой ширине. */
+.rel-match-group {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+  flex: 1 1 240px;
+}
+
+.rel-match-group-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+}
+
+.rel-match-col {
+  display: grid;
+  gap: 10px;
+}
+
+.rel-match-item {
+  font: inherit;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #cadcec;
+  background: #e9f2fb;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Левая колонка (пары грах) и правая (что рождается) — разный оттенок,
+   чтобы отличались с первого взгляда, а не только по подписи сверху. */
+.rel-match-col-pair .rel-match-item {
+  background: #fff1e0;
+  border-color: #f0c98a;
+}
+
+.rel-match-col-result .rel-match-item {
+  background: #e9f2fb;
+  border-color: #cadcec;
+}
+
+.rel-match-item:hover {
+  transform: translateY(-2px);
+}
+
+/* .rel-match-item.<state> (две части класса, а не одна) — иначе проигрывает
+   по специфичности правилам .rel-match-col-pair/.rel-match-col-result
+   .rel-match-item выше, и подсветка выбора/совпадения не была видна. */
+.rel-match-item.rel-match-item-selected {
+  border-color: #5bd1a0;
+  box-shadow: 0 0 0 3px rgba(94, 209, 158, 0.22);
+}
+
+.rel-match-item.rel-match-item-correct {
+  border-color: #5bd1a0;
+  background: rgba(94, 209, 158, 0.18);
+  cursor: default;
+}
+
+.rel-match-item-wrong {
+  animation: map-match-slot-shake 0.4s ease;
+}
+
+.rel-impact-zone-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.rel-myth-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 214, 133, 0.16);
+  border: 1px solid rgba(255, 214, 133, 0.5);
+  color: var(--muted);
+  font-size: 0.94rem;
+  font-style: italic;
+  max-width: 560px;
 }

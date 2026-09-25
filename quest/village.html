@@ -33,7 +33,9 @@
         </div>
 
         <div class="village-layout">
-          <div class="village-stage" id="villageStage"></div>
+          <div class="village-stage-wrap" id="villageStageWrap">
+            <div class="village-stage" id="villageStage"></div>
+          </div>
           <aside class="course-detail-panel" id="villageDetail"></aside>
         </div>
 
@@ -57,6 +59,14 @@
       <img id="patronReopenImage" class="patron-widget-reopen-image" src="" alt="" />
     </button>
 
+    <!-- Плавающая кнопка "Экзамен Шивы" — вне карты, вне .village-layout,
+         поэтому никак не зависит от того, рассеялись ли на карте облака.
+         Появляется/скрывается через village.js (updateShivaExamBadge). -->
+    <button type="button" class="shiva-exam-badge" id="shivaExamBadge" hidden aria-label="Экзамен Шивы">
+      <img class="shiva-exam-badge-image" src="assets/prologue/shiva.png" alt="" />
+      <span class="shiva-exam-badge-label">Экзамен Шивы</span>
+    </button>
+
     <script src="state.js"></script>
     <script src="src/config.js"></script>
     <script src="questApi.js"></script>
@@ -65,6 +75,7 @@
     <script src="lessons.js"></script>
     <script src="taskContent.js"></script>
     <script src="planetTaskContent.js"></script>
+    <script src="relationshipsTaskContent.js"></script>
     <script src="reactions.js"></script>
     <script src="reactionsExpanded.js"></script>
     <script src="village.js"></script>

@@ -12,6 +12,9 @@ const CABINET_PLANET_TASK_IDS = [
   'engine_map',
 ];
 const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
+// Mirrors REL_ROUNDS ids in village.js — "Экзамен Шивы", 6 раундов
+// задания №11. Ачивка Граха-таттва-джня требует 9 планет И весь экзамен.
+const CABINET_EXAM_ROUND_IDS = ['round_direction', 'round_reason', 'round_impact', 'round_union', 'round_neutral', 'round_nodes'];
 // Блок Граха-таттва рассчитан на 11 уроков (Введение + 9 планет уже
 // построены, 11-й ещё в разработке) — держим знаменатель фиксированным на
 // будущее, а не только на то, что уже реально существует в игре.
@@ -86,7 +89,8 @@ function renderProgress(state) {
   const progressFill = document.getElementById('progressFill');
   const planetList = document.getElementById('planetList');
 
-  const totalTasks = CABINET_INTRO_TASK_IDS.length + CABINET_UNLOCK_ORDER.length * CABINET_PLANET_TASK_IDS.length;
+  const totalTasks =
+    CABINET_INTRO_TASK_IDS.length + CABINET_UNLOCK_ORDER.length * CABINET_PLANET_TASK_IDS.length + CABINET_EXAM_ROUND_IDS.length;
 
   planetList.innerHTML = '';
 
@@ -119,12 +123,27 @@ function renderProgress(state) {
     planetList.appendChild(item);
   });
 
+  const allPlanetsDone = donePlanets === CABINET_UNLOCK_ORDER.length;
+  const examProgress = (state.taskProgress && state.taskProgress.relationships) || {};
+  const examDone = CABINET_EXAM_ROUND_IDS.filter((taskId) => examProgress[taskId]).length;
+  doneTasks += examDone;
+  const examComplete = examDone === CABINET_EXAM_ROUND_IDS.length;
+  if (allPlanetsDone) {
+    const examItem = document.createElement('li');
+    examItem.className = `cabinet-planet-item${examComplete ? ' is-done' : ''}`;
+    examItem.innerHTML = `
+      <span>Экзамен Шивы</span>
+      <span class="cabinet-planet-mark">${examComplete ? '✓' : `${examDone}/${CABINET_EXAM_ROUND_IDS.length}`}</span>
+    `;
+    planetList.appendChild(examItem);
+  }
+
   const percent = Math.round((doneTasks / totalTasks) * 100);
   progressFill.style.width = `${percent}%`;
   const doneLessons = donePlanets + (introDone === CABINET_INTRO_TASK_IDS.length ? 1 : 0);
   progressText.textContent = `Пройдено уроков: ${doneLessons} из ${GRAHA_TATTVA_LESSON_COUNT} · заданий: ${doneTasks} из ${totalTasks} (${percent}%)`;
 
-  return { courseComplete: donePlanets === CABINET_UNLOCK_ORDER.length, percent };
+  return { courseComplete: allPlanetsDone && examComplete, percent };
 }
 
 function renderCertificatePanel(courseComplete) {

@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const stage = document.getElementById('villageStage');
+  const stageWrap = document.getElementById('villageStageWrap');
   const detailRoot = document.getElementById('villageDetail');
   const taskContentPanel = document.getElementById('taskContentPanel');
 
@@ -121,17 +122,18 @@ document.addEventListener('DOMContentLoaded', () => {
     mangala: { dx: 0, dy: -3 },
   };
 
-  stage.style.width = '100%';
-  stage.style.maxWidth = `${STAGE_SIZE}px`;
-  stage.style.aspectRatio = '1 / 1';
-  stage.style.position = 'relative';
-  stage.style.margin = '0 auto';
+  stageWrap.style.width = '100%';
+  stageWrap.style.maxWidth = `${STAGE_SIZE}px`;
+  stageWrap.style.aspectRatio = '1 / 1';
+  stageWrap.style.margin = '0 auto';
 
   let selectedBuildingId = null;
   let activeTaskId = null;
   let currentLessonKey = null;
   let currentLessonHeading = null;
   let currentLessonTasks = null;
+  // Индекс открытого сейчас раунда экзамена (null — сам экзамен не открыт).
+  let relActiveRoundIndex = null;
 
   // --- Персонаж-покровитель: зафиксирован на экране (не на странице),
   // всегда в углу снизу, можно скрыть и показать снова. Раньше при новой
@@ -165,6 +167,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // реплика уйдёт, чтобы не отменять выбор пользователя навсегда.
   let transitionOverlay = null;
   let transitionWasHidden = false;
+  // Момент с Шивой временно подменяет портрет в виджете (обычно там
+  // покровитель игрока) — после этой конкретной реплики портрет всегда
+  // откатывается на покровителя как обычно. Отдельно, при входе в сам
+  // экзамен Шивы (по клику на иконку на карте, см. openRelationshipsExam),
+  // портрет переключается на Шиву заново и держится весь ход экзамена —
+  // это не связано с кат-сценой, а собственное состояние экрана экзамена.
+  let shivaActive = false;
+  // Заполняется showShivaMoment, когда после кат-сцены нужно что-то
+  // сделать (например, перерисовать карту деревни) — иначе просто null.
+  let afterOverlayCallback = null;
 
   const clearTransitionOverlay = () => {
     if (!transitionOverlay) return;
@@ -172,7 +184,16 @@ document.addEventListener('DOMContentLoaded', () => {
     transitionOverlay = null;
     overlay.classList.remove('transition-overlay-visible');
     setTimeout(() => overlay.remove(), 600);
+    if (shivaActive) {
+      shivaActive = false;
+      setupPatronWidget();
+    }
     if (transitionWasHidden) hidePatronWidget();
+    if (afterOverlayCallback) {
+      const cb = afterOverlayCallback;
+      afterOverlayCallback = null;
+      cb();
+    }
   };
 
   const hidePatronSpeech = () => {
@@ -224,6 +245,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     clearTimeout(speechHideTimer);
     speechHideTimer = setTimeout(hidePatronSpeech, TRANSITION_HOLD_MS);
+    bumpPatronImage();
+  };
+
+  // Завершение всей Граха-таттвы (девятая планета) — не рядовой переход
+  // между зданиями, а отдельная кат-сцена: вместо покровителя в виджете
+  // на время реплики появляется сам Шива (assets/prologue/shiva.png, уже
+  // использован в прологе). Держим дольше обычного перехода — момент
+  // значимый, читать чуть дольше.
+  const SHIVA_HOLD_MS = 8000;
+
+  const showShivaMoment = (message, onDone) => {
+    transitionWasHidden = patronWidget.classList.contains('patron-widget-hidden');
+    if (transitionWasHidden) showPatronWidget();
+
+    afterOverlayCallback = onDone || null;
+    shivaActive = true;
+    const img = document.getElementById('patronWidgetImage');
+    img.src = 'assets/prologue/shiva.png';
+    img.alt = 'Шива';
+    const reopenImg = document.getElementById('patronReopenImage');
+    reopenImg.src = 'assets/prologue/shiva.png';
+    reopenImg.alt = 'Шива';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'transition-overlay';
+    document.body.appendChild(overlay);
+    transitionOverlay = overlay;
+    // eslint-disable-next-line no-void
+    void overlay.offsetWidth;
+    overlay.classList.add('transition-overlay-visible');
+
+    patronSpeechBubble.textContent = message;
+    patronSpeechBubble.hidden = false;
+    patronSpeechBubble.classList.add('speech-bubble-visible');
+
+    clearTimeout(speechHideTimer);
+    speechHideTimer = setTimeout(hidePatronSpeech, SHIVA_HOLD_MS);
     bumpPatronImage();
   };
 
@@ -356,15 +414,26 @@ document.addEventListener('DOMContentLoaded', () => {
     shukra: 'Чертоги Шукры раскрыты! Дальше — Ремесленный двор, там ждёт Шани.',
     shani: 'Ремесленный двор ожил. Теперь путь лежит к Побережью — там кроется Раху.',
     rahu: 'Побережье открыто. Остался последний шаг — Гималаи, обитель Кету.',
-    ketu: 'Гималаи покорены — все девять уголков обители пробуждены. Васту Пуруша свободен!',
+    // ketu намеренно не здесь — это не рядовой переход, а конец всей
+    // Граха-таттвы, отдельная кат-сцена с Шивой (см. SHIVA_COMPLETE_MESSAGE).
   };
 
   const INTRO_COMPLETE_MESSAGE =
     'Обитель богов пробудилась! Теперь пора познакомиться с Сурьей — загляни в Ратушу.';
 
+  const SHIVA_COMPLETE_MESSAGE =
+    'Я смотрю, ты открыл весь потенциал знаний и дал возможность дышать Васту Пуруше. Теперь проверим, как хорошо ты понял планеты — на примерах их взаимоотношений. Мой знак появился на карте — приходи, когда будешь готов.';
+
   const reactToTaskComplete = (lessonKey) => {
     if (lessonKey === 'intro' && isIntroFullyDone()) {
       showTransitionMoment(INTRO_COMPLETE_MESSAGE);
+      return;
+    }
+    // Кету — последняя планета: этим шагом закрывается вся Граха-таттва,
+    // и это не рядовой переход, а отдельная кат-сцена с самим Шивой
+    // (вместо обычной реплики покровителя из PLANET_COMPLETE_MESSAGES).
+    if (lessonKey === 'ketu' && isPlanetFullyDone('ketu')) {
+      showShivaMoment(SHIVA_COMPLETE_MESSAGE, buildVillageStage);
       return;
     }
     if (lessonKey && UNLOCK_ORDER.includes(lessonKey) && isPlanetFullyDone(lessonKey)) {
@@ -1311,14 +1380,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // ошибке) и renderDetailsReveal (тап открывает пункт: ✓/✗ + пояснение,
   // без набора очков — это чтение с подсказками, а не тест).
 
-  const renderChoiceButtons = (container, question, options, onCorrect) => {
-    const q = document.createElement('p');
-    q.className = 'engine-step-question';
-    q.textContent = question;
-    container.appendChild(q);
+  const renderChoiceButtons = (container, question, options, onCorrect, vertical, onWrong) => {
+    if (question) {
+      const q = document.createElement('p');
+      q.className = 'engine-step-question';
+      q.textContent = question;
+      container.appendChild(q);
+    }
 
     const list = document.createElement('div');
-    list.className = 'engine-choice-list';
+    list.className = vertical ? 'engine-choice-list engine-choice-list-vertical' : 'engine-choice-list';
     container.appendChild(list);
 
     let settled = false;
@@ -1338,6 +1409,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // eslint-disable-next-line no-void
           void btn.offsetWidth;
           btn.classList.add('engine-choice-wrong', 'engine-choice-shake');
+          if (onWrong) onWrong();
         }
       });
       list.appendChild(btn);
@@ -1843,10 +1915,20 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(intro, timerEl, stage);
     taskContentPanel.appendChild(wrap);
 
-    const phrases = shuffle(data.phrases);
+    // 2 ошибки за прохождение — и заново: та же механика "штрафа", что и в
+    // остальных движках (см. ENGINE_DETAILS_RESET_TEXT), только здесь
+    // перезапускает весь набор фраз, а не одну карточку — заданий тут
+    // мало, отдельной карточки для повтора не выделить.
+    const MAX_WRONG_PHRASES = 2;
+    const PHRASE_RESET_TEXT = 'Слишком много ошибок — начинаем заново.';
+    const PHRASE_RESET_DELAY_MS = 1400;
+
+    let phrases = shuffle(data.phrases);
     let index = 0;
+    let wrongCount = 0;
     let secondsLeft = data.timerSeconds;
     let finished = false;
+    let timerId = null;
 
     const finish = () => {
       if (finished) return;
@@ -1857,12 +1939,24 @@ document.addEventListener('DOMContentLoaded', () => {
       rerenderCurrentLesson();
     };
 
-    timerEl.textContent = `Осталось: ${secondsLeft} сек`;
-    const timerId = setInterval(() => {
-      secondsLeft -= 1;
-      timerEl.textContent = `Осталось: ${Math.max(secondsLeft, 0)} сек`;
-      if (secondsLeft <= 0) finish();
-    }, 1000);
+    const startTimer = () => {
+      clearInterval(timerId);
+      secondsLeft = data.timerSeconds;
+      timerEl.textContent = `Осталось: ${secondsLeft} сек`;
+      timerId = setInterval(() => {
+        secondsLeft -= 1;
+        timerEl.textContent = `Осталось: ${Math.max(secondsLeft, 0)} сек`;
+        if (secondsLeft <= 0) finish();
+      }, 1000);
+    };
+
+    const restart = () => {
+      phrases = shuffle(data.phrases);
+      index = 0;
+      wrongCount = 0;
+      startTimer();
+      showPhrase();
+    };
 
     const showPhrase = () => {
       if (finished) return;
@@ -1888,11 +1982,17 @@ document.addEventListener('DOMContentLoaded', () => {
           const correct = guna === phrases[index].guna;
           btn.classList.add(correct ? 'engine-choice-correct' : 'engine-choice-wrong');
           if (!correct) {
+            wrongCount += 1;
             buttons.querySelectorAll('.engine-choice-btn').forEach((b) => {
               if (b.textContent === phrases[index].guna) b.classList.add('engine-choice-correct');
             });
           }
           setTimeout(() => {
+            if (wrongCount >= MAX_WRONG_PHRASES) {
+              stage.innerHTML = `<p class="engine-details-warning engine-details-warning-reset">${PHRASE_RESET_TEXT}</p>`;
+              setTimeout(restart, PHRASE_RESET_DELAY_MS);
+              return;
+            }
             index += 1;
             if (index < phrases.length) showPhrase();
             else finish();
@@ -1902,6 +2002,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     };
 
+    startTimer();
     showPhrase();
   };
 
@@ -2362,6 +2463,929 @@ document.addEventListener('DOMContentLoaded', () => {
     showRound();
   };
 
+  // --- "Экзамен Шивы" (Граха-таттва-джня): не входит в список заданий
+  // планеты. После Кету идёт только кат-сцена (см.
+  // reactToTaskComplete/showShivaMoment), которая ничего не открывает —
+  // она лишь обновляет статус кнопки входа (см. updateShivaExamBadge, ниже
+  // по файлу, и #shivaExamBadge в village.html — фиксированный элемент
+  // вне карты, не зависит от тумана/облаков). Вход в сам экзамен —
+  // openRelationshipsExam, свой список из 6 раундов в обход
+  // openLesson/computeTaskStatuses. Контент — relationshipsTaskContent.js,
+  // единственный источник которого презентация "Соединения.pptx" (слайды
+  // 1–19).
+
+  const renderRelPairHeader = (container, fromId, toId) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'rel-pair-header';
+    const fromChar = MOKSHA_CHARACTERS.find((c) => c.id === fromId);
+    const toChar = MOKSHA_CHARACTERS.find((c) => c.id === toId);
+    const makePortrait = (ch) => {
+      const box = document.createElement('div');
+      box.className = 'rel-pair-portrait';
+      const img = document.createElement('img');
+      img.src = ch.file;
+      img.alt = ch.title;
+      const name = document.createElement('div');
+      name.className = 'rel-pair-name';
+      name.textContent = ch.title;
+      box.append(img, name);
+      return box;
+    };
+    const arrow = document.createElement('div');
+    arrow.className = 'rel-pair-arrow';
+    arrow.textContent = '→';
+    wrap.append(makePortrait(fromChar), arrow, makePortrait(toChar));
+    container.appendChild(wrap);
+  };
+
+  // Штраф — тот же принцип, что и везде в игре (task_2, task_gunas,
+  // engine_details): слишком много ошибок подряд в одном заходе на
+  // раунд — раунд пересобирается заново (новая выборка/тасовка), а не
+  // засчитывается как провал навсегда.
+  const REL_ROUND_MAX_WRONG = 3;
+  const REL_ROUND_RESET_TEXT = 'Слишком много ошибок в этом раунде — начнём его заново.';
+  const REL_ROUND_RESET_DELAY_MS = 1400;
+
+  // feedbackEl показывает сообщение о пересборке, restartFn пересобирает
+  // раунд с нуля (новая выборка пар/раундов). Возвращает onWrong —
+  // подключается к renderChoiceButtons или дёргается вручную.
+  const createRoundPenalty = (feedbackEl, restartFn, warningClass) => {
+    let wrongCount = 0;
+    return () => {
+      wrongCount += 1;
+      if (wrongCount >= REL_ROUND_MAX_WRONG) {
+        wrongCount = 0;
+        if (feedbackEl) {
+          feedbackEl.hidden = false;
+          feedbackEl.textContent = REL_ROUND_RESET_TEXT;
+          if (warningClass) feedbackEl.classList.add(warningClass);
+        }
+        setTimeout(restartFn, REL_ROUND_RESET_DELAY_MS);
+      }
+    };
+  };
+
+  // Раунд 1 "Кто кому друг?" — по каждой сэмплированной паре спрашиваем
+  // оба направления отдельно, обратное не подставляется автоматически
+  // (слайды 8, 11, 13–14: отношения не всегда взаимны).
+  const REL_ROUND1_SIZE = 5;
+
+  const renderRelDirectionRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent =
+      'Для каждой пары планет определи отношение — сначала в одну сторону, потом отдельно в обратную. Отношения не всегда взаимны.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'flower-feedback';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    const start = () => {
+      feedback.hidden = true;
+      const pairs = shuffle(REL_UNORDERED_PAIRS).slice(0, REL_ROUND1_SIZE);
+      const steps = [];
+      pairs.forEach(([a, b]) => {
+        const [first, second] = Math.random() < 0.5 ? [a, b] : [b, a];
+        steps.push({ fromId: first, toId: second });
+        steps.push({ fromId: second, toId: first });
+      });
+
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      let idx = 0;
+      const showStep = () => {
+        body.innerHTML = '';
+        if (idx >= steps.length) {
+          goNext();
+          return;
+        }
+        const { fromId, toId } = steps[idx];
+        const header = document.createElement('div');
+        renderRelPairHeader(header, fromId, toId);
+        body.appendChild(header);
+
+        const correct = relOf(fromId, toId);
+        const options = shuffle(['friend', 'enemy', 'neutral']).map((rel) => ({
+          text: REL_LABELS[rel],
+          correct: rel === correct,
+        }));
+
+        const qWrap = document.createElement('div');
+        qWrap.className = 'rel-question-wrap';
+        body.appendChild(qWrap);
+        renderChoiceButtons(
+          qWrap,
+          'Как первая граха (слева) относится ко второй (справа)?',
+          options,
+          () => {
+            idx += 1;
+            showStep();
+          },
+          false,
+          onWrong,
+        );
+      };
+
+      showStep();
+    };
+
+    start();
+  };
+
+  // Раунд 2 "Почему такое отношение?" — объяснение должно соответствовать
+  // именно указанному направлению (слайды 4, 12–19).
+  const REL_ROUND2_SIZE = 5;
+
+  // Раунд 2: один вопрос, три варианта — правильный текст плюс два
+  // отвлекающих, которые называют только одну из двух показанных планет
+  // (без упоминания третьей по имени, регистронезависимо), чтобы вариант
+  // всегда реально относился к спрошенной паре.
+  const REL_ALL_REASON_ENTRIES = [];
+  REL_PLANETS.forEach((p) => {
+    REL_PLANETS.forEach((q) => {
+      if (p !== q) REL_ALL_REASON_ENTRIES.push({ fromId: p, toId: q, ...REL_REASON[p][q] });
+    });
+  });
+
+  // Третий вариант — не текст про другую пару (в презентации для точно
+  // этих двух планет и без того есть только сам текст + обратное
+  // направление), а содержательная ошибка другого типа: неверно назван
+  // сам характер отношения (перепутаны дружба/вражда/нейтральность).
+  // Называет только те же две планеты, что в вопросе, ничего не
+  // придумывает сверх уже известного из таблицы (REL_TABLE).
+  const REL_WRONG_MECHANISM_TEXT = {
+    friend: (fromSub, toSub) => `${toSub} и ${fromSub} здесь не поддерживают друг друга — скорее мешают, как враги.`,
+    enemy: (fromSub, toSub) => `${toSub} и ${fromSub} здесь ладят и поддерживают друг друга, как близкие друзья.`,
+    neutral: (fromSub, toSub) =>
+      `${toSub} и ${fromSub} здесь либо крепко дружат, либо открыто враждуют — нейтральности тут нет.`,
+  };
+
+  const renderRelReasonRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = 'Отношение уже известно. Выбери объяснение, которое подходит именно этому направлению.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'flower-feedback';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    // Полные предложения почти всегда называют по имени обе стороны своей
+    // СОБСТВЕННОЙ пары — "упоминает хотя бы одну из двух спрошенных планет"
+    // пропускало фразы вроде "Юпитер и Меркурий..." для пары Юпитер/Луна:
+    // Юпитер там есть, но по факту это ответ про другую пару целиком.
+    // Единственный вариант, который гарантированно и только про ЭТИ две
+    // планеты — обратное направление той же пары. Второй вариант берём,
+    // только если он ТОЖЕ называет исключительно эти две планеты (ни одной
+    // третьей); если такого нет — вопрос честно остаётся с двумя
+    // вариантами вместо трёх (то же "менять форму проверки", когда третий
+    // однозначный вариант физически неоткуда взять).
+    const pickTextDistractors = (fromId, toId, correctText, count) => {
+      const fromRoot = REL_NAME_ROOTS[fromId].toLowerCase();
+      const toRoot = REL_NAME_ROOTS[toId].toLowerCase();
+      const otherRoots = REL_PLANETS.filter((p) => p !== fromId && p !== toId).map((p) => REL_NAME_ROOTS[p].toLowerCase());
+      const mentionsOnlyThisPair = (v) => {
+        const low = v.toLowerCase();
+        return (low.includes(fromRoot) || low.includes(toRoot)) && !otherRoots.some((root) => low.includes(root));
+      };
+
+      const candidates = [
+        ...new Set(
+          REL_ALL_REASON_ENTRIES.filter((e) => e.text !== correctText && mentionsOnlyThisPair(e.text)).map((e) => e.text),
+        ),
+      ];
+      return shuffle(candidates).slice(0, count);
+    };
+
+    const start = () => {
+      feedback.hidden = true;
+      const pool = shuffle(REL_DIRECTED_PAIRS).slice(0, REL_ROUND2_SIZE);
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      let idx = 0;
+      const showStep = () => {
+        body.innerHTML = '';
+        if (idx >= pool.length) {
+          goNext();
+          return;
+        }
+        const { fromId, toId, relation } = pool[idx];
+        const fromChar = MOKSHA_CHARACTERS.find((c) => c.id === fromId);
+
+        const header = document.createElement('div');
+        renderRelPairHeader(header, fromId, toId);
+        body.appendChild(header);
+
+        const question = document.createElement('p');
+        question.className = 'rel-round-title';
+        question.textContent = `Почему ${fromChar.title} считает ${REL_ACCUSATIVE[toId]} ${REL_RELATION_WORD(relation, toId)}?`;
+        body.appendChild(question);
+
+        const toChar = MOKSHA_CHARACTERS.find((c) => c.id === toId);
+        const entry = REL_REASON[fromId][toId];
+        const isMythPair = (fromId === 'chandra' && toId === 'budha') || (fromId === 'budha' && toId === 'chandra');
+
+        const wrongMechanismText = REL_WRONG_MECHANISM_TEXT[relation](fromChar.title, toChar.title);
+        const options = shuffle([
+          { text: entry.text, correct: true },
+          ...pickTextDistractors(fromId, toId, entry.text, 1).map((t) => ({ text: t, correct: false })),
+          { text: wrongMechanismText, correct: false },
+        ]);
+
+        const qWrap = document.createElement('div');
+        qWrap.className = 'rel-question-wrap';
+        body.appendChild(qWrap);
+        renderChoiceButtons(
+          qWrap,
+          '',
+          options,
+          () => {
+            if (isMythPair) {
+              const note = document.createElement('p');
+              note.className = 'rel-myth-note';
+              note.textContent = REL_MYTH_KEY.budha;
+              body.appendChild(note);
+              setTimeout(() => {
+                idx += 1;
+                showStep();
+              }, 2600);
+            } else {
+              idx += 1;
+              showStep();
+            }
+          },
+          true,
+          onWrong,
+        );
+      };
+
+      showStep();
+    };
+
+    start();
+  };
+
+  // Раунд 3 "Что меняется?" — единственная пара с явно подтверждённым
+  // множественным воздействием (слайд 5, повтор на слайде 9): Сатурн ↔
+  // Юпитер, в обе стороны по-разному влияют на разные качества.
+  const renderRelImpactRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = 'Одна граха может по-разному воздействовать на качества партнёра. Разнеси качества по типам воздействия.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'engine-details-warning';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    const start = () => {
+      feedback.hidden = true;
+      const cases = REL_IMPACT_CASES;
+      const onWrong = createRoundPenalty(feedback, start);
+      let caseIdx = 0;
+
+      const showCase = () => {
+      body.innerHTML = '';
+      feedback.hidden = true;
+      if (caseIdx >= cases.length) {
+        goNext();
+        return;
+      }
+      const c = cases[caseIdx];
+
+      const header = document.createElement('div');
+      renderRelPairHeader(header, c.fromId, c.toId);
+      body.appendChild(header);
+
+      const caseIntro = document.createElement('p');
+      caseIntro.className = 'engine-step-question';
+      caseIntro.textContent = c.intro;
+      body.appendChild(caseIntro);
+
+      const zonesEl = document.createElement('div');
+      zonesEl.className = 'rel-impact-zones';
+      const poolEl = document.createElement('div');
+      poolEl.className = 'map-match-pool';
+      body.append(poolEl, zonesEl);
+
+      const filled = new Set();
+      let selectedUid = null;
+      const cardEls = {};
+      const slotEls = {};
+      const cards = c.cards.map((card, i) => ({ uid: `c${i}`, text: card.text, impact: card.impact }));
+
+      const clearSelection = () => {
+        selectedUid = null;
+        Object.values(cardEls).forEach((el) => el.classList.remove('map-match-card-selected'));
+      };
+
+      const attemptPlace = (uid, zoneId) => {
+        if (!uid || !cardEls[uid]) return;
+        const card = cards.find((cc) => cc.uid === uid);
+        if (card.impact === zoneId) {
+          filled.add(zoneId);
+          const slot = slotEls[zoneId];
+          slot.classList.add('map-match-slot-filled');
+          // Зона может принять несколько верных карточек подряд — каждая
+          // добавляет свою строку, а не перезаписывает предыдущую.
+          const valueEl = document.createElement('div');
+          valueEl.className = 'map-match-slot-value';
+          slot.querySelector('.map-match-slot-values').appendChild(valueEl);
+          valueEl.textContent = card.text;
+          cardEls[uid].remove();
+          delete cardEls[uid];
+          clearSelection();
+          feedback.hidden = true;
+          if (Object.keys(cardEls).length === 0) {
+            setTimeout(() => {
+              caseIdx += 1;
+              showCase();
+            }, 700);
+          }
+        } else {
+          const slot = slotEls[zoneId];
+          slot.classList.remove('map-match-slot-shake');
+          // eslint-disable-next-line no-void
+          void slot.offsetWidth;
+          slot.classList.add('map-match-slot-shake');
+          clearSelection();
+          feedback.hidden = false;
+          feedback.textContent = 'Не тот тип воздействия — вспомни определение и попробуй снова.';
+          onWrong();
+        }
+      };
+
+      REL_IMPACT_TYPES.forEach((zone) => {
+        const slot = document.createElement('div');
+        slot.className = 'map-match-slot';
+        const label = document.createElement('div');
+        label.className = 'map-match-slot-label';
+        label.textContent = zone.label;
+        const hint = document.createElement('div');
+        hint.className = 'rel-impact-zone-desc';
+        hint.textContent = zone.desc;
+        const values = document.createElement('div');
+        values.className = 'map-match-slot-values';
+        slot.append(label, hint, values);
+
+        slot.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          slot.classList.add('map-match-slot-hover');
+        });
+        slot.addEventListener('dragleave', () => slot.classList.remove('map-match-slot-hover'));
+        slot.addEventListener('drop', (e) => {
+          e.preventDefault();
+          slot.classList.remove('map-match-slot-hover');
+          attemptPlace(e.dataTransfer.getData('text/plain'), zone.id);
+        });
+        slot.addEventListener('click', () => {
+          if (!selectedUid) return;
+          attemptPlace(selectedUid, zone.id);
+        });
+
+        slotEls[zone.id] = slot;
+        zonesEl.appendChild(slot);
+      });
+
+      shuffle(cards).forEach((card) => {
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'map-match-card';
+        el.textContent = card.text;
+        el.draggable = true;
+        el.addEventListener('dragstart', (e) => {
+          e.dataTransfer.setData('text/plain', card.uid);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        el.addEventListener('click', () => {
+          if (selectedUid === card.uid) {
+            clearSelection();
+            return;
+          }
+          clearSelection();
+          selectedUid = card.uid;
+          el.classList.add('map-match-card-selected');
+        });
+        cardEls[card.uid] = el;
+        poolEl.appendChild(el);
+      });
+      };
+
+      showCase();
+    };
+
+    start();
+  };
+
+  // Раунд 4 "Как проявляется союз?" — конфликт рождает новую способность
+  // (слайды 4, 7, 12–19), два экрана по три пары — сопоставление клик-клик,
+  // с автопереходом на следующий экран после верных трёх пар.
+  const renderRelUnionRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent =
+      'В соединении качества грах взаимодействуют и создают общий способ проявления. Соедини пару грах с тем, что рождается из их взаимодействия.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'flower-feedback';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    const start = () => {
+      feedback.hidden = true;
+      const screens = REL_UNION_SCREENS;
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      let screenIdx = 0;
+
+      const showScreen = () => {
+        body.innerHTML = '';
+        feedback.hidden = true;
+        if (screenIdx >= screens.length) {
+          goNext();
+          return;
+        }
+        const screen = screens[screenIdx];
+        const cases = Array.isArray(screen) ? screen : screen.cases;
+        const screenIntro = Array.isArray(screen) ? null : screen.intro;
+
+        if (screenIntro) {
+          const screenIntroEl = document.createElement('p');
+          screenIntroEl.className = 'quiz-intro';
+          screenIntroEl.textContent = screenIntro;
+          body.appendChild(screenIntroEl);
+        }
+
+        const columns = document.createElement('div');
+        columns.className = 'rel-match-columns';
+
+        const leftGroup = document.createElement('div');
+        leftGroup.className = 'rel-match-group';
+        const leftHeading = document.createElement('div');
+        leftHeading.className = 'rel-match-group-heading';
+        leftHeading.textContent = 'Пара грах';
+        const leftCol = document.createElement('div');
+        leftCol.className = 'rel-match-col rel-match-col-pair';
+        leftGroup.append(leftHeading, leftCol);
+
+        const rightGroup = document.createElement('div');
+        rightGroup.className = 'rel-match-group';
+        const rightHeading = document.createElement('div');
+        rightHeading.className = 'rel-match-group-heading';
+        rightHeading.textContent = 'Что рождается';
+        const rightCol = document.createElement('div');
+        rightCol.className = 'rel-match-col rel-match-col-result';
+        rightGroup.append(rightHeading, rightCol);
+
+        columns.append(leftGroup, rightGroup);
+        body.appendChild(columns);
+
+        const leftOrder = shuffle(cases.map((c, i) => i));
+        const rightOrder = shuffle(cases.map((c, i) => i));
+
+        const matched = new Set();
+        let selected = null;
+
+        const trySelect = (side, i, el) => {
+          if (!selected) {
+            selected = { i, el, side };
+            el.classList.add('rel-match-item-selected');
+            return;
+          }
+          if (selected.side === side) {
+            selected.el.classList.remove('rel-match-item-selected');
+            selected = { i, el, side };
+            el.classList.add('rel-match-item-selected');
+            return;
+          }
+          const leftSel = side === 'left' ? { i, el } : selected;
+          const rightSel = side === 'right' ? { i, el } : selected;
+          selected.el.classList.remove('rel-match-item-selected');
+          selected = null;
+
+          if (leftSel.i === rightSel.i) {
+            matched.add(leftSel.i);
+            leftSel.el.classList.add('rel-match-item-correct');
+            rightSel.el.classList.add('rel-match-item-correct');
+            if (matched.size === cases.length) {
+              setTimeout(() => {
+                screenIdx += 1;
+                showScreen();
+              }, 700);
+            }
+          } else {
+            [leftSel.el, rightSel.el].forEach((el2) => {
+              el2.classList.remove('rel-match-item-wrong');
+              // eslint-disable-next-line no-void
+              void el2.offsetWidth;
+              el2.classList.add('rel-match-item-wrong');
+            });
+            onWrong();
+          }
+        };
+
+        leftOrder.forEach((i) => {
+          const c = cases[i];
+          const el = document.createElement('button');
+          el.type = 'button';
+          el.className = 'rel-match-item';
+          el.textContent = c.label;
+          el.addEventListener('click', () => {
+            if (matched.has(i)) return;
+            trySelect('left', i, el);
+          });
+          leftCol.appendChild(el);
+        });
+
+        rightOrder.forEach((i) => {
+          const c = cases[i];
+          const el = document.createElement('button');
+          el.type = 'button';
+          el.className = 'rel-match-item';
+          el.textContent = c.manifestation;
+          el.addEventListener('click', () => {
+            if (matched.has(i)) return;
+            trySelect('right', i, el);
+          });
+          rightCol.appendChild(el);
+        });
+      };
+
+      showScreen();
+    };
+
+    start();
+  };
+
+  // Раунд 5 "Нейтральность и влияние" — нейтральное отношение не значит
+  // "ничего не происходит" (слайды 8, 15, 17–19).
+  const renderRelNeutralRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = 'Нейтральность — не отсутствие влияния. Определи, кто здесь влияет на кого.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'flower-feedback';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    const start = () => {
+      feedback.hidden = true;
+      const items = shuffle(REL_NEUTRAL_CASES);
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      let idx = 0;
+
+      const showStep = () => {
+        body.innerHTML = '';
+        if (idx >= items.length) {
+          goNext();
+          return;
+        }
+        const item = items[idx];
+        const fromChar = MOKSHA_CHARACTERS.find((c) => c.id === item.fromId);
+        const toChar = MOKSHA_CHARACTERS.find((c) => c.id === item.toId);
+
+        const label = document.createElement('p');
+        label.className = 'engine-step-question';
+        label.textContent = item.pairLabel;
+        body.appendChild(label);
+
+        const card = document.createElement('p');
+        card.className = 'engine-transcript';
+        card.textContent = `«${item.text}»`;
+        body.appendChild(card);
+
+        const options = shuffle([
+          { text: `${fromChar.title} → ${toChar.title}`, correct: true },
+          { text: `${toChar.title} → ${fromChar.title}`, correct: false },
+        ]);
+
+        const qWrap = document.createElement('div');
+        qWrap.className = 'rel-question-wrap';
+        body.appendChild(qWrap);
+        renderChoiceButtons(
+          qWrap,
+          'Кто здесь влияет на кого?',
+          options,
+          () => {
+            idx += 1;
+            showStep();
+          },
+          false,
+          onWrong,
+        );
+      };
+
+      showStep();
+    };
+
+    start();
+  };
+
+  // Раунд 6 "Раху и Кету" — характер воздействия узлов, без таблицы
+  // друг/враг и без придуманных пар с конкретными планетами (слайд 19).
+  // Раунд 6 "Раху и Кету" — два экрана (один на узел), на каждом 5
+  // перемешанных карточек и множественный выбор: нужно отметить ВСЕ верные
+  // и ни одной неверной (проверка по кнопке "Проверить", пояснения — после
+  // неё; сколько ответов верно — заранее не сообщается).
+  const renderRelNodesRound = (stage, goNext) => {
+    const intro = document.createElement('p');
+    intro.className = 'quiz-intro';
+    intro.textContent = 'Выбери все описания, которые соответствуют воздействию этой грахи.';
+    stage.appendChild(intro);
+
+    const feedback = document.createElement('p');
+    feedback.className = 'flower-feedback';
+    feedback.hidden = true;
+    stage.appendChild(feedback);
+
+    const body = document.createElement('div');
+    body.className = 'rel-round-body';
+    stage.appendChild(body);
+
+    const start = () => {
+      feedback.hidden = true;
+      const rounds = REL_NODES_ROUNDS;
+      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
+      let roundIdx = 0;
+
+      const showRound = () => {
+        body.innerHTML = '';
+        feedback.hidden = true;
+        if (roundIdx >= rounds.length) {
+          goNext();
+          return;
+        }
+        const round = rounds[roundIdx];
+        const char = MOKSHA_CHARACTERS.find((c) => c.id === round.node);
+
+        const header = document.createElement('div');
+        header.className = 'rel-pair-header';
+        const portrait = document.createElement('div');
+        portrait.className = 'rel-pair-portrait';
+        const img = document.createElement('img');
+        img.src = char.file;
+        img.alt = char.title;
+        const name = document.createElement('div');
+        name.className = 'rel-pair-name';
+        name.textContent = char.title;
+        portrait.append(img, name);
+        header.appendChild(portrait);
+        body.appendChild(header);
+
+        const roundTitle = document.createElement('p');
+        roundTitle.className = 'engine-step-question';
+        roundTitle.textContent = round.title;
+        body.appendChild(roundTitle);
+
+        const listEl = document.createElement('div');
+        listEl.className = 'rel-question-wrap';
+        body.appendChild(listEl);
+
+        const cards = shuffle(round.cards.map((c, i) => ({ ...c, uid: `c${i}` })));
+        const selected = new Set();
+
+        const checkBtn = document.createElement('button');
+        checkBtn.type = 'button';
+        checkBtn.className = 'btn btn-primary';
+        checkBtn.textContent = 'Проверить';
+
+        const explanationEl = document.createElement('p');
+        explanationEl.className = 'rel-myth-note';
+        explanationEl.hidden = true;
+        explanationEl.textContent = round.explanation;
+
+        const render = () => {
+          listEl.innerHTML = '';
+          cards.forEach((card) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'engine-choice-btn';
+            if (selected.has(card.uid)) btn.classList.add('engine-choice-selected');
+            btn.textContent = card.text;
+            btn.addEventListener('click', () => {
+              if (selected.has(card.uid)) selected.delete(card.uid);
+              else selected.add(card.uid);
+              render();
+            });
+            listEl.appendChild(btn);
+          });
+        };
+
+        checkBtn.addEventListener('click', () => {
+          const correctUids = new Set(cards.filter((c) => c.correct).map((c) => c.uid));
+          const isExact = selected.size === correctUids.size && [...selected].every((uid) => correctUids.has(uid));
+
+          explanationEl.hidden = false;
+
+          if (isExact) {
+            feedback.hidden = true;
+            checkBtn.hidden = true;
+            setTimeout(() => {
+              roundIdx += 1;
+              showRound();
+            }, 1600);
+          } else {
+            feedback.hidden = false;
+            feedback.textContent = 'Есть лишние или пропущенные варианты — прочитай пояснение ниже и попробуй ещё раз.';
+            onWrong();
+          }
+        });
+
+        render();
+        body.append(checkBtn, explanationEl);
+      };
+
+      showRound();
+    };
+
+    start();
+  };
+
+  // Экзамен Шивы: 6 раундов — теперь 6 независимых, отдельно завершаемых
+  // и переигрываемых подзаданий (как обычные задания планеты), а не один
+  // сплошной проход. Каждый пройденный раунд остаётся доступным для
+  // повтора; следующий раунд открывается после предыдущего (первый
+  // проход — по порядку, как и задумано ТЗ), но повторное прохождение уже
+  // открытых раундов ничего не блокирует и не переупорядочивает.
+  const REL_ROUNDS = [
+    { key: 'direction', id: 'round_direction', title: '1. Кто кому друг?' },
+    { key: 'reason', id: 'round_reason', title: '2. Почему такое отношение?' },
+    { key: 'impact', id: 'round_impact', title: '3. Что меняется?' },
+    { key: 'union', id: 'round_union', title: '4. Как проявляется союз?' },
+    { key: 'neutral', id: 'round_neutral', title: '5. Нейтральность и влияние' },
+    { key: 'nodes', id: 'round_nodes', title: '6. Раху и Кету' },
+  ];
+
+  const REL_ROUND_RENDERERS = {
+    direction: renderRelDirectionRound,
+    reason: renderRelReasonRound,
+    impact: renderRelImpactRound,
+    union: renderRelUnionRound,
+    neutral: renderRelNeutralRound,
+    nodes: renderRelNodesRound,
+  };
+
+  const getRelRoundStatus = (i, progress) => {
+    if (progress[REL_ROUNDS[i].id]) return 'completed';
+    if (i === 0) return 'unlocked';
+    return progress[REL_ROUNDS[i - 1].id] ? 'unlocked' : 'locked';
+  };
+
+  const renderRelExamList = () => {
+    const progress = getTaskProgress('relationships');
+    detailRoot.innerHTML = '';
+
+    const headingEl = document.createElement('h3');
+    headingEl.textContent = 'Обитель Богов · Экзамен Шивы';
+
+    const list = document.createElement('div');
+    list.className = 'task-list';
+
+    REL_ROUNDS.forEach((round, i) => {
+      const status = getRelRoundStatus(i, progress);
+      const item = document.createElement('div');
+      item.className = `task-item status-${status}`;
+      if (status === 'locked') item.classList.add('locked');
+      if (status === 'completed') item.classList.add('completed');
+      if (relActiveRoundIndex === i) item.classList.add('active');
+
+      const icon = document.createElement('div');
+      icon.className = 'task-icon';
+      icon.textContent = status === 'completed' ? '✓' : '⚡';
+
+      const meta = document.createElement('div');
+      const statusText = status === 'completed' ? 'Выполнено' : status === 'unlocked' ? 'Доступно' : 'Закрыто';
+      meta.innerHTML = `<div class="task-title">${round.title}</div><div class="task-status">${statusText}</div>`;
+
+      item.append(icon, meta);
+
+      if (status !== 'locked') {
+        item.addEventListener('click', () => {
+          relActiveRoundIndex = i;
+          renderRelExamList();
+          renderRelRoundContent(i);
+          taskContentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+
+      list.appendChild(item);
+    });
+
+    detailRoot.append(headingEl, list);
+  };
+
+  const renderRelRoundContent = (i) => {
+    const round = REL_ROUNDS[i];
+    taskContentPanel.innerHTML = '';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+    const title = document.createElement('p');
+    title.className = 'rel-round-title';
+    title.textContent = round.title;
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+    wrap.append(title, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const showDone = () => {
+      taskContentPanel.innerHTML = '';
+      const doneWrap = document.createElement('div');
+      doneWrap.className = 'engine-task';
+      const doneText = document.createElement('p');
+      doneText.className = 'task-content-done';
+      doneText.textContent = `✓ «${round.title}» выполнено`;
+      doneWrap.appendChild(doneText);
+
+      const allDone = REL_ROUNDS.every((r) => getTaskProgress('relationships')[r.id]);
+      if (allDone) {
+        const feedbackText = document.createElement('p');
+        feedbackText.className = 'task-content-feedback';
+        feedbackText.textContent = REL_FINAL_MESSAGE;
+        const backBtn = document.createElement('button');
+        backBtn.type = 'button';
+        backBtn.className = 'btn btn-primary';
+        backBtn.textContent = 'Вернуться в деревню';
+        backBtn.addEventListener('click', () => {
+          exitRelationshipsTask();
+          currentLessonKey = null;
+          relActiveRoundIndex = null;
+          detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
+          renderTaskContentPanel(null, null);
+          buildVillageStage();
+        });
+        doneWrap.append(feedbackText, backBtn);
+      } else {
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'btn btn-secondary';
+        retryBtn.textContent = 'Пройти ещё раз';
+        retryBtn.addEventListener('click', () => renderRelRoundContent(i));
+        doneWrap.appendChild(retryBtn);
+      }
+
+      taskContentPanel.appendChild(doneWrap);
+      renderRelExamList();
+    };
+
+    REL_ROUND_RENDERERS[round.key](stage, () => {
+      completeTask('relationships', round.id);
+      showDone();
+    });
+  };
+
+  // Портрет в виджете переключается на Шиву на весь ход экзамена (список
+  // раундов и сами раунды) и возвращается на покровителя игрока, только
+  // когда экзамен реально закрыт — см. exitRelationshipsTask.
+  const exitRelationshipsTask = () => {
+    shivaActive = false;
+    setupPatronWidget();
+  };
+
+  const openRelationshipsExam = () => {
+    currentLessonKey = null;
+    currentLessonHeading = null;
+    currentLessonTasks = null;
+    activeTaskId = null;
+    relActiveRoundIndex = null;
+
+    shivaActive = true;
+    const img = document.getElementById('patronWidgetImage');
+    img.src = 'assets/prologue/shiva.png';
+    img.alt = 'Шива';
+    const reopenImg = document.getElementById('patronReopenImage');
+    reopenImg.src = 'assets/prologue/shiva.png';
+    reopenImg.alt = 'Шива';
+
+    renderRelExamList();
+    taskContentPanel.innerHTML = '<p class="task-content-placeholder">Выбери раунд из списка выше, чтобы начать.</p>';
+    taskContentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   // --- Правая колонка: только список заданий. Содержимое выбранного —
   // отдельное окно внизу, по ширине совпадающее с картой + списком сверху.
 
@@ -2552,6 +3576,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const openBuildingLesson = (character) => {
+    // Если игрок ушёл со здания посреди задания №11 (не долистав до
+    // конца) — портрет Шивы иначе так и остался бы в виджете навсегда.
+    if (shivaActive) exitRelationshipsTask();
     selectBuilding(character.id);
     showPatronSpeech(getReaction(patronId, character.id));
     openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
@@ -2912,9 +3939,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // статус конкретной планеты впервые стал 'unlocked'.
   let lastBuildingStatus = null;
 
+  // Кнопка "Экзамен Шивы" — появляется, как только все 9 планет пройдены
+  // (тот же момент, когда раньше сразу открывался сам экзамен). Не
+  // привязана к карте вообще: фиксированный элемент на экране (как и
+  // patronWidget), заданный статически в village.html, а не создаваемый
+  // заново в buildVillageStage — так что туман/облака на карте (см.
+  // renderClouds) никак на неё не влияют, при любом их состоянии.
+  const shivaExamBadge = document.getElementById('shivaExamBadge');
+  shivaExamBadge.addEventListener('click', () => {
+    selectBuilding(null);
+    openRelationshipsExam();
+  });
+
+  const updateShivaExamBadge = () => {
+    shivaExamBadge.hidden = !UNLOCK_ORDER.every((id) => isPlanetFullyDone(id));
+  };
+
   const buildVillageStage = () => {
     stage.innerHTML = '';
     stage.classList.remove('village-stage-empty');
+    updateShivaExamBadge();
 
     const mapUnlocked = isVillageMapUnlocked();
     // Читаем cloudsDispersed ДО renderClouds — тот сам его выставит в
@@ -2981,5 +4025,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Деревня уже открыта — это не первый заход, а возвращение.
     // welcomeBack есть только в расширенном пуле, базового аналога нет.
     showPatronSpeech(pickExpandedOnly('welcomeBack'));
+  }
+
+  // --- Dev-заглушка (только на локальном сервере): ?dev=task11 в адресной
+  // строке сразу показывает кат-сцену с Шивой, затем перерисовывает карту
+  // (открывая иконку экзамена) и сама открывает список раундов — без
+  // прохождения всех десяти предыдущих уроков заново и без ручного клика
+  // по иконке.
+  if (isLocalDevHost() && new URLSearchParams(window.location.search).get('dev') === 'task11') {
+    setTimeout(
+      () =>
+        showShivaMoment(SHIVA_COMPLETE_MESSAGE, () => {
+          buildVillageStage();
+          // Заглушка сделана специально чтобы не проходить 9 планет заново,
+          // поэтому и кнопку показываем принудительно — настоящая проверка
+          // прогресса (updateShivaExamBadge) её иначе скрыла бы.
+          shivaExamBadge.hidden = false;
+          openRelationshipsExam();
+        }),
+      300,
+    );
   }
 });
