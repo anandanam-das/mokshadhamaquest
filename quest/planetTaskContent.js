@@ -531,57 +531,57 @@ const PLANET_TASK_CONTENT = {
           id: 'weekday',
           label: 'День недели',
           correct: 'Воскресенье',
-          distractors: ['Понедельник', 'Пятница'],
+          distractors: ['Понедельник'],
         },
         {
           id: 'color',
           label: 'Цвет',
           correct: 'Оранжевый / золотой',
-          distractors: ['Серебристый', 'Зелёный'],
+          distractors: ['Серебристый'],
         },
         {
           id: 'metal',
           label: 'Металл',
           correct: 'Золото, платина',
-          distractors: ['Серебро', 'Медь / бронза'],
+          distractors: ['Серебро'],
         },
         {
           id: 'gem',
           label: 'Камень',
           correct: 'Рубин',
-          distractors: ['Жемчуг', 'Изумруд'],
+          distractors: ['Жемчуг'],
         },
         {
           id: 'number',
           label: 'Число',
           correct: '1',
-          distractors: ['2', '9'],
+          distractors: ['2'],
         },
         {
           id: 'chakra',
           label: 'Чакра',
           correct: 'Аджна (третий глаз)',
-          distractors: ['Свадхистана', 'Манипура'],
+          distractors: ['Свадхистана'],
         },
         {
           id: 'direction',
           label: 'Направление',
           correct: 'Восток',
-          distractors: ['Юг', 'Запад', 'Север'],
+          distractors: ['Юг'],
         },
         {
           id: 'house',
           label: 'Дом максимальной силы',
           correct: '10 дом',
-          distractors: ['1 дом', '4 дом', '7 дом'],
+          distractors: ['1 дом'],
         },
         // Ранее в карте покровителя отсутствовали — хотя факт уже
         // использовался в самой игре (см. "Изъян в писании" выше: "падение
         // Солнца в Весах, а в Овне — экзальтация") и Лев как "свой знак"
         // Солнца уже фигурировал дистрактором у других планет.
-        { id: 'ownSign', label: 'Свой знак', correct: 'Лев', distractors: ['Рак', 'Дева'] },
-        { id: 'exaltation', label: 'Экзальтация', correct: 'Овен', distractors: ['Телец', 'Козерог'] },
-        { id: 'debilitation', label: 'Дебилитация', correct: 'Весы', distractors: ['Скорпион', 'Рыбы'] },
+        { id: 'ownSign', label: 'Свой знак', correct: 'Лев', distractors: ['Рак'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Овен', distractors: ['Телец'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Весы', distractors: ['Скорпион'] },
       ],
     },
   },
@@ -1147,16 +1147,16 @@ const PLANET_TASK_CONTENT = {
     // --- Задание "Карта звёздного покровителя" (сопоставление) ---
     mapTask: {
       categories: [
-        { id: 'weekday', label: 'День недели', correct: 'Понедельник', distractors: ['Воскресенье', 'Вторник'] },
-        { id: 'color', label: 'Цвет', correct: 'Белый', distractors: ['Оранжевый / золотой', 'Красный / алый'] },
-        { id: 'metal', label: 'Металл', correct: 'Серебро', distractors: ['Золото, платина', 'Железо'] },
-        { id: 'gem', label: 'Камень', correct: 'Жемчуг', distractors: ['Рубин', 'Красный коралл'] },
-        { id: 'number', label: 'Число', correct: '2', distractors: ['1', '9'] },
-        { id: 'direction', label: 'Направление', correct: 'Северо-запад', distractors: ['Восток', 'Юг'] },
-        { id: 'house', label: 'Дом максимальной силы', correct: '4 дом', distractors: ['10 дом', '1 дом'] },
-        { id: 'ownSign', label: 'Свой знак', correct: 'Рак', distractors: ['Лев', 'Овен, Скорпион'] },
-        { id: 'exaltation', label: 'Экзальтация', correct: 'Телец', distractors: ['Овен', 'Козерог'] },
-        { id: 'debilitation', label: 'Дебилитация', correct: 'Скорпион', distractors: ['Весы', 'Дева'] },
+        { id: 'weekday', label: 'День недели', correct: 'Понедельник', distractors: ['Воскресенье'] },
+        { id: 'color', label: 'Цвет', correct: 'Белый', distractors: ['Оранжевый / золотой'] },
+        { id: 'metal', label: 'Металл', correct: 'Серебро', distractors: ['Золото, платина'] },
+        { id: 'gem', label: 'Камень', correct: 'Жемчуг', distractors: ['Рубин'] },
+        { id: 'number', label: 'Число', correct: '2', distractors: ['1'] },
+        { id: 'direction', label: 'Направление', correct: 'Северо-запад', distractors: ['Восток'] },
+        { id: 'house', label: 'Дом максимальной силы', correct: '4 дом', distractors: ['10 дом'] },
+        { id: 'ownSign', label: 'Свой знак', correct: 'Рак', distractors: ['Лев'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Телец', distractors: ['Овен'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Скорпион', distractors: ['Весы'] },
       ],
     },
   },
@@ -1709,17 +1709,17 @@ const PLANET_TASK_CONTENT = {
     // --- Задание "Карта звёздного покровителя" (сопоставление) ---
     mapTask: {
       categories: [
-        { id: 'weekday', label: 'День недели', correct: 'Вторник', distractors: ['Воскресенье', 'Понедельник'] },
-        { id: 'color', label: 'Цвет', correct: 'Красный / алый', distractors: ['Оранжевый / золотой', 'Белый'] },
-        { id: 'metal', label: 'Металл', correct: 'Железо', distractors: ['Золото, платина', 'Серебро'] },
-        { id: 'gem', label: 'Камень', correct: 'Красный коралл', distractors: ['Рубин', 'Жемчуг'] },
-        { id: 'number', label: 'Число', correct: '9', distractors: ['1', '2'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Манипура', distractors: ['Аджна (третий глаз)', 'Свадхистана'] },
-        { id: 'direction', label: 'Направление', correct: 'Юг', distractors: ['Восток', 'Северо-запад'] },
-        { id: 'house', label: 'Дом максимальной силы', correct: '10 дом', distractors: ['4 дом', '1 дом'] },
-        { id: 'ownSign', label: 'Свой знак', correct: 'Овен, Скорпион', distractors: ['Лев', 'Дева'] },
-        { id: 'exaltation', label: 'Экзальтация', correct: 'Козерог', distractors: ['Овен', 'Телец'] },
-        { id: 'debilitation', label: 'Дебилитация', correct: 'Рак', distractors: ['Весы', 'Скорпион'] },
+        { id: 'weekday', label: 'День недели', correct: 'Вторник', distractors: ['Воскресенье'] },
+        { id: 'color', label: 'Цвет', correct: 'Красный / алый', distractors: ['Оранжевый / золотой'] },
+        { id: 'metal', label: 'Металл', correct: 'Железо', distractors: ['Золото, платина'] },
+        { id: 'gem', label: 'Камень', correct: 'Красный коралл', distractors: ['Рубин'] },
+        { id: 'number', label: 'Число', correct: '9', distractors: ['1'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Манипура', distractors: ['Аджна (третий глаз)'] },
+        { id: 'direction', label: 'Направление', correct: 'Юг', distractors: ['Восток'] },
+        { id: 'house', label: 'Дом максимальной силы', correct: '10 дом', distractors: ['4 дом'] },
+        { id: 'ownSign', label: 'Свой знак', correct: 'Овен, Скорпион', distractors: ['Лев'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Козерог', distractors: ['Овен'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Рак', distractors: ['Весы'] },
       ],
     },
   },
@@ -2328,14 +2328,14 @@ const PLANET_TASK_CONTENT = {
     // --- Задание "Карта звёздного покровителя" (сопоставление) ---
     mapTask: {
       categories: [
-        { id: 'weekday', label: 'День недели', correct: 'Среда', distractors: ['Воскресенье', 'Понедельник'] },
-        { id: 'color', label: 'Цвет', correct: 'Зелёный', distractors: ['Белый', 'Красный / алый'] },
-        { id: 'metal', label: 'Металл', correct: 'Ртуть', distractors: ['Серебро', 'Бронза'] },
-        { id: 'gem', label: 'Камень', correct: 'Изумруд', distractors: ['Жемчуг', 'Красный коралл'] },
-        { id: 'number', label: 'Число', correct: '5', distractors: ['2', '9'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Вишуддха', distractors: ['Аджна (третий глаз)', 'Манипура'] },
+        { id: 'weekday', label: 'День недели', correct: 'Среда', distractors: ['Воскресенье'] },
+        { id: 'color', label: 'Цвет', correct: 'Зелёный', distractors: ['Белый'] },
+        { id: 'metal', label: 'Металл', correct: 'Ртуть', distractors: ['Серебро'] },
+        { id: 'gem', label: 'Камень', correct: 'Изумруд', distractors: ['Жемчуг'] },
+        { id: 'number', label: 'Число', correct: '5', distractors: ['2'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Вишуддха', distractors: ['Аджна (третий глаз)'] },
         { id: 'direction', label: 'Направление', correct: 'Север', distractors: ['Восток', 'Северо-запад'] },
-        { id: 'house', label: 'Дом максимальной силы', correct: '1 дом', distractors: ['10 дом', '4 дом'] },
+        { id: 'house', label: 'Дом максимальной силы', correct: '1 дом', distractors: ['10 дом'] },
         { id: 'ownSign', label: 'Свой знак', correct: 'Близнецы и Дева', distractors: ['Лев', 'Рак'] },
         { id: 'exaltation', label: 'Экзальтация', correct: 'Дева', distractors: ['Овен', 'Телец'] },
         { id: 'debilitation', label: 'Дебилитация', correct: 'Рыбы', distractors: ['Весы', 'Скорпион'] },
@@ -2987,14 +2987,14 @@ const PLANET_TASK_CONTENT = {
     // --- Задание "Карта звёздного покровителя" (сопоставление) ---
     mapTask: {
       categories: [
-        { id: 'weekday', label: 'День недели', correct: 'Четверг', distractors: ['Среда', 'Вторник'] },
-        { id: 'color', label: 'Цвет', correct: 'Жёлтый', distractors: ['Зелёный', 'Красный / алый'] },
-        { id: 'metal', label: 'Металл', correct: 'Золото, платина', distractors: ['Бронза', 'Железо'] },
-        { id: 'gem', label: 'Камень', correct: 'Жёлтый сапфир', distractors: ['Изумруд', 'Красный коралл'] },
-        { id: 'number', label: 'Число', correct: '3', distractors: ['5', '9'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Свадхистхана', distractors: ['Аджна', 'Манипура'] },
+        { id: 'weekday', label: 'День недели', correct: 'Четверг', distractors: ['Среда'] },
+        { id: 'color', label: 'Цвет', correct: 'Жёлтый', distractors: ['Зелёный'] },
+        { id: 'metal', label: 'Металл', correct: 'Золото, платина', distractors: ['Бронза'] },
+        { id: 'gem', label: 'Камень', correct: 'Жёлтый сапфир', distractors: ['Изумруд'] },
+        { id: 'number', label: 'Число', correct: '3', distractors: ['5'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Свадхистхана', distractors: ['Аджна'] },
         { id: 'direction', label: 'Направление', correct: 'Северо-восток', distractors: ['Север', 'Юг'] },
-        { id: 'house', label: 'Дом максимальной силы', correct: '1 дом', distractors: ['10 дом', '4 дом'] },
+        { id: 'house', label: 'Дом максимальной силы', correct: '1 дом', distractors: ['10 дом'] },
         { id: 'ownSign', label: 'Свой знак', correct: 'Стрелец и Рыбы', distractors: ['Лев', 'Близнецы и Дева'] },
         { id: 'exaltation', label: 'Экзальтация', correct: 'Рак', distractors: ['Овен', 'Дева'] },
         { id: 'debilitation', label: 'Дебилитация', correct: 'Козерог', distractors: ['Весы', 'Скорпион'] },
@@ -3625,12 +3625,12 @@ const PLANET_TASK_CONTENT = {
     mapTask: {
       categories: [
         { id: 'weekday', label: 'День недели', correct: 'Пятница', distractors: ['Воскресенье'] },
-        { id: 'color', label: 'Цвет', correct: 'Розовый', distractors: [] },
+        { id: 'color', label: 'Цвет', correct: 'Розовый', distractors: ['Белый'] },
         { id: 'metal', label: 'Металл', correct: 'Серебро', distractors: ['Золото'] },
-        { id: 'gem', label: 'Камень', correct: 'Бриллиант', distractors: [] },
+        { id: 'gem', label: 'Камень', correct: 'Бриллиант', distractors: ['Жемчуг'] },
         { id: 'number', label: 'Число', correct: '6', distractors: ['1'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Анахата', distractors: [] },
-        { id: 'direction', label: 'Направление', correct: 'Юго-восток', distractors: ['Восток'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Анахата', distractors: ['Свадхистхана'] },
+        { id: 'direction', label: 'Направление', correct: 'Юго-восток', distractors: ['Восток', 'Юг'] },
         { id: 'house', label: 'Дом максимальной силы', correct: '4 дом', distractors: [] },
         { id: 'ownSign', label: 'Свой знак', correct: 'Телец и Весы', distractors: ['Лев', 'Рак'] },
         { id: 'exaltation', label: 'Экзальтация', correct: 'Рыбы', distractors: ['Овен', 'Телец'] },
@@ -4258,12 +4258,12 @@ const PLANET_TASK_CONTENT = {
     mapTask: {
       categories: [
         { id: 'weekday', label: 'День недели', correct: 'Суббота', distractors: ['Пятница'] },
-        { id: 'color', label: 'Цвет', correct: 'Чёрный / тёмно-синий', distractors: [] },
+        { id: 'color', label: 'Цвет', correct: 'Чёрный / тёмно-синий', distractors: ['Красный / алый'] },
         { id: 'metal', label: 'Металл', correct: 'Сталь / свинец', distractors: ['Серебро'] },
-        { id: 'gem', label: 'Камень', correct: 'Синий сапфир', distractors: [] },
+        { id: 'gem', label: 'Камень', correct: 'Синий сапфир', distractors: ['Рубин'] },
         { id: 'number', label: 'Число', correct: '8', distractors: ['6'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Муладхара', distractors: [] },
-        { id: 'direction', label: 'Направление', correct: 'Запад', distractors: ['Юго-восток'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Муладхара', distractors: ['Аджна (третий глаз)'] },
+        { id: 'direction', label: 'Направление', correct: 'Запад', distractors: ['Юго-восток', 'Восток'] },
         { id: 'house', label: 'Дом максимальной силы', correct: '7 дом', distractors: [] },
         { id: 'ownSign', label: 'Свой знак', correct: 'Козерог и Водолей', distractors: ['Рак', 'Лев'] },
         { id: 'exaltation', label: 'Экзальтация', correct: 'Весы', distractors: ['Рыбы', 'Телец'] },
@@ -4871,27 +4871,27 @@ const PLANET_TASK_CONTENT = {
     // намеренно не добавлен — единого мнения по нему в источниках нет.
     mapTask: {
       categories: [
-        { id: 'weekday', label: 'День недели', correct: 'Суббота', distractors: ['Среда', 'Пятница'] },
-        { id: 'color', label: 'Цвет', correct: 'Дымчатый / ржавый', distractors: ['Золотой', 'Белый'] },
-        { id: 'metal', label: 'Металл', correct: 'Свинец', distractors: ['Медь', 'Серебро'] },
-        { id: 'gem', label: 'Камень', correct: 'Гессонит', distractors: ['Рубин', 'Жемчуг'] },
+        { id: 'weekday', label: 'День недели', correct: 'Суббота', distractors: ['Среда'] },
+        { id: 'color', label: 'Цвет', correct: 'Дымчатый / ржавый', distractors: ['Золотой'] },
+        { id: 'metal', label: 'Металл', correct: 'Свинец', distractors: ['Медь'] },
+        { id: 'gem', label: 'Камень', correct: 'Гессонит', distractors: ['Рубин'] },
         {
           id: 'gemSecondary',
           label: 'Дополнительный камень',
           correct: 'Чёрный агат',
-          distractors: ['Коралл', 'Изумруд'],
+          distractors: ['Коралл'],
         },
-        { id: 'number', label: 'Число', correct: '4', distractors: ['1', '6'] },
+        { id: 'number', label: 'Число', correct: '4', distractors: ['1'] },
         {
           id: 'chakra',
           label: 'Чакра',
           correct: 'Нет соответствующей чакры',
-          distractors: ['Муладхара', 'Аджна'],
+          distractors: ['Муладхара'],
         },
         { id: 'direction', label: 'Направление', correct: 'Юго-запад', distractors: ['Восток', 'Север'] },
-        { id: 'house', label: 'Дом максимальной силы', correct: '10 дом', distractors: ['1 дом', '7 дом'] },
-        { id: 'exaltation', label: 'Экзальтация', correct: 'Телец', distractors: ['Рыбы', 'Скорпион'] },
-        { id: 'debilitation', label: 'Дебилитация', correct: 'Скорпион', distractors: ['Телец', 'Овен'] },
+        { id: 'house', label: 'Дом максимальной силы', correct: '10 дом', distractors: ['1 дом'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Телец', distractors: ['Рыбы', 'Козерог'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Скорпион', distractors: ['Овен', 'Дева'] },
       ],
     },
   },
@@ -5434,22 +5434,22 @@ const PLANET_TASK_CONTENT = {
     },
 
     // --- Задание "Карта звёздного покровителя" (сопоставление) ---
-    // ВНИМАНИЕ: в исходном ТЗ карточка-дистрактор "Рыбы — экзальтация"
-    // текстуально совпадает с correct-карточкой "Рыбы" (свой знак) —
-    // тот же коллаж-баг, что уже правился у Луны/Марса (две неотличимые
-    // на вид карточки в одном пуле). Здесь оставил дословно как в ТЗ и не
-    // стал сам подменять значение — см. итоговое сообщение.
+    // Раньше карточка-дистрактор "Рыбы" у экзальтации текстуально совпадала
+    // с correct-карточкой "Рыбы" у своего знака — тот же коллаж-баг, что
+    // уже правился у Луны/Марса (две неотличимые на вид карточки в одном
+    // пуле). Заменил на "Овен"/"Козерог", заодно добавил по 2-й карточке
+    // направлению и знакам для запутанности (как у остальных планет).
     mapTask: {
       categories: [
         { id: 'weekday', label: 'День недели', correct: 'Вторник', distractors: ['Пятница'] },
         { id: 'number', label: 'Число', correct: '7', distractors: ['6'] },
-        { id: 'direction', label: 'Направление', correct: 'Северо-восток', distractors: ['Юго-восток'] },
+        { id: 'direction', label: 'Направление', correct: 'Северо-восток', distractors: ['Юго-восток', 'Север'] },
         { id: 'color', label: 'Цвет', correct: 'Бирюзовый / болотный цвет', distractors: ['Белый'] },
         { id: 'metal', label: 'Металл', correct: 'Свинец с примесью железа', distractors: ['Серебро'] },
         { id: 'gem', label: 'Камень', correct: 'Кошачий глаз', distractors: ['Бриллиант'] },
-        { id: 'ownSign', label: 'Свой знак', correct: 'Рыбы', distractors: ['Весы'] },
-        { id: 'exaltation', label: 'Экзальтация', correct: 'Скорпион', distractors: ['Рыбы'] },
-        { id: 'debilitation', label: 'Дебилитация', correct: 'Телец', distractors: ['Дева'] },
+        { id: 'ownSign', label: 'Свой знак', correct: 'Рыбы', distractors: ['Весы', 'Лев'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Скорпион', distractors: ['Овен', 'Козерог'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Телец', distractors: ['Дева', 'Рак'] },
         { id: 'house', label: 'Дом максимальной силы', correct: '3, 6 и 11 дом', distractors: ['4 дом'] },
         { id: 'chakra', label: 'Чакра', correct: 'Чакра отсутствует', distractors: ['Свадхистхана'] },
       ],
