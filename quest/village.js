@@ -1795,13 +1795,20 @@ document.addEventListener('DOMContentLoaded', () => {
     intro.className = 'quiz-intro';
     intro.textContent = data.introText;
 
+    // Общая для всех планет подсказка (не дублируется в каждом introText):
+    // детали на картинке мелкие, без внимательного разглядывания и
+    // увеличения их легко пропустить.
+    const zoomHint = document.createElement('p');
+    zoomHint.className = 'quiz-intro';
+    zoomHint.innerHTML = '<strong>Внимательно рассмотри картинку — нажми на неё, чтобы увеличить.</strong>';
+
     const progress = document.createElement('p');
     progress.className = 'quiz-progress';
 
     const stage = document.createElement('div');
     stage.className = 'engine-stage';
 
-    wrap.append(intro, progress, stage);
+    wrap.append(intro, zoomHint, progress, stage);
     taskContentPanel.appendChild(wrap);
 
     const allCards = data.cards;
@@ -1915,12 +1922,11 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(intro, timerEl, stage);
     taskContentPanel.appendChild(wrap);
 
-    // 2 ошибки за прохождение — и заново: та же механика "штрафа", что и в
-    // остальных движках (см. ENGINE_DETAILS_RESET_TEXT), только здесь
-    // перезапускает весь набор фраз, а не одну карточку — заданий тут
-    // мало, отдельной карточки для повтора не выделить.
-    const MAX_WRONG_PHRASES = 2;
-    const PHRASE_RESET_TEXT = 'Слишком много ошибок — начинаем заново.';
+    // 1 ошибка — и заново: для зубрёжки наизусть даже одна ошибка должна
+    // перезапускать весь набор фраз (не одну карточку — заданий тут мало,
+    // отдельной карточки для повтора не выделить).
+    const MAX_WRONG_PHRASES = 1;
+    const PHRASE_RESET_TEXT = 'Ошибка — начинаем заново.';
     const PHRASE_RESET_DELAY_MS = 1400;
 
     let phrases = shuffle(data.phrases);
@@ -2022,74 +2028,85 @@ document.addEventListener('DOMContentLoaded', () => {
     taskContentPanel.appendChild(wrap);
 
     const allQuestions = data.questions;
-    const savedErr = getTaskStepState(lessonKey, task.id);
-    const savedQuestions =
-      savedErr && Array.isArray(savedErr.order)
-        ? savedErr.order.map((id) => allQuestions.find((q) => q.id === id)).filter(Boolean)
-        : null;
-    const questions =
-      savedQuestions && savedQuestions.length === allQuestions.length ? savedQuestions : shuffle(allQuestions);
-    let index =
-      savedQuestions && savedQuestions.length === allQuestions.length
-        ? Math.min(savedErr.index || 0, questions.length)
-        : 0;
-    setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
 
-    const showQuestion = () => {
-      stage.innerHTML = '';
-      progress.textContent = `Вопрос ${index + 1} из ${questions.length}`;
-      const q = questions[index];
+    // 1 ошибка — и весь набор вопросов заново (зазубрить наизусть, а не
+    // угадать с подсказкой): та же логика перезапуска, что и в "Слово
+    // гуны", просто здесь один вопрос из N, а не таймер на всё задание.
+    const RESET_TEXT = 'Ошибка — начинаем заново.';
+    const RESET_DELAY_MS = 1400;
 
-      const statement = document.createElement('p');
-      statement.className = 'engine-step-question';
-      statement.textContent = `«${q.statement}»`;
-      stage.appendChild(statement);
+    const start = () => {
+      const questions = shuffle(allQuestions);
+      let index = 0;
+      setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
 
-      const list = document.createElement('div');
-      list.className = 'engine-choice-list engine-choice-list-vertical';
-      stage.appendChild(list);
+      const showQuestion = () => {
+        stage.innerHTML = '';
+        progress.textContent = `Вопрос ${index + 1} из ${questions.length}`;
+        const q = questions[index];
 
-      let settled = false;
-      let correctBtn = null;
-      const entries = shuffle(q.options).map((opt) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'engine-choice-btn';
-        btn.textContent = opt.text;
-        if (opt.correct) correctBtn = btn;
-        list.appendChild(btn);
-        return { btn, opt };
-      });
+        const statement = document.createElement('p');
+        statement.className = 'engine-step-question';
+        statement.textContent = `«${q.statement}»`;
+        stage.appendChild(statement);
 
-      entries.forEach(({ btn, opt }) => {
-        btn.addEventListener('click', () => {
-          if (settled) return;
-          settled = true;
-          btn.classList.add(opt.correct ? 'engine-choice-correct' : 'engine-choice-wrong');
-          if (!opt.correct) correctBtn.classList.add('engine-choice-correct');
+        const list = document.createElement('div');
+        list.className = 'engine-choice-list engine-choice-list-vertical';
+        stage.appendChild(list);
 
-          const nextBtn = document.createElement('button');
-          nextBtn.type = 'button';
-          nextBtn.className = 'btn btn-primary engine-details-next';
-          nextBtn.textContent = index === questions.length - 1 ? 'Завершить' : 'Дальше';
-          nextBtn.addEventListener('click', () => {
-            index += 1;
-            if (index < questions.length) {
-              setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
-              showQuestion();
-            } else {
-              clearTaskStepState(lessonKey, task.id);
-              completeTask(lessonKey, task.id);
-              reactToTaskComplete(lessonKey);
-              rerenderCurrentLesson();
-            }
-          });
-          stage.appendChild(nextBtn);
+        let settled = false;
+        let correctBtn = null;
+        const entries = shuffle(q.options).map((opt) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'engine-choice-btn';
+          btn.textContent = opt.text;
+          if (opt.correct) correctBtn = btn;
+          list.appendChild(btn);
+          return { btn, opt };
         });
-      });
+
+        entries.forEach(({ btn, opt }) => {
+          btn.addEventListener('click', () => {
+            if (settled) return;
+            settled = true;
+            btn.classList.add(opt.correct ? 'engine-choice-correct' : 'engine-choice-wrong');
+            if (!opt.correct) correctBtn.classList.add('engine-choice-correct');
+
+            if (!opt.correct) {
+              const warning = document.createElement('p');
+              warning.className = 'engine-details-warning engine-details-warning-reset';
+              warning.textContent = RESET_TEXT;
+              stage.appendChild(warning);
+              setTimeout(start, RESET_DELAY_MS);
+              return;
+            }
+
+            const nextBtn = document.createElement('button');
+            nextBtn.type = 'button';
+            nextBtn.className = 'btn btn-primary engine-details-next';
+            nextBtn.textContent = index === questions.length - 1 ? 'Завершить' : 'Дальше';
+            nextBtn.addEventListener('click', () => {
+              index += 1;
+              if (index < questions.length) {
+                setTaskStepState(lessonKey, task.id, { order: questions.map((q) => q.id), index });
+                showQuestion();
+              } else {
+                clearTaskStepState(lessonKey, task.id);
+                completeTask(lessonKey, task.id);
+                reactToTaskComplete(lessonKey);
+                rerenderCurrentLesson();
+              }
+            });
+            stage.appendChild(nextBtn);
+          });
+        });
+      };
+
+      showQuestion();
     };
 
-    showQuestion();
+    start();
   };
 
   // "Карта звёздного покровителя" (planet_map_matching) — 8 подписанных

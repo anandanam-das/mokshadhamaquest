@@ -4879,6 +4879,23 @@ h3 {
   display: none;
 }
 
+.cabinet-email-panel {
+  margin-top: 18px;
+}
+
+.cabinet-email-panel:empty {
+  display: none;
+}
+
+.cabinet-email-verified {
+  color: #5bd1a0;
+}
+
+.cabinet-email-form {
+  max-width: 420px;
+  margin-top: 10px;
+}
+
 .cabinet-certificate-actions {
   display: flex;
   gap: 12px;

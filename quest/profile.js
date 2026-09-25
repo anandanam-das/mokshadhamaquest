@@ -128,15 +128,16 @@ function renderProgress(state) {
   const examDone = CABINET_EXAM_ROUND_IDS.filter((taskId) => examProgress[taskId]).length;
   doneTasks += examDone;
   const examComplete = examDone === CABINET_EXAM_ROUND_IDS.length;
-  if (allPlanetsDone) {
-    const examItem = document.createElement('li');
-    examItem.className = `cabinet-planet-item${examComplete ? ' is-done' : ''}`;
-    examItem.innerHTML = `
-      <span>Экзамен Шивы</span>
-      <span class="cabinet-planet-mark">${examComplete ? '✓' : `${examDone}/${CABINET_EXAM_ROUND_IDS.length}`}</span>
-    `;
-    planetList.appendChild(examItem);
-  }
+  // Раньше строка появлялась только после allPlanetsDone — но задания
+  // экзамена уже считаются в totalTasks/doneTasks и прогресс-баре всегда,
+  // так что строка должна быть видна всегда же, как "Введение" и планеты.
+  const examItem = document.createElement('li');
+  examItem.className = `cabinet-planet-item${examComplete ? ' is-done' : ''}`;
+  examItem.innerHTML = `
+    <span>Экзамен Шивы</span>
+    <span class="cabinet-planet-mark">${examComplete ? '✓' : `${examDone}/${CABINET_EXAM_ROUND_IDS.length}`}</span>
+  `;
+  planetList.appendChild(examItem);
 
   const percent = Math.round((doneTasks / totalTasks) * 100);
   progressFill.style.width = `${percent}%`;
@@ -146,12 +147,14 @@ function renderProgress(state) {
   return { courseComplete: allPlanetsDone && examComplete, percent };
 }
 
-function renderCertificatePanel(courseComplete) {
+function renderCertificatePanel(courseComplete, profile) {
   const panel = document.getElementById('certificatePanel');
   if (!courseComplete) {
     panel.innerHTML = '';
     return;
   }
+
+  const emailReady = !!(profile && profile.email && profile.email_verified);
 
   panel.innerHTML = `
     <h3>Сертификат</h3>
@@ -176,8 +179,64 @@ function renderCertificatePanel(courseComplete) {
     links.innerHTML = `
       <a class="btn btn-secondary" href="${MOKSHA_CONFIG.questApiBaseUrl}/api/certificate/${result.id}/pdf" target="_blank" rel="noopener">Скачать PDF</a>
       <a class="btn btn-secondary" href="verify.html?id=${result.id}" target="_blank" rel="noopener">Страница проверки</a>
+      ${emailReady ? '<button type="button" class="btn btn-secondary" id="emailCertificateBtn">Отправить на почту</button>' : ''}
     `;
     event.target.hidden = true;
+
+    if (emailReady) {
+      document.getElementById('emailCertificateBtn').addEventListener('click', async (sendEvent) => {
+        sendEvent.target.disabled = true;
+        sendEvent.target.textContent = 'Отправляем…';
+        const sendResult = await emailCertificate();
+        sendEvent.target.textContent = sendResult.ok ? 'Отправлено ✓' : 'Не удалось отправить';
+        if (!sendResult.ok) sendEvent.target.disabled = false;
+      });
+    }
+  });
+}
+
+function renderEmailPanel(profile) {
+  const panel = document.getElementById('emailPanel');
+  const email = profile && profile.email;
+  const verified = !!(profile && profile.email_verified);
+
+  if (verified) {
+    panel.innerHTML = `
+      <h3>Почта</h3>
+      <p class="cabinet-progress-text">${email} — <strong class="cabinet-email-verified">подтверждена ✓</strong></p>
+    `;
+    return;
+  }
+
+  panel.innerHTML = `
+    <h3>Почта</h3>
+    <p class="cabinet-progress-text">Подтверди почту, чтобы получать диплом и уведомления на неё.</p>
+    <div class="registration-actions cabinet-email-form">
+      <input type="email" id="emailInput" placeholder="you@example.com" value="${email || ''}" />
+      <button type="button" class="btn btn-primary" id="confirmEmailBtn">Подтвердить почту</button>
+    </div>
+    <p class="cabinet-progress-text" id="emailStatus" hidden></p>
+  `;
+
+  document.getElementById('confirmEmailBtn').addEventListener('click', async (event) => {
+    const input = document.getElementById('emailInput');
+    const value = input.value.trim();
+    const status = document.getElementById('emailStatus');
+    if (!value) return;
+
+    event.target.disabled = true;
+    event.target.textContent = 'Отправляем…';
+    try {
+      if (value !== email) await saveQuestProfile({ email: value });
+      const result = await sendEmailVerification();
+      status.hidden = false;
+      status.textContent = result.ok
+        ? 'Письмо отправлено — перейди по ссылке из письма, чтобы подтвердить.'
+        : 'Не удалось отправить письмо. Попробуй ещё раз чуть позже.';
+    } finally {
+      event.target.disabled = false;
+      event.target.textContent = 'Подтвердить почту';
+    }
   });
 }
 
@@ -268,6 +327,10 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         greeting.textContent = 'Твой прогресс и покровитель';
       }
+      renderEmailPanel(profile);
+      // Перерисовываем панель сертификата теперь, когда известен статус
+      // почты — только так кнопка "Отправить на почту" появится вовремя.
+      renderCertificatePanel(courseComplete, profile);
     })
     .catch(() => {
       greeting.textContent = 'Твой прогресс и покровитель';

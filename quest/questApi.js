@@ -75,6 +75,20 @@ async function issueQuestCertificate() {
   return { ok: true, ...data };
 }
 
+async function sendEmailVerification() {
+  const response = await questApiFetch('/api/email/send-verification', { method: 'POST' });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) return { ok: false, error: data.error || 'unknown_error' };
+  return { ok: true, ...data };
+}
+
+async function emailCertificate() {
+  const response = await questApiFetch('/api/certificate/email', { method: 'POST' });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) return { ok: false, error: data.error || 'unknown_error' };
+  return { ok: true, ...data };
+}
+
 async function fetchAdminOverview() {
   const response = await questApiFetch('/api/admin/overview');
   if (!response.ok) throw new Error('fetch_admin_overview_failed');

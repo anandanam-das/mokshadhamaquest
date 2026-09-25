@@ -1,11 +1,15 @@
 require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
 const cors = require('cors');
 const { pool } = require('./db');
 const { requireAuth, requireAdmin } = require('./auth');
 const { generateCertificatePdf } = require('./certificate');
+const { sendVerificationEmail, sendCertificateEmail } = require('./email');
 
 const { PORT = 4000, ALLOWED_ORIGINS = '' } = process.env;
+const EMAIL_VERIFY_BASE_URL = process.env.EMAIL_VERIFY_BASE_URL || 'https://www.moksha-education.com/quest/verify-email.html';
+const EMAIL_VERIFY_TTL_MS = 24 * 60 * 60 * 1000;
 
 // Mirrors UNLOCK_ORDER / PLANET_TASK_IDS in quest/village.js — kept in
 // sync manually since this service is deployed separately from the
@@ -21,6 +25,18 @@ const REQUIRED_PLANET_TASK_IDS = [
   'engine_map',
 ];
 
+// Mirrors REL_ROUNDS ids in quest/village.js — the 6 rounds of task 11
+// ("Экзамен Шивы"), stored under taskProgress.relationships. Completing
+// the course now requires this in addition to the 9 planets.
+const REQUIRED_EXAM_ROUND_IDS = [
+  'round_direction',
+  'round_reason',
+  'round_impact',
+  'round_union',
+  'round_neutral',
+  'round_nodes',
+];
+
 // The "Введение" (Семя) lesson — same idea as REQUIRED_PLANET_TASK_IDS but
 // for the intro block, which lives under taskProgress.intro rather than a
 // planet id. Not part of isCourseComplete (that's specifically the 9
@@ -28,10 +44,13 @@ const REQUIRED_PLANET_TASK_IDS = [
 const INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
 
 function isCourseComplete(taskProgress) {
-  return REQUIRED_PLANETS.every((planetId) => {
+  const planetsDone = REQUIRED_PLANETS.every((planetId) => {
     const progress = taskProgress[planetId] || {};
     return REQUIRED_PLANET_TASK_IDS.every((taskId) => progress[taskId]);
   });
+  const examProgress = taskProgress.relationships || {};
+  const examDone = REQUIRED_EXAM_ROUND_IDS.every((roundId) => examProgress[roundId]);
+  return planetsDone && examDone;
 }
 
 const app = express();
@@ -71,6 +90,17 @@ app.post(
     // flag — only `true` is ever written, so a page that doesn't know the
     // current value can't accidentally flip it back to false.
     const { email, firstName, lastName, patronPlanet, hasSeenPrologue } = req.body || {};
+
+    // A changed email must be re-verified — reset the flag (and drop any
+    // stale pending token) whenever the incoming email differs from what's
+    // on file, so a verified badge never survives switching to an address
+    // nobody proved ownership of.
+    let emailChanged = false;
+    if (email) {
+      const { rows: current } = await pool.query('SELECT email FROM users WHERE telegram_id = $1', [req.telegramId]);
+      emailChanged = !current.length || current[0].email !== email;
+    }
+
     const { rows } = await pool.query(
       `INSERT INTO users (telegram_id, email, first_name, last_name, patron_planet, has_seen_prologue)
        VALUES ($1, $2, $3, $4, $5, COALESCE($6, false))
@@ -80,11 +110,96 @@ app.post(
          last_name = COALESCE(EXCLUDED.last_name, users.last_name),
          patron_planet = COALESCE(EXCLUDED.patron_planet, users.patron_planet),
          has_seen_prologue = COALESCE(EXCLUDED.has_seen_prologue, users.has_seen_prologue),
+         email_verified = CASE WHEN $7 THEN false ELSE users.email_verified END,
+         email_verify_token = CASE WHEN $7 THEN NULL ELSE users.email_verify_token END,
+         email_verify_expires = CASE WHEN $7 THEN NULL ELSE users.email_verify_expires END,
          updated_at = now()
        RETURNING *`,
-      [req.telegramId, email || null, firstName || null, lastName || null, patronPlanet || null, hasSeenPrologue === true ? true : null]
+      [
+        req.telegramId,
+        email || null,
+        firstName || null,
+        lastName || null,
+        patronPlanet || null,
+        hasSeenPrologue === true ? true : null,
+        emailChanged,
+      ]
     );
     res.json(rows[0]);
+  })
+);
+
+app.post(
+  '/api/email/send-verification',
+  requireAuth,
+  ah(async (req, res) => {
+    const { rows } = await pool.query('SELECT email, email_verified FROM users WHERE telegram_id = $1', [req.telegramId]);
+    if (!rows.length || !rows[0].email) return res.status(400).json({ error: 'no_email' });
+    if (rows[0].email_verified) return res.json({ ok: true, alreadyVerified: true });
+
+    const token = crypto.randomBytes(24).toString('hex');
+    const expires = new Date(Date.now() + EMAIL_VERIFY_TTL_MS);
+    await pool.query('UPDATE users SET email_verify_token = $2, email_verify_expires = $3 WHERE telegram_id = $1', [
+      req.telegramId,
+      token,
+      expires,
+    ]);
+
+    const verifyUrl = `${EMAIL_VERIFY_BASE_URL}?token=${token}`;
+    await sendVerificationEmail(rows[0].email, verifyUrl);
+    res.json({ ok: true });
+  })
+);
+
+// Public — no auth. The link inside the verification email hits this
+// directly from the browser.
+app.get(
+  '/api/email/verify',
+  ah(async (req, res) => {
+    const { token } = req.query;
+    if (!token) return res.status(400).json({ error: 'missing_token' });
+
+    const { rows } = await pool.query(
+      'SELECT telegram_id, email_verify_expires FROM users WHERE email_verify_token = $1',
+      [token]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'invalid_token' });
+    if (new Date(rows[0].email_verify_expires) < new Date()) return res.status(410).json({ error: 'token_expired' });
+
+    await pool.query(
+      `UPDATE users SET email_verified = true, email_verify_token = NULL, email_verify_expires = NULL
+       WHERE telegram_id = $1`,
+      [rows[0].telegram_id]
+    );
+    res.json({ ok: true });
+  })
+);
+
+app.post(
+  '/api/certificate/email',
+  requireAuth,
+  ah(async (req, res) => {
+    const { rows: userRows } = await pool.query('SELECT email, email_verified FROM users WHERE telegram_id = $1', [
+      req.telegramId,
+    ]);
+    if (!userRows.length || !userRows[0].email) return res.status(400).json({ error: 'no_email' });
+    if (!userRows[0].email_verified) return res.status(409).json({ error: 'email_not_verified' });
+
+    const { rows: certRows } = await pool.query(
+      'SELECT c.id, c.issued_at, u.first_name, u.last_name FROM certificates c JOIN users u ON u.telegram_id = c.telegram_id WHERE c.telegram_id = $1 ORDER BY c.issued_at ASC LIMIT 1',
+      [req.telegramId]
+    );
+    if (!certRows.length) return res.status(409).json({ error: 'no_certificate' });
+
+    const cert = certRows[0];
+    const pdfBytes = await generateCertificatePdf({
+      id: cert.id,
+      firstName: cert.first_name,
+      lastName: cert.last_name,
+      issuedAt: cert.issued_at,
+    });
+    await sendCertificateEmail(userRows[0].email, pdfBytes, `moksha-quest-certificate-${cert.id}.pdf`);
+    res.json({ ok: true });
   })
 );
 

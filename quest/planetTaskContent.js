@@ -575,6 +575,13 @@ const PLANET_TASK_CONTENT = {
           correct: '10 дом',
           distractors: ['1 дом', '4 дом', '7 дом'],
         },
+        // Ранее в карте покровителя отсутствовали — хотя факт уже
+        // использовался в самой игре (см. "Изъян в писании" выше: "падение
+        // Солнца в Весах, а в Овне — экзальтация") и Лев как "свой знак"
+        // Солнца уже фигурировал дистрактором у других планет.
+        { id: 'ownSign', label: 'Свой знак', correct: 'Лев', distractors: ['Рак', 'Дева'] },
+        { id: 'exaltation', label: 'Экзальтация', correct: 'Овен', distractors: ['Телец', 'Козерог'] },
+        { id: 'debilitation', label: 'Дебилитация', correct: 'Весы', distractors: ['Скорпион', 'Рыбы'] },
       ],
     },
   },
@@ -2323,7 +2330,7 @@ const PLANET_TASK_CONTENT = {
       categories: [
         { id: 'weekday', label: 'День недели', correct: 'Среда', distractors: ['Воскресенье', 'Понедельник'] },
         { id: 'color', label: 'Цвет', correct: 'Зелёный', distractors: ['Белый', 'Красный / алый'] },
-        { id: 'metal', label: 'Металл', correct: 'Бронза', distractors: ['Серебро', 'Железо'] },
+        { id: 'metal', label: 'Металл', correct: 'Ртуть', distractors: ['Серебро', 'Бронза'] },
         { id: 'gem', label: 'Камень', correct: 'Изумруд', distractors: ['Жемчуг', 'Красный коралл'] },
         { id: 'number', label: 'Число', correct: '5', distractors: ['2', '9'] },
         { id: 'chakra', label: 'Чакра', correct: 'Вишуддха', distractors: ['Аджна (третий глаз)', 'Манипура'] },
@@ -2985,7 +2992,7 @@ const PLANET_TASK_CONTENT = {
         { id: 'metal', label: 'Металл', correct: 'Золото, платина', distractors: ['Бронза', 'Железо'] },
         { id: 'gem', label: 'Камень', correct: 'Жёлтый сапфир', distractors: ['Изумруд', 'Красный коралл'] },
         { id: 'number', label: 'Число', correct: '3', distractors: ['5', '9'] },
-        { id: 'chakra', label: 'Чакра', correct: 'Аджна', distractors: ['Вишуддха', 'Манипура'] },
+        { id: 'chakra', label: 'Чакра', correct: 'Свадхистхана', distractors: ['Аджна', 'Манипура'] },
         { id: 'direction', label: 'Направление', correct: 'Северо-восток', distractors: ['Север', 'Юг'] },
         { id: 'house', label: 'Дом максимальной силы', correct: '1 дом', distractors: ['10 дом', '4 дом'] },
         { id: 'ownSign', label: 'Свой знак', correct: 'Стрелец и Рыбы', distractors: ['Лев', 'Близнецы и Дева'] },
