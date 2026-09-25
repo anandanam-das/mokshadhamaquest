@@ -167,13 +167,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // реплика уйдёт, чтобы не отменять выбор пользователя навсегда.
   let transitionOverlay = null;
   let transitionWasHidden = false;
-  // Момент с Шивой временно подменяет портрет в виджете (обычно там
-  // покровитель игрока) — после этой конкретной реплики портрет всегда
-  // откатывается на покровителя как обычно. Отдельно, при входе в сам
-  // экзамен Шивы (по клику на иконку на карте, см. openRelationshipsExam),
-  // портрет переключается на Шиву заново и держится весь ход экзамена —
-  // это не связано с кат-сценой, а собственное состояние экрана экзамена.
+  // Два РАЗНЫХ состояния делят портрет Шивы, поэтому нужны два отдельных
+  // флага (раньше был один общий shivaActive, и это была баг: закрытие
+  // случайно ещё показанной старой реплики во время экзамена откатывало
+  // портрет на покровителя игрока прямо посреди экзамена).
+  // shivaActive — вход в сам экзамен Шивы (см. openRelationshipsExam),
+  // держится весь ход экзамена, снимается только exitRelationshipsTask.
   let shivaActive = false;
+  // shivaCutsceneActive — отдельный кратковременный момент (showShivaMoment):
+  // портрет подменяется на Шиву только на время ЭТОЙ конкретной реплики и
+  // откатывается сам, когда реплика закрывается — независимо от того,
+  // активен ли сейчас экзамен.
+  let shivaCutsceneActive = false;
   // Заполняется showShivaMoment, когда после кат-сцены нужно что-то
   // сделать (например, перерисовать карту деревни) — иначе просто null.
   let afterOverlayCallback = null;
@@ -184,9 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
     transitionOverlay = null;
     overlay.classList.remove('transition-overlay-visible');
     setTimeout(() => overlay.remove(), 600);
-    if (shivaActive) {
-      shivaActive = false;
-      setupPatronWidget();
+    if (shivaCutsceneActive) {
+      shivaCutsceneActive = false;
+      // Экзамен Шивы (если он сейчас активен) держит свой портрет сам —
+      // не откатываем его тут, иначе закрытие кат-сцены посреди экзамена
+      // сбросило бы портрет на покровителя игрока прямо во время экзамена.
+      if (!shivaActive) setupPatronWidget();
     }
     if (transitionWasHidden) hidePatronWidget();
     if (afterOverlayCallback) {
@@ -260,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (transitionWasHidden) showPatronWidget();
 
     afterOverlayCallback = onDone || null;
-    shivaActive = true;
+    shivaCutsceneActive = true;
     const img = document.getElementById('patronWidgetImage');
     img.src = 'assets/prologue/shiva.png';
     img.alt = 'Шива';
@@ -390,7 +398,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const LORE_DROP_CHANCE = 0.2;
 
+  // Портрет на время экзамена — Шива, а не выбранный игроком покровитель
+  // (см. shivaActive), поэтому тап по нему должен звучать голосом Шивы,
+  // а не переигрывать пул реакций patronId — иначе картинка одна, а
+  // реплика будто от другого персонажа.
+  const SHIVA_IDLE_REACTIONS = [
+    'Не спеши — каждая граха раскрывается только тому, кто вглядывается внимательно.',
+    'Отношения между грахами меняются в зависимости от направления — как и у людей.',
+    'Дружба, вражда, нейтральность — это не ярлык навсегда, а то, что одна граха даёт другой прямо сейчас.',
+    'Я видел тысячи учеников — торопливые путают дружбу с союзом, а союз с дружбой.',
+    'Проверь себя внимательно — здесь нет случайных ответов, только то, что ты действительно понял.',
+    'Каждый раунд можно пройти заново, если собьёшься — не бойся ошибиться, бойся не понять.',
+  ];
+
   document.getElementById('patronWidgetImage').addEventListener('click', () => {
+    if (shivaActive) {
+      showPatronSpeech(pickNoRepeat('shiva:idleTap', SHIVA_IDLE_REACTIONS));
+      return;
+    }
     if (Math.random() < LORE_DROP_CHANCE) {
       showPatronSpeech(pickExpandedOnly('loreDrop'));
     } else {
@@ -3397,6 +3422,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const reopenImg = document.getElementById('patronReopenImage');
     reopenImg.src = 'assets/prologue/shiva.png';
     reopenImg.alt = 'Шива';
+    // Если оставался пузырь с репликой прежнего покровителя — прячем его:
+    // иначе портрет уже Шива, а текст ещё звучит чужим голосом.
+    hidePatronSpeech();
 
     renderRelExamList();
     taskContentPanel.innerHTML = '<p class="task-content-placeholder">Выбери раунд из списка выше, чтобы начать.</p>';
