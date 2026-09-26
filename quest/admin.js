@@ -32,6 +32,7 @@ function renderViewRow(user) {
     <td>${user.email || '—'}</td>
     <td>${getCharacterTitle(user.patronPlanet)}</td>
     <td>${user.donePlanets}/${user.totalPlanets}</td>
+    <td>${user.doneLessons}/${user.totalLessons}</td>
     <td>${user.doneTasks}/${user.totalTasks}</td>
     <td>${user.hasCertificate ? '✓' : '—'}</td>
     <td>${formatDate(user.createdAt)}</td>
@@ -79,6 +80,7 @@ function renderEditRow(user) {
       </select>
     </td>
     <td>${user.donePlanets}/${user.totalPlanets}</td>
+    <td>${user.doneLessons}/${user.totalLessons}</td>
     <td>${user.doneTasks}/${user.totalTasks}</td>
     <td>${user.hasCertificate ? '✓' : '—'}</td>
     <td>${formatDate(user.createdAt)}</td>

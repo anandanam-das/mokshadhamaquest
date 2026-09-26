@@ -11,6 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Выбор покровителя (creator.js) сохраняется в quest-api "best-effort" —
+  // если в тот момент запрос не прошёл, локально всё работает (персонаж
+  // лежит в localStorage), но в БД patron_planet так и остаётся пустым
+  // навсегда — в админке это выглядит как "—" у игрока, который явно уже
+  // играет. Подстраховка: на каждом заходе в деревню тихо повторяем
+  // синхронизацию, пока она не пройдёт.
+  if (typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
+    saveQuestProfile({ patronPlanet: state.character.patronPlanet }).catch(() => {});
+  }
+
   const taskTypeIcons = {
     guna_video: '🎥',
     guna_phrase: '🗣️',

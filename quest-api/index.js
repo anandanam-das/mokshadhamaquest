@@ -307,17 +307,31 @@ app.get(
        ORDER BY u.created_at DESC`
     );
 
-    const totalTasksPerUser = INTRO_TASK_IDS.length + REQUIRED_PLANETS.length * REQUIRED_PLANET_TASK_IDS.length;
+    // Mirrors quest/profile.js's totalTasks/doneLessons exactly (76 tasks,
+    // 11 lessons = Введение + 9 planets + Экзамен Шивы) — this used to omit
+    // the exam entirely, so the admin table's "Заданий" column topped out
+    // at 70/9 instead of matching what the student's own cabinet shows.
+    const totalTasksPerUser =
+      INTRO_TASK_IDS.length + REQUIRED_PLANETS.length * REQUIRED_PLANET_TASK_IDS.length + REQUIRED_EXAM_ROUND_IDS.length;
+    const totalLessonsPerUser = REQUIRED_PLANETS.length + 2; // Введение + 9 планет + экзамен
     const summarized = users.map((u) => {
       const progress = u.task_progress || {};
+      const introProgress = progress.intro || {};
+      const introDoneCount = INTRO_TASK_IDS.filter((taskId) => introProgress[taskId]).length;
+      const introDone = introDoneCount === INTRO_TASK_IDS.length;
       let donePlanets = 0;
-      let doneTasks = (progress.intro && INTRO_TASK_IDS.filter((taskId) => progress.intro[taskId]).length) || 0;
+      let doneTasks = introDoneCount;
       REQUIRED_PLANETS.forEach((planetId) => {
         const planetProgress = progress[planetId] || {};
         const completedCount = REQUIRED_PLANET_TASK_IDS.filter((taskId) => planetProgress[taskId]).length;
         doneTasks += completedCount;
         if (completedCount === REQUIRED_PLANET_TASK_IDS.length) donePlanets += 1;
       });
+      const examProgress = progress.relationships || {};
+      const examDoneCount = REQUIRED_EXAM_ROUND_IDS.filter((roundId) => examProgress[roundId]).length;
+      const examDone = examDoneCount === REQUIRED_EXAM_ROUND_IDS.length;
+      doneTasks += examDoneCount;
+      const doneLessons = donePlanets + (introDone ? 1 : 0) + (examDone ? 1 : 0);
       return {
         telegramId: u.telegram_id,
         email: u.email,
@@ -326,6 +340,8 @@ app.get(
         patronPlanet: u.patron_planet,
         donePlanets,
         totalPlanets: REQUIRED_PLANETS.length,
+        doneLessons,
+        totalLessons: totalLessonsPerUser,
         doneTasks,
         totalTasks: totalTasksPerUser,
         hasCertificate: !!u.certificate_id,
