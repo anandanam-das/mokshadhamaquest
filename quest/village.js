@@ -3490,11 +3490,30 @@ document.addEventListener('DOMContentLoaded', () => {
       doneText.textContent = `✓ «${round.title}» выполнено`;
       doneWrap.appendChild(doneText);
 
+      // "Закончить экзамен" — только на последнем раунде (и только когда
+      // все остальные тоже пройдены, что при последовательной разблокировке
+      // и так всегда верно на этом раунде). "Пройти ещё раз" доступна
+      // всегда, в том числе на последнем раунде — раньше allDone подменяла
+      // её на "Закончить экзамен" на КАЖДОМ раунде, если весь экзамен уже
+      // пройден целиком, а не только на действительно последнем.
+      const isLastRound = i === REL_ROUNDS.length - 1;
       const allDone = REL_ROUNDS.every((r) => getTaskProgress('relationships')[r.id]);
-      if (allDone) {
+
+      if (isLastRound && allDone) {
         const feedbackText = document.createElement('p');
         feedbackText.className = 'task-content-feedback';
         feedbackText.textContent = REL_FINAL_MESSAGE;
+        doneWrap.appendChild(feedbackText);
+      }
+
+      const retryBtn = document.createElement('button');
+      retryBtn.type = 'button';
+      retryBtn.className = 'btn btn-secondary';
+      retryBtn.textContent = 'Пройти ещё раз';
+      retryBtn.addEventListener('click', () => renderRelRoundContent(i, true));
+      doneWrap.appendChild(retryBtn);
+
+      if (isLastRound && allDone) {
         const backBtn = document.createElement('button');
         backBtn.type = 'button';
         backBtn.className = 'btn btn-primary';
@@ -3509,14 +3528,7 @@ document.addEventListener('DOMContentLoaded', () => {
             buildVillageStage();
           });
         });
-        doneWrap.append(feedbackText, backBtn);
-      } else {
-        const retryBtn = document.createElement('button');
-        retryBtn.type = 'button';
-        retryBtn.className = 'btn btn-secondary';
-        retryBtn.textContent = 'Пройти ещё раз';
-        retryBtn.addEventListener('click', () => renderRelRoundContent(i, true));
-        doneWrap.appendChild(retryBtn);
+        doneWrap.appendChild(backBtn);
       }
 
       taskContentPanel.appendChild(doneWrap);
