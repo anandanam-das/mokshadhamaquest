@@ -26,10 +26,17 @@ async function verify(token, secret) {
 // устаревший ответ. На проде это выглядело как бесконечный цикл
 // village.html → checking.html → village.html, потому что /api/access
 // точно так же не был помечен no-store (см. его комментарий).
-const withNoStore = (response) => {
-  response.headers.set('Cache-Control', 'private, no-store, must-revalidate');
-  return response;
-};
+// Собираем Response вручную (не через Response.redirect()) — у объекта,
+// который возвращает Response.redirect(), заголовки неизменяемые в этом
+// рантайме, и .headers.set() на нём падает с MIDDLEWARE_INVOCATION_FAILED.
+const redirectNoStore = (url) =>
+  new Response(null, {
+    status: 302,
+    headers: {
+      Location: url.toString(),
+      'Cache-Control': 'private, no-store, must-revalidate',
+    },
+  });
 
 export default async function middleware(request) {
   const url = new URL(request.url);
@@ -37,12 +44,12 @@ export default async function middleware(request) {
 
   const session = await verify(getCookie(request, SESSION_COOKIE), secret);
   if (!session) {
-    return withNoStore(Response.redirect(new URL('/quest/login.html', url), 302));
+    return redirectNoStore(new URL('/quest/login.html', url));
   }
 
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
   if (!access || String(access.id) !== String(session.id)) {
-    return withNoStore(Response.redirect(new URL('/quest/checking.html', url), 302));
+    return redirectNoStore(new URL('/quest/checking.html', url));
   }
 }
 
