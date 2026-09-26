@@ -3472,19 +3472,14 @@ document.addEventListener('DOMContentLoaded', () => {
     detailRoot.append(headingEl, list);
   };
 
-  const renderRelRoundContent = (i) => {
+  // forcePlay=true всегда реально запускает раунд заново (кнопка "Пройти
+  // ещё раз"); без него, если раунд уже отмечен выполненным, сразу
+  // показываем экран "✓ выполнено" вместо того, чтобы молча пересобирать
+  // раунд — раньше клик по уже пройденному раунду из списка выглядел так,
+  // будто прогресс не сохранился (см. planet/intro-задания: там то же самое
+  // "✓ выполнено" + отдельная кнопка на повтор, а не мгновенный рестарт).
+  const renderRelRoundContent = (i, forcePlay) => {
     const round = REL_ROUNDS[i];
-    taskContentPanel.innerHTML = '';
-
-    const wrap = document.createElement('div');
-    wrap.className = 'engine-task';
-    const title = document.createElement('p');
-    title.className = 'rel-round-title';
-    title.textContent = round.title;
-    const stage = document.createElement('div');
-    stage.className = 'engine-stage';
-    wrap.append(title, stage);
-    taskContentPanel.appendChild(wrap);
 
     const showDone = () => {
       taskContentPanel.innerHTML = '';
@@ -3520,13 +3515,29 @@ document.addEventListener('DOMContentLoaded', () => {
         retryBtn.type = 'button';
         retryBtn.className = 'btn btn-secondary';
         retryBtn.textContent = 'Пройти ещё раз';
-        retryBtn.addEventListener('click', () => renderRelRoundContent(i));
+        retryBtn.addEventListener('click', () => renderRelRoundContent(i, true));
         doneWrap.appendChild(retryBtn);
       }
 
       taskContentPanel.appendChild(doneWrap);
       renderRelExamList();
     };
+
+    if (!forcePlay && getTaskProgress('relationships')[round.id]) {
+      showDone();
+      return;
+    }
+
+    taskContentPanel.innerHTML = '';
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+    const title = document.createElement('p');
+    title.className = 'rel-round-title';
+    title.textContent = round.title;
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+    wrap.append(title, stage);
+    taskContentPanel.appendChild(wrap);
 
     REL_ROUND_RENDERERS[round.key](stage, () => {
       completeTask('relationships', round.id);

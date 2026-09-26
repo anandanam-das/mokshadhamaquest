@@ -15,9 +15,8 @@ const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2
 // Mirrors REL_ROUNDS ids in village.js — "Экзамен Шивы", 6 раундов
 // задания №11. Ачивка Граха-таттва-джня требует 9 планет И весь экзамен.
 const CABINET_EXAM_ROUND_IDS = ['round_direction', 'round_reason', 'round_impact', 'round_union', 'round_neutral', 'round_nodes'];
-// Блок Граха-таттва рассчитан на 11 уроков (Введение + 9 планет уже
-// построены, 11-й ещё в разработке) — держим знаменатель фиксированным на
-// будущее, а не только на то, что уже реально существует в игре.
+// Блок Граха-таттва — 11 уроков: Введение + 9 планет + Экзамен Шивы
+// (11-й, задание №11). Все уже построены и считаются в doneLessons ниже.
 const GRAHA_TATTVA_LESSON_COUNT = 11;
 
 function getCharacterById(id) {
@@ -141,7 +140,11 @@ function renderProgress(state) {
 
   const percent = Math.round((doneTasks / totalTasks) * 100);
   progressFill.style.width = `${percent}%`;
-  const doneLessons = donePlanets + (introDone === CABINET_INTRO_TASK_IDS.length ? 1 : 0);
+  // Экзамен Шивы — тоже урок (11-й: Введение + 9 планет + экзамен), и он
+  // уже построен и проходится — раньше этот +1 не начислялся, из-за чего
+  // "Пройдено уроков" застревало на 10 из 11 даже при 100% заданий.
+  const doneLessons =
+    donePlanets + (introDone === CABINET_INTRO_TASK_IDS.length ? 1 : 0) + (examComplete ? 1 : 0);
   progressText.textContent = `Пройдено уроков: ${doneLessons} из ${GRAHA_TATTVA_LESSON_COUNT} · заданий: ${doneTasks} из ${totalTasks} (${percent}%)`;
 
   return { courseComplete: allPlanetsDone && examComplete, percent };
