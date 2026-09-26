@@ -31,7 +31,6 @@ function renderViewRow(user) {
     <td>${user.telegramId}</td>
     <td>${user.email || '—'}</td>
     <td>${getCharacterTitle(user.patronPlanet)}</td>
-    <td>${user.donePlanets}/${user.totalPlanets}</td>
     <td>${user.doneLessons}/${user.totalLessons}</td>
     <td>${user.doneTasks}/${user.totalTasks}</td>
     <td>${user.hasCertificate ? '✓' : '—'}</td>
@@ -79,7 +78,6 @@ function renderEditRow(user) {
         ${patronOptions}
       </select>
     </td>
-    <td>${user.donePlanets}/${user.totalPlanets}</td>
     <td>${user.doneLessons}/${user.totalLessons}</td>
     <td>${user.doneTasks}/${user.totalTasks}</td>
     <td>${user.hasCertificate ? '✓' : '—'}</td>
