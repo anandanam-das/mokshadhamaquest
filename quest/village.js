@@ -4069,8 +4069,12 @@ document.addEventListener('DOMContentLoaded', () => {
     openLesson('intro', getLocationHeading('Введение'), INTRO_TASKS);
   } else {
     if (!state.introCompleted) setUserState({ introCompleted: true });
-    detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
-    renderTaskContentPanel(null, null);
+    // Список "Введения" открывается автоматически при каждом заходе (уже
+    // пройденного, но доступного для повторного прохождения) — как только
+    // игрок кликает по зданию или по значку экзамена Шивы,
+    // openBuildingLesson/openRelationshipsExam сами перезапишут detailRoot
+    // своим содержимым, как и раньше.
+    openLesson('intro', getLocationHeading('Введение'), INTRO_TASKS);
     // Деревня уже открыта — это не первый заход, а возвращение.
     // welcomeBack есть только в расширенном пуле, базового аналога нет.
     showPatronSpeech(pickExpandedOnly('welcomeBack'));
