@@ -4956,6 +4956,33 @@ h3 {
   color: var(--muted);
 }
 
+.tattva-block-artifact {
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+}
+
+.tattva-block-artifact-icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.tattva-block-artifact-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #6a3d0a;
+}
+
+.tattva-block-artifact-desc {
+  font-size: 0.76rem;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
 @media (max-width: 640px) {
   .tattva-path {
     grid-template-columns: 1fr;

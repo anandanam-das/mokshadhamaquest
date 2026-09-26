@@ -13,7 +13,7 @@ const CABINET_PLANET_TASK_IDS = [
 ];
 const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
 // Mirrors REL_ROUNDS ids in village.js — "Экзамен Шивы", 6 раундов
-// задания №11. Ачивка Граха-таттва-джня требует 9 планет И весь экзамен.
+// задания №11. Ачивка Граха-таттва-гья требует 9 планет И весь экзамен.
 const CABINET_EXAM_ROUND_IDS = ['round_direction', 'round_reason', 'round_impact', 'round_union', 'round_neutral', 'round_nodes'];
 // Блок Граха-таттва — 11 уроков: Введение + 9 планет + Экзамен Шивы
 // (11-й, задание №11). Все уже построены и считаются в doneLessons ниже.
@@ -32,8 +32,11 @@ const TATTVA_BLOCKS = [
     sanskrit: 'ग्रह तत्त्व',
     title: 'Граха-таттва',
     subtitle: 'Природа и взаимоотношения девяти грах',
-    achievementTitle: 'Граха-таттва-джня',
+    achievementTitle: 'Граха-таттва-гья',
     achievementSubtitle: 'Познавший природу грах',
+    artifactIcon: '🔯',
+    artifactName: 'Наваграха-янтра',
+    artifactDescription: 'Печать с девятью гранями — награда Шивы за пройденный экзамен',
     locked: false,
   },
   {
@@ -67,7 +70,16 @@ function renderTattvaPath(percent, courseComplete) {
       `;
     }
     const achievement = courseComplete
-      ? `<span class="tattva-block-achievement">🏅 ${block.achievementTitle}<br /><small>${block.achievementSubtitle}</small></span>`
+      ? `<span class="tattva-block-achievement">🏅 ${block.achievementTitle}<br /><small>${block.achievementSubtitle}</small></span>
+         ${
+           block.artifactName
+             ? `<div class="tattva-block-artifact">
+                  <span class="tattva-block-artifact-icon">${block.artifactIcon || ''}</span>
+                  <span class="tattva-block-artifact-name">${block.artifactName}</span>
+                  <span class="tattva-block-artifact-desc">${block.artifactDescription || ''}</span>
+                </div>`
+             : ''
+         }`
       : `
         <div class="tattva-block-progress"><div class="tattva-block-progress-fill" style="width:${percent}%"></div></div>
         <span class="tattva-block-status">${percent}%</span>
