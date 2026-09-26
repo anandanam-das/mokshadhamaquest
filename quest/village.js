@@ -3306,6 +3306,129 @@ document.addEventListener('DOMContentLoaded', () => {
     return progress[REL_ROUNDS[i - 1].id] ? 'unlocked' : 'locked';
   };
 
+  // Церемония после последнего раунда экзамена: тапаемая последовательность
+  // из 3 экранов на затемнённой подложке — поздравление (с фейерверком),
+  // артефакт, новый статус. Артефакта своей картинки в проекте нет — вместо
+  // неё крупный эмодзи-символ печати (.graduation-artifact-icon).
+  const GRADUATION_STEPS = [
+    {
+      heading: 'Экзамен пройден!',
+      text: 'Ты постиг связи между планетами — дружбу, вражду и то, что скрыто за нейтральностью. Настало время признать твоё знание.',
+    },
+    {
+      heading: 'Наваграха-янтра',
+      icon: '🔯',
+      text: 'Шива вручает тебе Наваграха-янтру — печать с девятью гранями. В ней Сурья, Чандра, Мангала, Буддха, Гуру, Шукра, Шани, Раху и Кету — не по одиночке, а в движении друг к другу, как ты теперь умеешь их видеть.',
+    },
+    {
+      heading: 'Новый статус получен',
+      badgeText: 'Граха-таттва-гья',
+      text: 'Отныне твой статус — Граха-таттва-гья, познавший природу планет. Обитель Богов открыта тебе полностью.',
+    },
+  ];
+
+  const spawnGraduationFireworks = (container) => {
+    const colors = ['#ffce54', '#ff7043', '#7ee787', '#64b5f6', '#f48fb1', '#ba68c8'];
+    const burstCenters = [
+      { x: 25, y: 30 },
+      { x: 70, y: 22 },
+      { x: 50, y: 42 },
+      { x: 82, y: 55 },
+      { x: 15, y: 58 },
+    ];
+    burstCenters.forEach((center, burstIdx) => {
+      for (let i = 0; i < 10; i += 1) {
+        const angle = (Math.PI * 2 * i) / 10;
+        const distance = 60 + Math.random() * 40;
+        const spark = document.createElement('div');
+        spark.className = 'graduation-spark';
+        spark.style.setProperty('--gx', `${center.x}vw`);
+        spark.style.setProperty('--gy', `${center.y}vh`);
+        spark.style.setProperty('--gdx', `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty('--gdy', `${Math.sin(angle) * distance}px`);
+        spark.style.setProperty('--gcolor', colors[(burstIdx + i) % colors.length]);
+        spark.style.setProperty('--gdelay', `${burstIdx * 0.25}s`);
+        container.appendChild(spark);
+      }
+    });
+  };
+
+  const showGraduationCeremony = (onDone) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'transition-overlay';
+    document.body.appendChild(overlay);
+    // eslint-disable-next-line no-void
+    void overlay.offsetWidth;
+    overlay.classList.add('transition-overlay-visible');
+
+    const fireworks = document.createElement('div');
+    fireworks.className = 'graduation-fireworks';
+    document.body.appendChild(fireworks);
+    spawnGraduationFireworks(fireworks);
+
+    const card = document.createElement('div');
+    card.className = 'graduation-card';
+    document.body.appendChild(card);
+
+    const cleanup = () => {
+      overlay.classList.remove('transition-overlay-visible');
+      setTimeout(() => overlay.remove(), 600);
+      fireworks.remove();
+      card.remove();
+      onDone();
+    };
+
+    let stepIdx = 0;
+    const showStep = () => {
+      card.innerHTML = '';
+      const step = GRADUATION_STEPS[stepIdx];
+
+      if (step.icon) {
+        const iconEl = document.createElement('div');
+        iconEl.className = 'graduation-artifact-icon';
+        iconEl.textContent = step.icon;
+        card.appendChild(iconEl);
+      } else {
+        const img = document.createElement('img');
+        img.src = 'assets/prologue/shiva.png';
+        img.alt = 'Шива';
+        card.appendChild(img);
+      }
+
+      const heading = document.createElement('h3');
+      heading.textContent = step.heading;
+      card.appendChild(heading);
+
+      if (step.badgeText) {
+        const badge = document.createElement('div');
+        badge.className = 'graduation-status-badge';
+        badge.textContent = step.badgeText;
+        card.appendChild(badge);
+      }
+
+      const text = document.createElement('p');
+      text.textContent = step.text;
+      card.appendChild(text);
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-primary';
+      const isLast = stepIdx === GRADUATION_STEPS.length - 1;
+      btn.textContent = isLast ? 'Вернуться в деревню' : 'Далее';
+      btn.addEventListener('click', () => {
+        if (isLast) {
+          cleanup();
+        } else {
+          stepIdx += 1;
+          showStep();
+        }
+      });
+      card.appendChild(btn);
+    };
+
+    showStep();
+  };
+
   const renderRelExamList = () => {
     const progress = getTaskProgress('relationships');
     detailRoot.innerHTML = '';
@@ -3380,14 +3503,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const backBtn = document.createElement('button');
         backBtn.type = 'button';
         backBtn.className = 'btn btn-primary';
-        backBtn.textContent = 'Вернуться в деревню';
+        backBtn.textContent = 'Закончить экзамен';
         backBtn.addEventListener('click', () => {
-          exitRelationshipsTask();
-          currentLessonKey = null;
-          relActiveRoundIndex = null;
-          detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
-          renderTaskContentPanel(null, null);
-          buildVillageStage();
+          showGraduationCeremony(() => {
+            exitRelationshipsTask();
+            currentLessonKey = null;
+            relActiveRoundIndex = null;
+            detailRoot.innerHTML = '<div class="course-empty">Выбери здание на карте, чтобы увидеть задания.</div>';
+            renderTaskContentPanel(null, null);
+            buildVillageStage();
+          });
         });
         doneWrap.append(feedbackText, backBtn);
       } else {

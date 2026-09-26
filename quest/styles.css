@@ -3312,6 +3312,97 @@ h3 {
   background: rgba(8, 14, 26, 0.55);
 }
 
+/* Церемония после последнего раунда экзамена Шивы: то же затемнение
+   (.transition-overlay), поверх него — фейерверк (частицы, разлетающиеся
+   из нескольких точек) и по центру — карточка с большим Шивой, идущая по
+   шагам (поздравление → артефакт → статус). Карточка выше виджета
+   покровителя (500), фейерверк — только над подложкой, ничего не
+   перехватывает клики. */
+
+.graduation-fireworks {
+  position: fixed;
+  inset: 0;
+  z-index: 455;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.graduation-spark {
+  position: absolute;
+  top: var(--gy);
+  left: var(--gx);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gcolor);
+  opacity: 0;
+  animation: graduation-spark-burst 1.1s ease-out forwards;
+  animation-delay: var(--gdelay);
+}
+
+@keyframes graduation-spark-burst {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--gdx), var(--gdy)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+.graduation-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 520;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: linear-gradient(160deg, #fff8e6, #ffe9b8);
+  border-radius: 24px;
+  padding: 28px 24px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+.graduation-card img {
+  width: 108px;
+  height: 108px;
+  object-fit: contain;
+}
+
+.graduation-artifact-icon {
+  font-size: 3.4rem;
+  line-height: 1;
+}
+
+.graduation-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #6a3d0a;
+}
+
+.graduation-status-badge {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #8a5a00;
+  background: rgba(255, 255, 255, 0.65);
+  padding: 6px 18px;
+  border-radius: 999px;
+}
+
+.graduation-card p {
+  margin: 0;
+  color: #4a3a1e;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
 /* Персонаж-покровитель: фиксирован относительно экрана (не страницы) —
    всегда в нижнем углу, поверх контента, независимо от прокрутки. */
 
