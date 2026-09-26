@@ -56,17 +56,8 @@ const INTRO_TASKS = [
   { id: 'village_intro', type: 'guided_tour', title: 'Знакомство с обителью' },
 ];
 
-// У Раху и Кету нет физической формы и традиционного "своего знака" (см.
-// комментарии в planetTaskContent.js) — карта звёздного покровителя для них
-// не подходит по смыслу. Вместо неё последнее задание — два раунда
-// сценариев на тему их учения (у Раху — новый опыт и желание, у Кету —
-// освоенный опыт и упорство), см. situationalTask.
-const getEngineTasksForPlanet = (planetGrahaTitle, planetId) => {
+const getEngineTasksForPlanet = (planetGrahaTitle) => {
   const genitive = genitiveCase[planetGrahaTitle] || planetGrahaTitle;
-  const isNode = planetId === 'rahu' || planetId === 'ketu';
-  const lastTask = isNode
-    ? { id: 'engine_map', type: 'situational_rounds', title: 'Испытание тени' }
-    : { id: 'engine_map', type: 'planet_map_matching', title: 'Карта звёздного покровителя' };
   return [
     LECTURE_TASK,
     { id: 'engine_video', type: 'guna_video', title: `Три лика ${genitive}` },
@@ -74,7 +65,7 @@ const getEngineTasksForPlanet = (planetGrahaTitle, planetId) => {
     { id: 'engine_audio', type: 'guna_audio', title: 'Голос трёх начал' },
     { id: 'engine_error', type: 'find_error', title: 'Изъян в писании' },
     { id: 'engine_image', type: 'guna_image', title: 'Окно в иной век' },
-    lastTask,
+    { id: 'engine_map', type: 'planet_map_matching', title: 'Карта звёздного покровителя' },
   ];
 };
 
