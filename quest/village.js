@@ -3151,130 +3151,129 @@ document.addEventListener('DOMContentLoaded', () => {
     start();
   };
 
-  // Раунд 6 "Раху и Кету" — характер воздействия узлов через связь с
-  // условной "другой грахой" (без привязки к конкретной планете — единой
-  // таблицы дружбы/вражды для узлов нет, слайд 19). 4 экрана (по 2 на
-  // узел), один вопрос на экран — проверяется сразу по клику на вариант,
-  // как и в остальных раундах (renderChoiceButtons), без отдельной кнопки
-  // "Проверить".
+  // Раунд 6 "Раху и Кету" — общий характер воздействия узлов при
+  // соединении (без таблицы друг/враг и без конкретных планет, слайд 19).
+  // 4 экрана (по 2 на узел): портрет узла, вопрос, три варианта — выбор
+  // без цветовой подсказки, затем "Проверить" вскрывает верный (и
+  // неверный, если выбран не он) вариант и показывает объяснение,
+  // "Далее"/"Завершить" ведёт к следующему экрану. Ни ограничения на
+  // ошибки, ни пересборки раунда здесь нет — по ТЗ это разбор, а не
+  // экзамен на попытки.
   const renderRelNodesRound = (stage, goNext) => {
-    const intro = document.createElement('p');
-    intro.className = 'quiz-intro';
-    intro.textContent = 'Разберись, что происходит на связи между узлом и другой грахой.';
-    stage.appendChild(intro);
+    const showIntro = () => {
+      stage.innerHTML = '';
+      const intro = document.createElement('p');
+      intro.className = 'quiz-intro';
+      intro.textContent = REL_NODES_INTRO;
+      stage.appendChild(intro);
 
-    const feedback = document.createElement('p');
-    feedback.className = 'flower-feedback';
-    feedback.hidden = true;
-    stage.appendChild(feedback);
-
-    const body = document.createElement('div');
-    body.className = 'rel-round-body';
-    stage.appendChild(body);
-
-    const start = () => {
-      feedback.hidden = true;
-      const rounds = REL_NODES_ROUNDS;
-      const onWrong = createRoundPenalty(feedback, start, 'flower-feedback-warning');
-      let roundIdx = 0;
-
-      const showRound = () => {
-        body.innerHTML = '';
-        feedback.hidden = true;
-        if (roundIdx >= rounds.length) {
-          goNext();
-          return;
-        }
-        const round = rounds[roundIdx];
-        const char = MOKSHA_CHARACTERS.find((c) => c.id === round.node);
-
-        const header = document.createElement('div');
-        header.className = 'rel-pair-header';
-
-        const portrait = document.createElement('div');
-        portrait.className = 'rel-pair-portrait';
-        const img = document.createElement('img');
-        img.src = char.file;
-        img.alt = char.title;
-        const name = document.createElement('div');
-        name.className = 'rel-pair-name';
-        name.textContent = char.title;
-        portrait.append(img, name);
-
-        const arrow = document.createElement('div');
-        arrow.className = 'rel-pair-arrow';
-        arrow.textContent = '→';
-
-        // Условная "другая граха" — не привязана к конкретной планете,
-        // поэтому вместо портрета просто две подписанные грани того, что
-        // граха приносит в соединение.
-        const otherCard = document.createElement('div');
-        otherCard.className = 'rel-pair-portrait';
-        const otherName = document.createElement('div');
-        otherName.className = 'rel-pair-name';
-        otherName.textContent = 'Другая граха';
-        const otherAbility = document.createElement('div');
-        otherAbility.className = 'task-status';
-        otherAbility.textContent = 'Способность';
-        const otherFrame = document.createElement('div');
-        otherFrame.className = 'task-status';
-        otherFrame.textContent = 'Привычный способ проявления';
-        otherCard.append(otherName, otherAbility, otherFrame);
-
-        header.append(portrait, arrow, otherCard);
-        body.appendChild(header);
-
-        if (round.preLabel) {
-          const preLabelEl = document.createElement('p');
-          preLabelEl.className = 'rel-pair-name';
-          preLabelEl.textContent = `Связь: «${round.preLabel}»`;
-          body.appendChild(preLabelEl);
-        }
-
-        if (round.observation) {
-          const observationEl = document.createElement('p');
-          observationEl.className = 'engine-transcript';
-          observationEl.textContent = round.observation;
-          body.appendChild(observationEl);
-        }
-
-        const roundTitle = document.createElement('p');
-        roundTitle.className = 'engine-step-question';
-        roundTitle.textContent = round.prompt;
-        body.appendChild(roundTitle);
-
-        const qWrap = document.createElement('div');
-        qWrap.className = 'rel-question-wrap';
-        body.appendChild(qWrap);
-
-        renderChoiceButtons(
-          qWrap,
-          '',
-          shuffle(round.options),
-          () => {
-            if (round.removesFrame) otherFrame.remove();
-
-            const note = document.createElement('p');
-            note.className = 'rel-myth-note';
-            const labelPart = round.connectionLabel ? `Связь: «${round.connectionLabel}». ` : '';
-            const addendumPart = round.addendum ? ` ${round.addendum}` : '';
-            note.textContent = `${labelPart}${round.explanation}${addendumPart}`;
-            body.appendChild(note);
-
-            setTimeout(() => {
-              roundIdx += 1;
-              showRound();
-            }, 2600);
-          },
-          true,
-          onWrong,
-        );
-      };
-
-      showRound();
+      const startBtn = document.createElement('button');
+      startBtn.type = 'button';
+      startBtn.className = 'btn btn-primary';
+      startBtn.textContent = 'Начать';
+      startBtn.addEventListener('click', () => showRound(0));
+      stage.appendChild(startBtn);
     };
 
-    start();
+    const showRound = (roundIdx) => {
+      stage.innerHTML = '';
+      if (roundIdx >= REL_NODES_ROUNDS.length) {
+        goNext();
+        return;
+      }
+      const round = REL_NODES_ROUNDS[roundIdx];
+      const char = MOKSHA_CHARACTERS.find((c) => c.id === round.node);
+      const indexInNode = (roundIdx % 2) + 1;
+
+      const progress = document.createElement('p');
+      progress.className = 'quiz-progress';
+      progress.textContent = `${char.title} · ${indexInNode} из 2`;
+      stage.appendChild(progress);
+
+      const portrait = document.createElement('div');
+      portrait.className = 'rel-pair-portrait';
+      const img = document.createElement('img');
+      img.src = char.file;
+      img.alt = char.title;
+      const name = document.createElement('div');
+      name.className = 'rel-pair-name';
+      name.textContent = char.title;
+      portrait.append(img, name);
+      stage.appendChild(portrait);
+
+      if (round.situation) {
+        const situationEl = document.createElement('p');
+        situationEl.className = 'engine-transcript';
+        situationEl.textContent = round.situation;
+        stage.appendChild(situationEl);
+      }
+
+      const questionEl = document.createElement('p');
+      questionEl.className = 'engine-step-question';
+      questionEl.textContent = round.question;
+      stage.appendChild(questionEl);
+
+      const listEl = document.createElement('div');
+      listEl.className = 'engine-choice-list engine-choice-list-vertical';
+      stage.appendChild(listEl);
+
+      const options = shuffle(round.options);
+      const optionEls = {};
+      let selectedId = null;
+      let checked = false;
+
+      const checkBtn = document.createElement('button');
+      checkBtn.type = 'button';
+      checkBtn.className = 'btn btn-primary';
+      checkBtn.textContent = 'Проверить';
+      checkBtn.disabled = true;
+
+      const explanationEl = document.createElement('p');
+      explanationEl.className = 'rel-myth-note';
+      explanationEl.hidden = true;
+      explanationEl.textContent = round.explanation;
+
+      const nextBtn = document.createElement('button');
+      nextBtn.type = 'button';
+      nextBtn.className = 'btn btn-primary engine-details-next';
+      nextBtn.hidden = true;
+      nextBtn.textContent = roundIdx === REL_NODES_ROUNDS.length - 1 ? 'Завершить' : 'Далее';
+      nextBtn.addEventListener('click', () => showRound(roundIdx + 1));
+
+      options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'engine-choice-btn';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', () => {
+          if (checked) return;
+          selectedId = opt.id;
+          Object.values(optionEls).forEach((el) => el.classList.remove('engine-choice-selected'));
+          btn.classList.add('engine-choice-selected');
+          checkBtn.disabled = false;
+        });
+        optionEls[opt.id] = btn;
+        listEl.appendChild(btn);
+      });
+
+      checkBtn.addEventListener('click', () => {
+        if (checked || !selectedId) return;
+        checked = true;
+        checkBtn.hidden = true;
+        options.forEach((opt) => {
+          const el = optionEls[opt.id];
+          el.classList.remove('engine-choice-selected');
+          if (opt.correct) el.classList.add('engine-choice-correct');
+          else if (opt.id === selectedId) el.classList.add('engine-choice-wrong');
+        });
+        explanationEl.hidden = false;
+        nextBtn.hidden = false;
+      });
+
+      stage.append(checkBtn, explanationEl, nextBtn);
+    };
+
+    showIntro();
   };
 
   // Экзамен Шивы: 6 раундов — теперь 6 независимых, отдельно завершаемых
