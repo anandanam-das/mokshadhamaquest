@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     layered_map: '🎯',
     guided_tour: '🗺️',
     guna_sort_rounds: '⚡',
+    situational_rounds: '🌗',
   };
 
   const stage = document.getElementById('villageStage');
@@ -2302,6 +2303,183 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
+  // "Испытание тени" (situational_rounds) — последнее задание планеты, но
+  // только у Раху и Кету вместо "Карты звёздного покровителя" (см.
+  // getEngineTasksForPlanet в lessons.js и комментарий там же): у узлов нет
+  // "своего знака" и физической формы, зато есть отдельная, отличная от
+  // классических грах, тема учения — её и разбирают эти два раунда.
+  // Каждый раунд — одна ситуация и две части ответа на одном экране: либо
+  // обычный выбор из вариантов (part.type === 'choice'), либо у Раху в
+  // раунде 2 — сортировка трёх историй по трём зонам (part.type === 'sort',
+  // по одной мини-группе вариантов на каждую историю). Проверка — сразу по
+  // обеим частям одной кнопкой; ошибка не двигает дальше, а просто
+  // предлагает попробовать снова тот же раунд (варианты при этом
+  // перемешиваются заново).
+  const renderChoicePart = (container, part, selected, onPick) => {
+    const qEl = document.createElement('p');
+    qEl.className = 'engine-step-question';
+    qEl.textContent = part.question;
+    container.appendChild(qEl);
+
+    const list = document.createElement('div');
+    list.className = 'engine-choice-list engine-choice-list-vertical';
+    part.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'engine-choice-btn';
+      if (selected === i) btn.classList.add('engine-choice-selected');
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => onPick(i));
+      list.appendChild(btn);
+    });
+    container.appendChild(list);
+  };
+
+  const renderSortPart = (container, part, selections, onPick) => {
+    part.items.forEach((item, itemIdx) => {
+      const itemEl = document.createElement('p');
+      itemEl.className = 'engine-transcript';
+      itemEl.textContent = item.text;
+      container.appendChild(itemEl);
+
+      const list = document.createElement('div');
+      list.className = 'engine-choice-list';
+      part.zones.forEach((zone) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'engine-choice-btn';
+        if (selections[itemIdx] === zone.id) btn.classList.add('engine-choice-selected');
+        btn.textContent = zone.label;
+        btn.addEventListener('click', () => onPick(itemIdx, zone.id));
+        list.appendChild(btn);
+      });
+      container.appendChild(list);
+    });
+  };
+
+  const renderSituationalRoundsTask = (lessonKey, task, data) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'engine-task';
+
+    const progressEl = document.createElement('p');
+    progressEl.className = 'quiz-progress';
+
+    const stage = document.createElement('div');
+    stage.className = 'engine-stage';
+
+    wrap.append(progressEl, stage);
+    taskContentPanel.appendChild(wrap);
+
+    const rounds = data.rounds;
+    let roundIndex = 0;
+
+    const showRound = () => {
+      progressEl.textContent = `Раунд ${roundIndex + 1} из ${rounds.length}`;
+      const round = rounds[roundIndex];
+
+      // Перемешиваем варианты при каждом заходе в раунд (в т.ч. при
+      // повторной попытке после ошибки) — чтобы нельзя было пройти по
+      // памяти о позиции варианта.
+      const part1 =
+        round.part1.type === 'choice'
+          ? { ...round.part1, options: shuffle(round.part1.options) }
+          : { ...round.part1, items: shuffle(round.part1.items) };
+      const part2 = { ...round.part2, options: shuffle(round.part2.options) };
+
+      let part1Selection = part1.type === 'sort' ? {} : null;
+      let part2Selection = null;
+
+      stage.innerHTML = '';
+
+      if (round.situation) {
+        const situationEl = document.createElement('p');
+        situationEl.className = 'engine-transcript';
+        situationEl.textContent = round.situation;
+        stage.appendChild(situationEl);
+      }
+
+      const part1El = document.createElement('div');
+      const part2El = document.createElement('div');
+      const feedbackEl = document.createElement('p');
+      feedbackEl.className = 'flower-feedback';
+      feedbackEl.hidden = true;
+      const explanationEl = document.createElement('p');
+      explanationEl.className = 'rel-myth-note';
+      explanationEl.hidden = true;
+      explanationEl.textContent = round.explanation;
+
+      const checkBtn = document.createElement('button');
+      checkBtn.type = 'button';
+      checkBtn.className = 'btn btn-primary';
+      checkBtn.textContent = 'Проверить';
+
+      const renderParts = () => {
+        part1El.innerHTML = '';
+        part2El.innerHTML = '';
+        if (part1.type === 'choice') {
+          renderChoicePart(part1El, part1, part1Selection, (i) => {
+            part1Selection = i;
+            renderParts();
+          });
+        } else {
+          renderSortPart(part1El, part1, part1Selection, (itemIdx, zoneId) => {
+            part1Selection = { ...part1Selection, [itemIdx]: zoneId };
+            renderParts();
+          });
+        }
+        renderChoicePart(part2El, part2, part2Selection, (i) => {
+          part2Selection = i;
+          renderParts();
+        });
+      };
+
+      renderParts();
+      stage.append(part1El, part2El, feedbackEl, explanationEl, checkBtn);
+
+      checkBtn.addEventListener('click', () => {
+        const part1Correct =
+          part1.type === 'choice'
+            ? part1Selection !== null && part1.options[part1Selection].correct
+            : Object.keys(part1Selection).length === part1.items.length &&
+              part1.items.every((item, i) => part1Selection[i] === item.zoneId);
+        const part2Correct = part2Selection !== null && part2.options[part2Selection].correct;
+
+        explanationEl.hidden = false;
+        checkBtn.hidden = true;
+
+        if (part1Correct && part2Correct) {
+          feedbackEl.hidden = true;
+          const nextBtn = document.createElement('button');
+          nextBtn.type = 'button';
+          nextBtn.className = 'btn btn-primary engine-details-next';
+          nextBtn.textContent = roundIndex === rounds.length - 1 ? 'Завершить' : 'Дальше';
+          nextBtn.addEventListener('click', () => {
+            roundIndex += 1;
+            if (roundIndex < rounds.length) {
+              showRound();
+            } else {
+              completeTask(lessonKey, task.id);
+              reactToTaskComplete(lessonKey);
+              rerenderCurrentLesson();
+            }
+          });
+          stage.appendChild(nextBtn);
+        } else {
+          feedbackEl.hidden = false;
+          feedbackEl.textContent = 'Есть неверный ответ — прочитай пояснение ниже и попробуй ещё раз.';
+          const retryBtn = document.createElement('button');
+          retryBtn.type = 'button';
+          retryBtn.className = 'btn btn-secondary engine-details-next';
+          retryBtn.textContent = 'Попробовать снова';
+          retryBtn.addEventListener('click', showRound);
+          stage.appendChild(retryBtn);
+        }
+      });
+    };
+
+    showRound();
+  };
+
   // "Одна энергия — три пути" (guna_sort_rounds) — 5 раундов: одна ситуация,
   // три реакции без подписи гуны, перетащить (или тап+тап) каждую в одну
   // из трёх фиксированных зон. Та же drag/tap-механика и вёрстка (map-match-*),
@@ -3502,6 +3680,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderGunaImageTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].imageTask);
     } else if (task.id === 'engine_map' && task.type === 'planet_map_matching') {
       renderPlanetMapTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].mapTask);
+    } else if (task.id === 'engine_map' && task.type === 'situational_rounds') {
+      renderSituationalRoundsTask(lessonKey, task, PLANET_TASK_CONTENT[lessonKey].situationalTask);
     } else if (task.type === 'guided_tour') {
       taskContentPanel.innerHTML = `<p class="task-content-text">Обзор обители идёт прямо на карте слева.</p>`;
       startVillageTour(lessonKey, task);
@@ -3630,7 +3810,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (shivaActive) exitRelationshipsTask();
     selectBuilding(character.id);
     showPatronSpeech(getReaction(patronId, character.id));
-    openLesson(character.id, getLocationHeading(character.subtitle), getEngineTasksForPlanet(character.title));
+    openLesson(
+      character.id,
+      getLocationHeading(character.subtitle),
+      getEngineTasksForPlanet(character.title, character.id)
+    );
   };
 
   // "Знакомство с обителью" — гайд-тур по карте: тёмная подложка на весь
