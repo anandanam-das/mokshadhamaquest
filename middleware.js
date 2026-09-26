@@ -20,18 +20,29 @@ async function verify(token, secret) {
   }
 }
 
+// Каждый ответ здесь зависит от кук конкретного пользователя — если
+// редирект закэшируется (edge/CDN/браузер), следующий заход другого
+// пользователя (или того же после успешной проверки) получит чужой или
+// устаревший ответ. На проде это выглядело как бесконечный цикл
+// village.html → checking.html → village.html, потому что /api/access
+// точно так же не был помечен no-store (см. его комментарий).
+const withNoStore = (response) => {
+  response.headers.set('Cache-Control', 'private, no-store, must-revalidate');
+  return response;
+};
+
 export default async function middleware(request) {
   const url = new URL(request.url);
   const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
 
   const session = await verify(getCookie(request, SESSION_COOKIE), secret);
   if (!session) {
-    return Response.redirect(new URL('/quest/login.html', url), 302);
+    return withNoStore(Response.redirect(new URL('/quest/login.html', url), 302));
   }
 
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
   if (!access || String(access.id) !== String(session.id)) {
-    return Response.redirect(new URL('/quest/checking.html', url), 302);
+    return withNoStore(Response.redirect(new URL('/quest/checking.html', url), 302));
   }
 }
 

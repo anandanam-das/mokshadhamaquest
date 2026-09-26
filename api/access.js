@@ -18,6 +18,13 @@ function readSession(req) {
 }
 
 module.exports = async (req, res) => {
+  // Per-user, cookie-dependent response — any caching layer (CDN, browser)
+  // serving a stale/shared copy here means the moksha_access cookie never
+  // actually gets (re)set, and the village.html middleware redirect loops
+  // back to checking.html forever (this is what was hanging on "Проверяем
+  // доступ…" — logs showed /api/access repeatedly answering 304).
+  res.setHeader('Cache-Control', 'private, no-store, must-revalidate');
+
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'method_not_allowed' });

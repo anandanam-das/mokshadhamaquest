@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const COOKIE_NAME = 'moksha_session';
 
 module.exports = (req, res) => {
+  res.setHeader('Cache-Control', 'private, no-store, must-revalidate');
   const { SESSION_SECRET } = process.env;
   const { token } = req.query;
 

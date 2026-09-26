@@ -7,6 +7,10 @@ const COOKIE_NAME = 'moksha_session';
 // secret, not SESSION_SECRET — that secret also guards the payment/access
 // cookies, and this token must never be valid there or vice versa.
 module.exports = (req, res) => {
+  // Mints a token unique per signed-in user — must never be cached/shared
+  // across requests (same class of bug as /api/access, see its comment).
+  res.setHeader('Cache-Control', 'private, no-store, must-revalidate');
+
   const { SESSION_SECRET, QUEST_API_SECRET } = process.env;
   if (!SESSION_SECRET || !QUEST_API_SECRET) {
     return res.status(500).json({ error: 'server_misconfigured' });
