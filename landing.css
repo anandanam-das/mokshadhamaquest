@@ -1700,6 +1700,15 @@ main {
   font-size: 0.62rem;
 }
 
+.footer-requisites {
+  margin: 4px 0 0;
+  max-width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
 /* Scroll reveal (generic) */
 
 .reveal {
