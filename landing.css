@@ -1930,3 +1930,7 @@ main {
     --ph: 33px;
   }
 }
+
+.offer-link { color: inherit; font-family: 'Inter', sans-serif; font-size: 0.875rem; line-height: 1.6; text-underline-offset: 4px; }
+.offer-link:hover { text-decoration-thickness: 2px; }
+.offer-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
