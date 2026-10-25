@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // prologue unseen, all task progress reset to zero.
       updated = setUserState({
         character: profile.patron_planet ? { patronPlanet: profile.patron_planet } : updated.character,
-        hasSeenPrologue: profile.has_seen_prologue || updated.hasSeenPrologue,
+        hasSeenPrologue: !!(profile.has_seen_prologue || updated.hasSeenPrologue || hasStartedQuest({taskProgress: profile.task_progress}) || hasStartedQuest(updated)),
         taskProgress: Object.keys(profile.task_progress || {}).length ? profile.task_progress : updated.taskProgress,
         stepProgress: Object.keys(profile.step_progress || {}).length ? profile.step_progress : updated.stepProgress,
       });
@@ -97,6 +97,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (isAdminTelegramId(updated.telegramId)) {
     window.location.href = 'admin.html';
     return;
+  }
+
+  if (!updated.hasSeenPrologue && hasStartedQuest(updated)) {
+    updated = setUserState({ hasSeenPrologue: true });
   }
 
   if (!updated.character) {

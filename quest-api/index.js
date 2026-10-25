@@ -112,7 +112,7 @@ app.post(
          first_name = COALESCE(EXCLUDED.first_name, users.first_name),
          last_name = COALESCE(EXCLUDED.last_name, users.last_name),
          patron_planet = COALESCE(EXCLUDED.patron_planet, users.patron_planet),
-         has_seen_prologue = COALESCE(EXCLUDED.has_seen_prologue, users.has_seen_prologue),
+         has_seen_prologue = COALESCE(users.has_seen_prologue, false) OR COALESCE(EXCLUDED.has_seen_prologue, false),
          email_verified = CASE WHEN $7 THEN false ELSE users.email_verified END,
          email_verify_token = CASE WHEN $7 THEN NULL ELSE users.email_verify_token END,
          email_verify_expires = CASE WHEN $7 THEN NULL ELSE users.email_verify_expires END,

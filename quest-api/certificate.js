@@ -44,8 +44,8 @@ async function generateCertificatePdf({ id, firstName, lastName, issuedAt }) {
   });
 
   const titleSize = 28;
-  page.drawText('MOKSHA QUEST', {
-    x: centeredX(boldFont, 'MOKSHA QUEST', titleSize, width),
+  page.drawText('MOKSHA EDUCATION', {
+    x: centeredX(boldFont, 'MOKSHA EDUCATION', titleSize, width),
     y: height - 110,
     size: titleSize,
     font: boldFont,

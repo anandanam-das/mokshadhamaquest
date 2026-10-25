@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // играет. Подстраховка: на каждом заходе в деревню тихо повторяем
   // синхронизацию, пока она не пройдёт.
   if (!finalPreview && typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
-    saveQuestProfile({ patronPlanet: state.character.patronPlanet }).catch(() => {});
+    saveQuestProfile({ patronPlanet: state.character.patronPlanet, ...(state.hasSeenPrologue ? { hasSeenPrologue: true } : {}) }).catch(() => {});
   }
 
   const taskTypeIcons = {
@@ -3342,7 +3342,7 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       heading: 'Новый статус получен',
       badgeText: 'Граха-таттва-гья',
-      text: 'Отныне твой статус — Граха-таттва-гья, познавший природу планет. Обитель Богов открыта тебе полностью.',
+      text: 'Отныне твой статус — Граха-таттва-гья, познавший природу планет. Твоя награда и новый статус уже доступны в личном кабинете. Теперь ты можешь получить сертификат о прохождении блока «Планеты».',
     },
   ];
 
@@ -3433,10 +3433,10 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.type = 'button';
       btn.className = 'btn btn-primary';
       const isLast = stepIdx === GRADUATION_STEPS.length - 1;
-      btn.textContent = isLast ? 'Вернуться в деревню' : 'Далее';
+      btn.textContent = isLast ? 'Перейти в личный кабинет' : 'Далее';
       btn.addEventListener('click', () => {
         if (isLast) {
-          cleanup();
+          window.location.href = finalPreview ? 'profile.html?dev=final' : 'profile.html';
         } else {
           stepIdx += 1;
           showStep();

@@ -53,6 +53,7 @@ async function fetchQuestProfile() {
 async function saveQuestProfile(profile) {
   const response = await questApiFetch('/api/profile', {
     method: 'POST',
+    keepalive: true,
     body: JSON.stringify(profile),
   });
   if (!response.ok) throw new Error('save_profile_failed');

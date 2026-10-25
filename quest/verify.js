@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     result.innerHTML = `
       <p class="task-content-done" style="font-size: 1.1rem;">✓ Сертификат подлинный</p>
-      <p class="login-gate-hint"><strong>${fullName}</strong> успешно завершил(а) курс MOKSHA Quest «Обитель богов».</p>
+      <p class="login-gate-hint"><strong>${fullName}</strong> успешно завершил(а) курс MOKSHA EDUCATION «Обитель богов».</p>
       <p class="login-gate-hint">Дата выдачи: ${dateStr}</p>
     `;
   } catch (error) {

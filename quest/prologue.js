@@ -4,6 +4,13 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  const state = getUserState();
+  if (state.hasSeenPrologue || hasStartedQuest(state)) {
+    setUserState({ hasSeenPrologue: true });
+    window.location.replace('village.html');
+    return;
+  }
+
   // Пять фаз анимации: battle (Шива против Андхакасуры) → center-glow
   // (рождение из пота) → pinning (боги придавливают существо к земле) →
   // center-still (Васту Пуруша неподвижен на земле) → zoom-out-to-map

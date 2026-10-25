@@ -44,6 +44,13 @@ function clearUserState() {
   localStorage.removeItem(USER_STATE_KEY);
 }
 
+// Any completed learning task means onboarding has already been passed.
+function hasStartedQuest(state) {
+  return Object.values(state.taskProgress || {}).some(lesson =>
+    lesson && typeof lesson === 'object' && Object.values(lesson).some(done => done === true)
+  );
+}
+
 function getTaskProgress(lessonKey) {
   return getUserState().taskProgress[lessonKey] || {};
 }
