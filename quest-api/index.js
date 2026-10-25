@@ -25,7 +25,7 @@ const REQUIRED_PLANET_TASK_IDS = [
   'engine_map',
 ];
 
-// Mirrors REL_ROUNDS ids in quest/village.js — the 6 rounds of task 11
+// Mirrors REL_ROUNDS ids in quest/village.js — the 9 sections of task 11
 // ("Экзамен Шивы"), stored under taskProgress.relationships. Completing
 // the course now requires this in addition to the 9 planets.
 const REQUIRED_EXAM_ROUND_IDS = [
@@ -35,6 +35,9 @@ const REQUIRED_EXAM_ROUND_IDS = [
   'round_union',
   'round_neutral',
   'round_nodes',
+  'final_body',
+  'final_distinguish',
+  'final_whole',
 ];
 
 // The "Введение" (Семя) lesson — same idea as REQUIRED_PLANET_TASK_IDS but

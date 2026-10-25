@@ -123,6 +123,7 @@ function isAdminTelegramId(telegramId) {
 // gameplay, the server copy is a mirror for the cabinet/certificate and
 // must never block or break the game if the API has a hiccup.
 window.syncProgressToQuestApi = function syncProgressToQuestApi(state) {
+  if(isLocalDevHost() && new URLSearchParams(location.search).get('dev')==='final')return;
   syncQuestProgress(state.taskProgress, state.stepProgress).catch((error) => {
     console.warn('quest-api progress sync failed (non-fatal):', error);
   });

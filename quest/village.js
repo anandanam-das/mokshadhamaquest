@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const finalPreview = isLocalDevHost() && new URLSearchParams(location.search).get('dev') === 'final';
+  if(finalPreview && !getUserState().telegramId) setUserState({telegramId:'local-final-preview',character:{patronPlanet:'surya'},hasSeenPrologue:true,introCompleted:true});
   const state = getUserState();
 
   if (!state.telegramId) {
@@ -17,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // навсегда — в админке это выглядит как "—" у игрока, который явно уже
   // играет. Подстраховка: на каждом заходе в деревню тихо повторяем
   // синхронизацию, пока она не пройдёт.
-  if (typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
+  if (!finalPreview && typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
     saveQuestProfile({ patronPlanet: state.character.patronPlanet }).catch(() => {});
   }
 
@@ -3286,7 +3288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showIntro();
   };
 
-  // Экзамен Шивы: 6 раундов — теперь 6 независимых, отдельно завершаемых
+  // Экзамен Шивы: 6 испытаний отношений и 3 итоговых задания, отдельно завершаемых
   // и переигрываемых подзаданий (как обычные задания планеты), а не один
   // сплошной проход. Каждый пройденный раунд остаётся доступным для
   // повтора; следующий раунд открывается после предыдущего (первый
@@ -3299,6 +3301,9 @@ document.addEventListener('DOMContentLoaded', () => {
     { key: 'union', id: 'round_union', title: '4. Как проявляется союз?' },
     { key: 'neutral', id: 'round_neutral', title: '5. Нейтральность и влияние' },
     { key: 'nodes', id: 'round_nodes', title: '6. Раху и Кету' },
+    { key: 'final_body', id: 'final_body', title: '7. Вселенная в человеке · 10 раундов' },
+    { key: 'final_distinguish', id: 'final_distinguish', title: '8. Различи силы · 9 раундов' },
+    { key: 'final_whole', id: 'final_whole', title: '9. Увидеть целое · 3 истории' },
   ];
 
   const REL_ROUND_RENDERERS = {
@@ -3308,10 +3313,14 @@ document.addEventListener('DOMContentLoaded', () => {
     union: renderRelUnionRound,
     neutral: renderRelNeutralRound,
     nodes: renderRelNodesRound,
+    final_body:(stage,done)=>renderFinalExam(stage,'body',done),
+    final_distinguish:(stage,done)=>renderFinalExam(stage,'pairs',done),
+    final_whole:(stage,done)=>renderFinalExam(stage,'stories',done),
   };
 
   const getRelRoundStatus = (i, progress) => {
     if (progress[REL_ROUNDS[i].id]) return 'completed';
+    if(finalPreview && i>=6)return 'unlocked';
     if (i === 0) return 'unlocked';
     return progress[REL_ROUNDS[i - 1].id] ? 'unlocked' : 'locked';
   };
@@ -3323,7 +3332,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const GRADUATION_STEPS = [
     {
       heading: 'Экзамен пройден!',
-      text: 'Ты постиг связи между планетами — дружбу, вражду и то, что скрыто за нейтральностью. Настало время признать твоё знание.',
+      text: 'Ты узнал грахи в устройстве человека, различил похожие силы и увидел их в общей истории. Настало время признать твоё знание.',
     },
     {
       heading: 'Наваграха-янтра',
@@ -3512,7 +3521,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isLastRound && allDone) {
         const feedbackText = document.createElement('p');
         feedbackText.className = 'task-content-feedback';
-        feedbackText.textContent = REL_FINAL_MESSAGE;
+        feedbackText.textContent = 'Общий экзамен завершён: соответствия, различение функций и разбор историй.';
         doneWrap.appendChild(feedbackText);
       }
 
@@ -3541,6 +3550,16 @@ document.addEventListener('DOMContentLoaded', () => {
         doneWrap.appendChild(backBtn);
       }
 
+      if(i===5){
+        const speech=document.createElement('p');speech.className='task-content-feedback';
+        speech.textContent='Шива: «Ты разобрался в отношениях грах. Теперь узнай их в человеке, различи похожие силы и найди их в общей истории».';
+        doneWrap.appendChild(speech);
+      }
+      if(i<REL_ROUNDS.length-1 && getRelRoundStatus(i+1,getTaskProgress('relationships'))!=='locked'){
+        const next=document.createElement('button');next.type='button';next.className='btn btn-primary';
+        next.textContent=i===5?'Начать общий экзамен':'Следующее испытание';
+        next.onclick=()=>{relActiveRoundIndex=i+1;renderRelRoundContent(i+1);};doneWrap.appendChild(next);
+      }
       taskContentPanel.appendChild(doneWrap);
       renderRelExamList();
     };
@@ -3561,6 +3580,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.append(title, stage);
     taskContentPanel.appendChild(wrap);
 
+    if(forcePlay && i>=6)clearTaskStepState('relationships',round.id);
     REL_ROUND_RENDERERS[round.key](stage, () => {
       completeTask('relationships', round.id);
       showDone();
@@ -4243,6 +4263,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showPatronSpeech(pickExpandedOnly('welcomeBack'));
   }
 
+  if(finalPreview){
+    openRelationshipsExam();relActiveRoundIndex=6;renderRelRoundContent(6);taskContentPanel.scrollIntoView({block:'start'});
+    const note=document.createElement('p');note.className='quiz-intro';
+    note.textContent='Локальная проверка: отдельный тестовый профиль. Все три новых испытания доступны сразу.';detailRoot.prepend(note);
+  }
   // --- Dev-заглушка (только на локальном сервере): ?dev=task11 в адресной
   // строке сразу показывает кат-сцену с Шивой, затем перерисовывает карту
   // (открывая иконку экзамена) и сама открывает список раундов — без

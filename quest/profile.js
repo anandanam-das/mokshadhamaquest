@@ -12,9 +12,9 @@ const CABINET_PLANET_TASK_IDS = [
   'engine_map',
 ];
 const CABINET_INTRO_TASK_IDS = ['watch_lecture', 'task_gunas', 'task_1', 'task_2', 'task_3', 'task_4', 'village_intro'];
-// Mirrors REL_ROUNDS ids in village.js — "Экзамен Шивы", 6 раундов
+// Mirrors REL_ROUNDS ids in village.js — "Экзамен Шивы", 9 испытаний
 // задания №11. Ачивка Граха-таттва-гья требует 9 планет И весь экзамен.
-const CABINET_EXAM_ROUND_IDS = ['round_direction', 'round_reason', 'round_impact', 'round_union', 'round_neutral', 'round_nodes'];
+const CABINET_EXAM_ROUND_IDS = ['round_direction', 'round_reason', 'round_impact', 'round_union', 'round_neutral', 'round_nodes', 'final_body', 'final_distinguish', 'final_whole'];
 // Блок Граха-таттва — 11 уроков: Введение + 9 планет + Экзамен Шивы
 // (11-й, задание №11). Все уже построены и считаются в doneLessons ниже.
 const GRAHA_TATTVA_LESSON_COUNT = 11;
