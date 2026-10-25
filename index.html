@@ -14,7 +14,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="landing.css?v=97" />
+    <link rel="stylesheet" href="landing.css?v=98" />
   </head>
   <body>
     <div class="pixel-overlay" aria-hidden="true"></div>
@@ -441,24 +441,22 @@
 
             <details class="faq-item">
               <summary>
-                <span class="faq-q">В&nbsp;какие дни и&nbsp;сколько лекций в&nbsp;неделю будет проходить?</span>
+                <span class="faq-q">Как проходит обучение?</span>
                 <span class="faq-mark" aria-hidden="true"></span>
               </summary>
               <div class="faq-a">
-                <p>Две лекции в&nbsp;неделю.</p>
+                <p>Блок «Планеты» — 11 занятий в&nbsp;записи: смотрите в&nbsp;своём темпе и&nbsp;выполняйте задания на&nbsp;игровой платформе. Видеозаписи и&nbsp;общение с&nbsp;учениками — в&nbsp;Telegram-чате. Второй блок «Знаки зодиака» пройдёт в&nbsp;живой группе; программа, даты и&nbsp;стоимость уточняются.</p>
               </div>
             </details>
 
             <details class="faq-item">
               <summary>
-                <span class="faq-q">Сколько перерыв между блоками в&nbsp;обучении?</span>
+                <span class="faq-q">Что входит в&nbsp;личный разбор?</span>
                 <span class="faq-mark" aria-hidden="true"></span>
               </summary>
               <div class="faq-a">
                 <p>
-                  От&nbsp;месяца до&nbsp;двух. Нам нужно успеть подготовить презентации
-                  для лекций и&nbsp;разработать домашние задания на&nbsp;нашей игровой
-                  обучающей платформе.
+                  В&nbsp;пакете за&nbsp;200&nbsp;$ — один созвон до&nbsp;30&nbsp;минут: несколько планет в&nbsp;вашей карте и&nbsp;два личных вопроса по&nbsp;теме курса. Заранее пришлите данные рождения и&nbsp;вопросы. Разбор можно получить в&nbsp;течение двух месяцев после покупки.
                 </p>
               </div>
             </details>
@@ -472,8 +470,7 @@
           <p class="eyebrow">Начать обучение</p>
           <h2 class="pixel-heading roadmap-heading">Дорожная карта обучения</h2>
           <p class="roadmap-lead">
-            Курс идёт по&nbsp;ступеням: каждая открывает следующую. Сейчас доступна
-            запись на&nbsp;первую — «Планеты».
+            «Планеты» доступны в&nbsp;записи. На&nbsp;второй блок «Знаки зодиака» открываем набор в&nbsp;живую группу.
           </p>
 
           <!-- compact stage track -->
@@ -483,11 +480,7 @@
                 <span class="roadmap-node-dot">1</span>
                 <span class="roadmap-node-name">Планеты</span>
               </li>
-              <li class="roadmap-node is-locked">
-                <span class="roadmap-node-dot">2</span>
-                <span class="roadmap-node-name">Знаки</span>
-                <span class="roadmap-node-lock" aria-hidden="true"></span>
-              </li>
+              <li class="roadmap-node is-open"><a class="roadmap-node-link" href="#signs-enrollment"><span class="roadmap-node-dot">2</span><span class="roadmap-node-name">Знаки</span><span class="roadmap-node-caption">Живая группа</span></a></li>
               <li class="roadmap-node is-locked">
                 <span class="roadmap-node-dot">3</span>
                 <span class="roadmap-node-name">Дома</span>
@@ -516,38 +509,47 @@
             </ol>
           </div>
 
-          <!-- featured offer: first stage -->
-          <div class="roadmap-offer">
+          <div class="roadmap-offer roadmap-offer-packages">
             <div class="roadmap-offer-main">
-              <span class="roadmap-offer-badge">Ступень 1 · доступна</span>
+              <span class="roadmap-offer-badge">Блок 1 · курс в записи</span>
               <h3 class="roadmap-offer-title">Планеты</h3>
-              <p class="roadmap-offer-desc">
-                Природа девяти планет-грах: характер, роль и&nbsp;влияние каждой —
-                фундамент, на&nbsp;котором строится всё чтение карты.
-              </p>
+              <p class="roadmap-offer-desc">Природа девяти планет-грах: характер, роль и&nbsp;влияние каждой — фундамент чтения карты.</p>
               <ul class="roadmap-offer-list">
-                <li>Две лекции в&nbsp;неделю с&nbsp;разбором каждой планеты</li>
+                <li>11 занятий в&nbsp;записи — обучение в&nbsp;своём темпе</li>
                 <li>Практические задания на&nbsp;игровой платформе MOKSHA</li>
-                <li>Личные рекомендации по&nbsp;практикам и&nbsp;сопровождение</li>
+                <li>Видеозаписи и&nbsp;общение с&nbsp;учениками в&nbsp;Telegram-чате</li>
               </ul>
             </div>
-
-            <div class="roadmap-offer-buy">
-              <span class="roadmap-offer-price">
-                <b>180&nbsp;$</b>
-                <span>за&nbsp;ступень</span>
-              </span>
-              <a
-                href="https://t.me/moksha_support?text=Привет!%20Хочу%20купить%20обучение%20по%20Джйотиш%20про%20Планеты%20🪐"
-                target="_blank"
-                rel="noopener"
-                class="btn btn-primary roadmap-offer-cta"
-                >Записаться на&nbsp;курс</a
-              >
-              <span class="roadmap-offer-note">
-                Следующие ступени открываются по&nbsp;мере прохождения курса.
-              </span>
+            <div class="purchase-options" aria-label="Варианты покупки">
+              <article class="purchase-option" aria-labelledby="basic-title">
+                <h4 id="basic-title">Курс в записи</h4>
+                <span class="roadmap-offer-price"><b>120&nbsp;$</b><span>за весь блок</span></span>
+                <p>Все 11 занятий, задания на&nbsp;платформе и&nbsp;учебный Telegram-чат.</p>
+                <a href="https://t.me/moksha_support?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%BA%D1%83%D1%80%D1%81%20%C2%AB%D0%9F%D0%BB%D0%B0%D0%BD%D0%B5%D1%82%D1%8B%C2%BB%20%D0%B2%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B8%20%D0%B7%D0%B0%20%24120.%20%D0%9F%D1%80%D0%B8%D1%88%D0%BB%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D1%80%D0%B5%D0%BA%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B%20%D0%B4%D0%BB%D1%8F%20%D0%BE%D0%BF%D0%BB%D0%B0%D1%82%D1%8B." target="_blank" rel="noopener" class="btn btn-primary roadmap-offer-cta" aria-label="Купить курс в записи за 120 долларов">Купить за&nbsp;120&nbsp;$</a>
+              </article>
+              <article class="purchase-option purchase-option-personal" aria-labelledby="personal-title">
+                <h4 id="personal-title">Курс с личным разбором</h4>
+                <span class="roadmap-offer-price"><b>200&nbsp;$</b><span>курс и личная встреча</span></span>
+                <p>Всё из&nbsp;базового пакета и&nbsp;один созвон до&nbsp;30&nbsp;минут: планеты в&nbsp;вашей карте и&nbsp;два личных вопроса по&nbsp;теме курса.</p>
+                <p class="purchase-option-term">Разбор — в&nbsp;течение двух месяцев после покупки.</p>
+                <a href="https://t.me/moksha_support?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%BA%D1%83%D1%80%D1%81%20%C2%AB%D0%9F%D0%BB%D0%B0%D0%BD%D0%B5%D1%82%D1%8B%C2%BB%20%D1%81%20%D0%BB%D0%B8%D1%87%D0%BD%D1%8B%D0%BC%20%D1%80%D0%B0%D0%B7%D0%B1%D0%BE%D1%80%D0%BE%D0%BC%20%D0%B7%D0%B0%20%24200.%20%D0%9F%D1%80%D0%B8%D1%88%D0%BB%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D1%80%D0%B5%D0%BA%D0%B2%D0%B8%D0%B7%D0%B8%D1%82%D1%8B%20%D0%B4%D0%BB%D1%8F%20%D0%BE%D0%BF%D0%BB%D0%B0%D1%82%D1%8B." target="_blank" rel="noopener" class="btn btn-primary roadmap-offer-cta" aria-label="Купить курс с личным разбором за 200 долларов">Купить за&nbsp;200&nbsp;$</a>
+              </article>
+            </div>
+            <div class="purchase-footer">
+              <p>Кнопка откроет Telegram с&nbsp;готовой заявкой. Отправьте её — мы&nbsp;пришлём реквизиты. После оплаты добавим вас в&nbsp;учебный чат и&nbsp;предоставим доступ к&nbsp;платформе.</p>
               <a class="offer-link" href="/offer.html" target="_blank" rel="noopener">Условия покупки — публичная оферта</a>
+            </div>
+          </div>
+          <div class="roadmap-offer" id="signs-enrollment">
+            <div class="roadmap-offer-main">
+              <span class="roadmap-offer-badge">Блок 2 · набор в живую группу</span>
+              <h3 class="roadmap-offer-title">Знаки зодиака</h3>
+              <p class="roadmap-offer-desc">Следующий блок обучения — в&nbsp;живом формате. Программа разрабатывается, даты и&nbsp;стоимость уточняются.</p>
+              <p class="roadmap-offer-desc">Оставьте заявку в&nbsp;Telegram, чтобы узнать подробности набора.</p>
+            </div>
+            <div class="roadmap-offer-buy">
+              <a href="https://t.me/moksha_support?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D1%83%D0%B7%D0%BD%D0%B0%D1%82%D1%8C%20%D0%BE%20%D0%BD%D0%B0%D0%B1%D0%BE%D1%80%D0%B5%20%D0%B2%20%D0%B6%D0%B8%D0%B2%D1%83%D1%8E%20%D0%B3%D1%80%D1%83%D0%BF%D0%BF%D1%83%20%D0%B2%D1%82%D0%BE%D1%80%D0%BE%D0%B3%D0%BE%20%D0%B1%D0%BB%D0%BE%D0%BA%D0%B0%20%C2%AB%D0%97%D0%BD%D0%B0%D0%BA%D0%B8%20%D0%B7%D0%BE%D0%B4%D0%B8%D0%B0%D0%BA%D0%B0%C2%BB.%20%D0%A1%D0%BE%D0%BE%D0%B1%D1%89%D0%B8%D1%82%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0%2C%20%D0%BA%D0%BE%D0%B3%D0%B4%D0%B0%20%D0%B1%D1%83%D0%B4%D1%83%D1%82%20%D0%B8%D0%B7%D0%B2%D0%B5%D1%81%D1%82%D0%BD%D1%8B%20%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0%2C%20%D0%B4%D0%B0%D1%82%D1%8B%20%D0%B8%20%D1%81%D1%82%D0%BE%D0%B8%D0%BC%D0%BE%D1%81%D1%82%D1%8C." target="_blank" rel="noopener" class="btn btn-primary roadmap-offer-cta">Узнать о&nbsp;наборе</a>
+              <span class="roadmap-offer-note">Программа, даты и&nbsp;цена — скоро</span>
             </div>
           </div>
         </div>
