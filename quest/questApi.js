@@ -63,6 +63,7 @@ async function saveQuestProfile(profile) {
 async function syncQuestProgress(taskProgress, stepProgress) {
   const response = await questApiFetch('/api/progress', {
     method: 'POST',
+    keepalive: true,
     body: JSON.stringify({ taskProgress, stepProgress }),
   });
   if (!response.ok) throw new Error('sync_progress_failed');

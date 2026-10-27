@@ -16,17 +16,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!response.ok) throw new Error('request_failed');
 
     const cert = await response.json();
-    const fullName = [cert.first_name, cert.last_name].filter(Boolean).join(' ') || 'Участник курса';
-    const dateStr = new Date(cert.issued_at).toLocaleDateString('ru-RU', {
+    const name = [cert.first_name, cert.last_name].filter(Boolean).join(' ') || 'Участник курса';
+    const escaped = document.createElement('span');
+    escaped.textContent = name;
+    const fullName = escaped.innerHTML;
+    const dateStr = new Date(cert.completed_at || cert.issued_at).toLocaleDateString('ru-RU', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      timeZone: 'Asia/Tbilisi',
     });
 
     result.innerHTML = `
       <p class="task-content-done" style="font-size: 1.1rem;">✓ Сертификат подлинный</p>
-      <p class="login-gate-hint"><strong>${fullName}</strong> успешно завершил(а) курс MOKSHA EDUCATION «Обитель богов».</p>
-      <p class="login-gate-hint">Дата выдачи: ${dateStr}</p>
+      <p class="login-gate-hint"><strong>${fullName}</strong> успешно завершил(а) первый блок «Граха-таттва — природа планет» на платформе MOKSHA EDUCATION и получил(а) статус «Граха-таттва-гья».</p>
+      <p class="login-gate-hint">Дата завершения: ${dateStr}</p>
     `;
   } catch (error) {
     result.innerHTML = '<p class="login-gate-hint">Не удалось проверить сертификат. Попробуйте позже.</p>';

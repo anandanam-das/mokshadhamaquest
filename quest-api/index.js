@@ -189,7 +189,7 @@ app.post(
     if (!userRows[0].email_verified) return res.status(409).json({ error: 'email_not_verified' });
 
     const { rows: certRows } = await pool.query(
-      'SELECT c.id, c.issued_at, u.first_name, u.last_name FROM certificates c JOIN users u ON u.telegram_id = c.telegram_id WHERE c.telegram_id = $1 ORDER BY c.issued_at ASC LIMIT 1',
+      'SELECT c.id, c.issued_at, COALESCE(u.course_completed_at, c.issued_at) AS completed_at, u.first_name, u.last_name FROM certificates c JOIN users u ON u.telegram_id = c.telegram_id WHERE c.telegram_id = $1 ORDER BY c.issued_at ASC LIMIT 1',
       [req.telegramId]
     );
     if (!certRows.length) return res.status(409).json({ error: 'no_certificate' });
@@ -200,6 +200,7 @@ app.post(
       firstName: cert.first_name,
       lastName: cert.last_name,
       issuedAt: cert.issued_at,
+      completedAt: cert.completed_at,
     });
     await sendCertificateEmail(userRows[0].email, pdfBytes, `moksha-quest-certificate-${cert.id}.pdf`);
     res.json({ ok: true });
@@ -212,14 +213,15 @@ app.post(
   ah(async (req, res) => {
     const { taskProgress, stepProgress } = req.body || {};
     const { rows } = await pool.query(
-      `INSERT INTO users (telegram_id, task_progress, step_progress)
-       VALUES ($1, $2, $3)
+      `INSERT INTO users (telegram_id, task_progress, step_progress, course_completed_at)
+       VALUES ($1, $2, $3, CASE WHEN $4 THEN now() ELSE NULL END)
        ON CONFLICT (telegram_id) DO UPDATE SET
          task_progress = EXCLUDED.task_progress,
          step_progress = EXCLUDED.step_progress,
+         course_completed_at = COALESCE(users.course_completed_at, EXCLUDED.course_completed_at),
          updated_at = now()
-       RETURNING telegram_id, task_progress, step_progress, updated_at`,
-      [req.telegramId, JSON.stringify(taskProgress || {}), JSON.stringify(stepProgress || {})]
+       RETURNING telegram_id, task_progress, step_progress, course_completed_at, updated_at`,
+      [req.telegramId, JSON.stringify(taskProgress || {}), JSON.stringify(stepProgress || {}), isCourseComplete(taskProgress || {})]
     );
     res.json(rows[0]);
   })
@@ -229,7 +231,7 @@ app.post(
   '/api/certificate',
   requireAuth,
   ah(async (req, res) => {
-    const { rows: userRows } = await pool.query('SELECT task_progress FROM users WHERE telegram_id = $1', [
+    const { rows: userRows } = await pool.query('SELECT task_progress, course_completed_at FROM users WHERE telegram_id = $1', [
       req.telegramId,
     ]);
     if (!userRows.length) return res.status(404).json({ error: 'profile_not_found' });
@@ -241,11 +243,13 @@ app.post(
       'SELECT id, issued_at FROM certificates WHERE telegram_id = $1 ORDER BY issued_at ASC LIMIT 1',
       [req.telegramId]
     );
-    if (existing.length) return res.json(existing[0]);
+    if (existing.length) return res.json({ ...existing[0], completed_at: userRows[0].course_completed_at || existing[0].issued_at });
+    // New certificates require the timestamp saved by the last progress sync.
+    if (!userRows[0].course_completed_at) return res.status(409).json({ error: 'completion_date_missing' });
 
     const { rows } = await pool.query(
-      'INSERT INTO certificates (telegram_id) VALUES ($1) RETURNING id, issued_at',
-      [req.telegramId]
+      'INSERT INTO certificates (telegram_id, issued_at) VALUES ($1, $2) RETURNING id, issued_at',
+      [req.telegramId, userRows[0].course_completed_at]
     );
     res.json(rows[0]);
   })
@@ -256,7 +260,7 @@ app.get(
   '/api/certificate/:id',
   ah(async (req, res) => {
     const { rows } = await pool.query(
-      `SELECT c.id, c.issued_at, u.first_name, u.last_name
+      `SELECT c.id, c.issued_at, COALESCE(u.course_completed_at, c.issued_at) AS completed_at, u.first_name, u.last_name
        FROM certificates c JOIN users u ON u.telegram_id = c.telegram_id
        WHERE c.id = $1`,
       [req.params.id]
@@ -272,7 +276,7 @@ app.get(
   '/api/certificate/:id/pdf',
   ah(async (req, res) => {
     const { rows } = await pool.query(
-      `SELECT c.id, c.issued_at, u.first_name, u.last_name
+      `SELECT c.id, c.issued_at, COALESCE(u.course_completed_at, c.issued_at) AS completed_at, u.first_name, u.last_name
        FROM certificates c JOIN users u ON u.telegram_id = c.telegram_id
        WHERE c.id = $1`,
       [req.params.id]
@@ -285,6 +289,7 @@ app.get(
       firstName: cert.first_name,
       lastName: cert.last_name,
       issuedAt: cert.issued_at,
+      completedAt: cert.completed_at,
     });
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="moksha-quest-certificate-${cert.id}.pdf"`);
