@@ -11,7 +11,7 @@
 const planetBuildings = {
   surya: { name: 'Ратуша', planet: 'Сурья', file: 'ratusha', glow: '#f9ae38' },
   chandra: { name: 'Дом Божественной Матери', planet: 'Чандра', file: 'dom-bozhestvennoy-materi', glow: '#bcd9ff' },
-  mangala: { name: 'Воинский зал', planet: 'Мангала', file: 'voinskiy-zal', glow: '#e2685f' },
+  mangala: { name: 'Воинская крепость', planet: 'Мангала', file: 'voinskiy-zal', glow: '#e2685f' },
   budha: { name: 'Торговая гильдия', planet: 'Буддха', file: 'torgovaya-gildiya', glow: '#7cd992' },
   guru: { name: 'Храм мудрости', planet: 'Гуру', file: 'hram-mudrosti', glow: '#ffd966' },
   shukra: { name: 'Чертоги Шукры', planet: 'Шукра', file: 'chertogi-shukry', glow: '#ffb3d1' },
