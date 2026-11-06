@@ -3,10 +3,9 @@
 
   // Direct links can arrive before images and fonts settle, especially in
   // the Telegram browser. The query also works when the fragment is dropped.
-  const openPricing = location.hash === '#pricing' ||
-    (!location.hash && new URLSearchParams(location.search).get('section') === 'pricing');
-  if (openPricing) {
-    const pricing = document.getElementById('pricing');
+  const section = location.hash.slice(1) || new URLSearchParams(location.search).get('section');
+  if (section === 'pricing' || section === 'buy-planets') {
+    const target = document.getElementById(section);
     const header = document.querySelector('.site-header');
     const interaction = new AbortController();
     const stop = () => interaction.abort();
@@ -14,18 +13,25 @@
       window.addEventListener(event, stop, { passive: true, signal: interaction.signal });
     }
 
-    const alignPricing = () => {
+    const alignSection = () => {
       if (interaction.signal.aborted) return;
-      pricing.style.scrollMarginTop = (header.offsetHeight + 12) + 'px';
-      pricing.scrollIntoView({ block: 'start', behavior: 'instant' });
+      const offset = header.offsetHeight + 12;
+      target.style.scrollMarginTop = offset + 'px';
+      const buyButton = section === 'buy-planets' ? target.querySelector('.roadmap-offer-cta') : null;
+      const visibleHeight = (window.visualViewport?.height || window.innerHeight) - offset;
+      if (buyButton && buyButton.getBoundingClientRect().bottom - target.getBoundingClientRect().top > visibleHeight - 12) {
+        buyButton.scrollIntoView({ block: 'center', behavior: 'instant' });
+        return;
+      }
+      target.scrollIntoView({ block: 'start', behavior: 'instant' });
     };
-    alignPricing();
+    alignSection();
     const loaded = document.readyState === 'complete'
       ? Promise.resolve()
       : new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
     Promise.all([loaded, document.fonts?.ready]).then(() => {
       requestAnimationFrame(() => {
-        alignPricing();
+        alignSection();
         stop();
       });
     });
