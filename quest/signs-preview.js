@@ -139,7 +139,7 @@ async function renderMap(reveal=false){
  stopTyping();setView(false);root.replaceChildren();window.scrollTo(0,0);
  const map=el('div','world-map');map.setAttribute('aria-label','Карта обители второго блока');
  const heading=el('div','section-heading signs-map-heading');
- heading.append(el('h2','','MOKSHA DHAMA QUEST'),el('p','section-subheading','Раши-таттва · блок 2'));
+ heading.append(el('h2','','MOKSHA DHAMA QUEST'),el('p','section-subheading','Раси-таттва · блок 2'));
  const layout=el('div','map-only');layout.append(map);root.append(heading,layout);
  for(const [id,pos] of Object.entries(world.layout)){
   const building=planetBuildings[id];

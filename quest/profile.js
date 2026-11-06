@@ -42,7 +42,7 @@ const TATTVA_BLOCKS = [
   {
     id: 'rashi',
     sanskrit: 'राशि तत्त्व',
-    title: 'Раши-таттва',
+    title: 'Раси-таттва',
     subtitle: 'Природа знаков зодиака',
     locked: true,
   },
