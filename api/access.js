@@ -3,15 +3,14 @@ const { getChatMemberStatus, isActiveMember } = require('./_lib/telegram');
 
 const COOKIE_NAME = 'moksha_session';
 const ACCESS_COOKIE_NAME = 'moksha_access';
-// Browsers cap cookie lifetime at ~400 days regardless of what we send;
-// this is the practical maximum, not a deliberate expiry on our side.
-const ACCESS_COOKIE_MAX_AGE_SECONDS = 400 * 24 * 60 * 60;
+const ACCESS_COOKIE_MAX_AGE_SECONDS = 15 * 60;
 
 function readSession(req) {
   const token = req.cookies && req.cookies[COOKIE_NAME];
   if (!token) return null;
   try {
-    return jwt.verify(token, process.env.SESSION_SECRET);
+    const session = jwt.verify(token, process.env.SESSION_SECRET, { algorithms: ['HS256'] });
+    return typeof session.first_name === 'string' && !session.exp ? session : null;
   } catch (error) {
     return null;
   }
@@ -46,39 +45,35 @@ module.exports = async (req, res) => {
     return sendJson(res, 405, { error: 'method_not_allowed' });
   }
 
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, SESSION_SECRET } = process.env;
+
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, TELEGRAM_SIGNS_CHANNEL_ID, SESSION_SECRET } = process.env;
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID || !SESSION_SECRET) {
     return sendJson(res, 500, { error: 'server_misconfigured' });
   }
 
   const session = readSession(req);
-  const telegramId = session ? session.id : req.query.telegramId;
+  if (!session?.id) return sendJson(res, 401, { error: 'not_authenticated' });
 
-  if (!telegramId) {
-    return sendJson(res, 401, { error: 'not_authenticated' });
+  const chats = Object.entries({ planets: TELEGRAM_CHANNEL_ID, signs: TELEGRAM_SIGNS_CHANNEL_ID })
+    .filter(([, chatId]) => chatId);
+  const checks = await Promise.allSettled(chats.map(async ([block, chatId]) => {
+    const member = await getChatMemberStatus(TELEGRAM_BOT_TOKEN, chatId, session.id);
+    return isActiveMember(member) ? block : null;
+  }));
+  const blocks = checks.flatMap((check) => check.status === 'fulfilled' && check.value ? [check.value] : []);
+  const unavailableBlocks = chats.flatMap(([block], index) => checks[index].status === 'rejected' ? [block] : []);
+  const accessToken = blocks.length ? jwt.sign({ id: session.id, blocks }, SESSION_SECRET, { expiresIn: '15m' }) : '';
+  res.setHeader('Set-Cookie',
+    `${ACCESS_COOKIE_NAME}=${accessToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${blocks.length ? ACCESS_COOKIE_MAX_AGE_SECONDS : 0}`);
+  if (!blocks.length && unavailableBlocks.length) {
+    return sendJson(res, 502, { error: 'telegram_api_error' });
   }
 
-  try {
-    const status = await getChatMemberStatus(TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, telegramId);
-    const hasAccess = isActiveMember(status);
-
-    if (hasAccess) {
-      const accessToken = jwt.sign({ id: telegramId }, SESSION_SECRET);
-      res.setHeader(
-        'Set-Cookie',
-        `${ACCESS_COOKIE_NAME}=${accessToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${ACCESS_COOKIE_MAX_AGE_SECONDS}`
-      );
-    } else {
-      res.setHeader('Set-Cookie', `${ACCESS_COOKIE_NAME}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
-    }
-
-    sendJson(res, 200, {
-      telegramId,
-      hasPlanetsAccess: hasAccess,
-      hasSignsAccess: false,
-      hasNakshatrasAccess: false,
-    });
-  } catch (error) {
-    sendJson(res, 502, { error: 'telegram_api_error', message: error.message });
-  }
+  return sendJson(res, 200, {
+    telegramId: session.id,
+    hasPlanetsAccess: blocks.includes('planets'),
+    hasSignsAccess: blocks.includes('signs'),
+    hasNakshatrasAccess: false,
+    unavailableBlocks,
+  });
 };

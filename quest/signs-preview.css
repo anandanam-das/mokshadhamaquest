@@ -1,0 +1,239 @@
+/* Layout for the local second-block prototype. Colours, fonts, gradient and buttons come from styles.css. */
+.topbar{position:relative;display:flex;align-items:center;gap:24px;max-width:1260px;margin:0 auto;padding:20px}.topbar>a{font-weight:800;letter-spacing:.04em}.topbar>span{flex:1;color:var(--text);font-size:14px}
+#previewRoot{position:relative;max-width:1260px;margin:auto;padding:20px 24px 60px}#previewRoot h1{font-size:clamp(20px,2.5vw,30px);line-height:1.5}#previewRoot h2{font-size:clamp(16px,1.8vw,22px);line-height:1.5}#previewRoot .muted,#previewRoot small{color:var(--muted)}.entry-card{max-width:680px;margin:10vh auto;padding:36px;text-align:center;background:var(--panel);border:2px solid var(--border);border-radius:24px;box-shadow:0 20px 45px #1f563420}.entry-card small{display:block;margin-top:24px}.entry-card .lead{margin:22px auto}.entry-card>.btn{margin:18px auto 0}.page-heading{margin-bottom:24px}.page-heading>.btn{margin-bottom:18px}.world-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:24px;align-items:start}.world-map{position:relative;aspect-ratio:1;background:url('assets/village/landscape.png') center/cover;border-radius:24px;overflow:hidden;box-shadow:0 12px 45px #193d2922}.map-building.btn{position:absolute;transform:translate(-50%,-50%);padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;line-height:0;display:block;min-height:0}.map-building img{width:100%;filter:drop-shadow(0 5px 4px #122d3b44);image-rendering:pixelated}.map-building:hover img{filter:drop-shadow(0 0 10px #fff4a2)}.map-location.btn{position:absolute;transform:translate(-50%,-50%);padding:7px 12px;font-size:12px;white-space:nowrap;background:#fffef0;border:2px solid var(--accent);box-shadow:0 3px 12px #0003}.route-panel,.location-conversation,.room-card{padding:24px;background:var(--panel);border:2px solid var(--border);border-radius:24px;box-shadow:0 12px 30px #1f563412}.route-panel h2{font-size:17px!important}.route-step{display:grid;grid-template-columns:28px 1fr;gap:2px 10px;margin:18px 0;font-size:14px}.step-number{grid-row:span 2;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;background:#d4eeff;color:#245e87}.route-step small{grid-column:2}.route-panel>.btn{width:100%;margin-top:12px}.route-panel>.muted{font-size:13px}.location-scene{position:relative;width:100%;aspect-ratio:16/9;border-radius:24px;overflow:hidden;box-shadow:0 12px 45px #193d2922;background:#78b9d8}.location-scene.coast{background:url('assets/village/landscape.png') left bottom/220%}.location-landscape,.location-landscape>img{display:block;width:100%;height:100%;object-fit:cover;image-rendering:pixelated}.teacher-figure{position:absolute;left:60%;bottom:6%;transform:translateX(-50%);height:59%;aspect-ratio:1;display:block;filter:drop-shadow(0 6px 3px #12243b25)}.teacher-figure>img{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}.landscape-label{position:absolute;top:20px;left:20px;border-radius:14px;background:var(--panel);padding:10px 15px;font-size:13px}.teacher-seat{position:absolute;left:54%;bottom:10%;transform:translateX(-50%);display:grid;text-align:center;gap:8px;background:var(--panel);border:2px solid var(--border);border-radius:24px;padding:25px}.seat-mark{font-size:40px}.location-conversation{max-width:790px;margin:24px auto}.teacher-speech{font-size:18px;line-height:1.7}.rooms-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}.room-card .muted{font-size:14px}
+#storyDialog{padding:0;width:min(960px,calc(100% - 48px));max-width:none;max-height:calc(100dvh - 40px);border:0;overflow:visible;background:transparent;color:var(--text);box-shadow:none}
+#storyDialog::backdrop{background:rgba(8,14,26,.55)}
+.story-layout{display:grid;grid-template-columns:32% 1fr;gap:28px;align-items:center;min-height:420px}.story-art{display:flex;align-items:center;justify-content:center}.story-art>img{display:block;width:100%;max-height:440px;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 12px 12px #10283844)}.story-copy{position:relative;padding:28px 30px;border-radius:24px;background:#fff;border:2px solid rgba(89,124,74,.24);box-shadow:0 14px 35px #10283833}.story-copy:before{content:'';position:absolute;left:-14px;top:55%;width:24px;height:24px;background:#fff;border-left:2px solid rgba(89,124,74,.24);border-bottom:2px solid rgba(89,124,74,.24);transform:rotate(45deg)}#storyText{font-family:'Inter',sans-serif;font-size:19px;line-height:1.8;min-height:180px;margin:0 0 24px}.story-footer{display:flex;align-items:center;justify-content:space-between;gap:16px}.story-footer>span{color:var(--muted);font-size:13px}.story-footer>.btn{font-size:14px}.story-copy [hidden]{display:none}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:4px}
+@media(max-width:850px){.world-layout{grid-template-columns:1fr}.topbar{gap:12px;flex-wrap:wrap;padding:16px}.topbar>a{font-size:13px}.topbar>span{font-size:12px}#previewRoot{padding:16px 16px 40px}.entry-card{padding:26px;margin:6vh auto}.story-layout{gap:18px;grid-template-columns:29% 1fr}.story-copy{padding:22px}#storyText{font-size:17px;min-height:190px}.location-conversation{padding:22px}}
+@media(max-width:500px){.topbar>.btn{font-size:12px;padding:9px 12px}.topbar>span{order:3;flex-basis:100%}.story-layout{grid-template-columns:1fr;gap:12px;min-height:0}.story-art{height:180px}.story-art>img{width:auto;height:180px;max-width:100%}.story-copy{padding:20px;border-radius:20px}.story-copy:before{left:48%;top:-14px;transform:rotate(135deg)}#storyText{font-size:16px;line-height:1.6;min-height:160px;margin-bottom:18px}.story-footer>.btn{font-size:12px;padding:10px 12px}.teacher-figure{height:64%;left:58%;bottom:5%}.map-location.btn{font-size:10px;padding:5px 8px}.landscape-label{left:10px;top:10px;font-size:11px;max-width:80%}.teacher-seat{padding:14px;font-size:12px}.location-conversation>p{font-size:15px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Opening: just Shiva, then the cloud reveal, then the Kailash beacon. */
+.topbar[hidden]{display:none}
+body.intro-active{overflow:hidden}
+body.intro-active #previewRoot{min-height:100dvh}
+.map-only{display:grid;place-items:center}
+.map-only .world-map{width:min(100%,calc(100dvh - 135px));max-width:850px}
+.map-building{position:absolute;transform:translate(-50%,-50%);line-height:0;pointer-events:none}
+.rashi-cloud-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:4;pointer-events:none}
+.kailash-call.btn{position:absolute;left:88%;top:48%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%);padding:0;background:transparent;border:0;box-shadow:none;border-radius:50%;z-index:3;opacity:0;pointer-events:none}
+.kailash-call.is-calling{opacity:1;pointer-events:auto;cursor:pointer}
+.kailash-call:before,.kailash-call:after{content:'';position:absolute;inset:12%;border-radius:50%;border:3px solid #fff3a1;box-shadow:0 0 20px #ffd66e,inset 0 0 20px #ffd66e88;background:#ffe79822}
+.kailash-call:after{inset:28%;border-color:#fffce0;background:#fff3b133}
+.kailash-call.btn:hover{transform:translate(-50%,-50%)}
+.kailash-call.btn:focus-visible{outline:3px solid white;outline-offset:6px}
+@keyframes kailash-beacon{0%,100%{filter:brightness(1);scale:1}50%{filter:brightness(1.5);scale:1.12}}
+@media(max-width:500px){.map-only .world-map{width:100%}}
+@media(prefers-reduced-motion:reduce){.kailash-call.is-calling{animation:none}}
+
+.kailash-call.is-calling:before,.kailash-call.is-calling:after{animation:kailash-beacon 1.7s ease-in-out infinite}.kailash-call.is-calling:after{animation-delay:.25s}@media(prefers-reduced-motion:reduce){.kailash-call.is-calling:before,.kailash-call.is-calling:after{animation:none}}
+
+.kailash-call.coast-call{left:19%;top:81%;width:20%}
+
+.location-scene.coast{background:#36bfd5}.teacher-figure.varuna-figure{aspect-ratio:2/3;height:76%;left:62%;bottom:12%;filter:none}@media(max-width:500px){.teacher-figure.varuna-figure{height:80%;left:61%;bottom:11%}}
+
+.aries-call.kailash-call { left: 50%; top: 86%; width: 22%; }
+.aries-hall-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+.story-art > img[hidden], #indraCompanion[hidden] { display: none; }
+.indra-meeting .story-art { gap: 8px; }
+.indra-meeting .story-art > img { width: calc(50% - 4px); }
+.story-art > .story-listening { opacity: .65; }
+#indraCompanion {
+  position: fixed;
+  right: 12px;
+  bottom: 8px;
+  height: clamp(104px, 25vh, 238px);
+  width: auto;
+  z-index: 5;
+  pointer-events: none;
+}
+@media (max-width: 500px) {
+  #indraCompanion { height: 112px; }
+  .indra-meeting .story-art > img { width: auto; max-width: 45%; }
+}
+
+/* Subtle motion stays behind the characters and outside the interaction layer. */
+#storyIndra.facing-shiva { transform: scaleX(-1); }
+#indraCompanion {
+  transform-origin: center bottom;
+  animation: indra-companion-breathe 3.4s ease-in-out infinite;
+}
+.wind-canopy, .wind-meadow, .shore-water, .landscape-motion {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.wind-canopy {
+  mask-image: radial-gradient(ellipse 42% 30% at 9% 2%, #000 48%, transparent 100%);
+  transform-origin: 8% 29%;
+  animation: kailash-canopy-sway 5.8s ease-in-out infinite;
+}
+.landscape-motion svg { display: block; width: 100%; height: 100%; }
+.mountain-flock {
+  fill: none;
+  stroke: #24394d;
+  stroke-width: 1.5;
+  animation: kailash-birds-cross 21s linear infinite;
+}
+.mountain-flock path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: kailash-wings .75s ease-in-out infinite alternate;
+}
+.mountain-flock path:nth-child(2) { animation-delay: -.2s; }
+.mountain-flock path:nth-child(3) { animation-delay: -.4s; }
+@keyframes indra-companion-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: translateY(-3px) scale(1.035); }
+}
+@keyframes kailash-canopy-sway {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(.85deg) translateX(.35%); }
+}
+@keyframes kailash-birds-cross {
+  0% { transform: translate(-64px, 85px); opacity: 0; }
+  12%, 82% { opacity: .85; }
+  92%, 100% { transform: translate(780px, 40px); opacity: 0; }
+}
+@keyframes kailash-wings {
+  from { transform: scaleY(.25); }
+  to { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #indraCompanion { animation: none; }
+  .wind-canopy, .wind-meadow, .shore-water, .landscape-motion { display: none; }
+}
+
+/* The shore keeps its original texture while the water pixels refract. */
+.shore-water {
+  clip-path: polygon(11% 28.5%, 100% 28.5%, 100% 34%, 94% 40%, 85% 43%, 99% 46%, 100% 69%, 93% 72%, 88% 77%, 82% 79%, 93% 81%, 87% 88%, 80% 95%, 68% 94%, 55% 91%, 45% 88%, 36% 83%, 28% 79%, 23% 73%, 17% 70%, 9% 64%, 0 59%, 9% 56%, 8% 52%, 20% 49%, 30% 47%, 26% 44%, 20% 42%, 15% 38%);
+}
+.shore-water > img { filter: url(#coast-ripples); }
+.wind-meadow {
+  mask-image:
+    radial-gradient(ellipse 12% 23% at 5% 100%, #000 50%, transparent 100%),
+    radial-gradient(ellipse 12% 22% at 98% 97%, #000 48%, transparent 100%);
+  transform-origin: 50% 100%;
+  animation: kailash-meadow-sway 4.8s ease-in-out infinite;
+}
+@keyframes kailash-meadow-sway {
+  0%, 100% { transform: skewX(0); }
+  45% { transform: skewX(-1.6deg); }
+  72% { transform: skewX(.7deg); }
+}
+
+.mangala-ruler {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 20px;
+}
+.mangala-ruler img { width: clamp(140px, 25vw, 240px); }
+.mangala-rooms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 3vw, 32px);
+  max-width: 840px;
+  margin: 0 auto 48px;
+}
+.mangala-room.btn {
+  position: relative;
+  display: grid;
+  justify-items: stretch;
+  text-align: left;
+  gap: 5px;
+  padding: 10px;
+  background: #1a202a;
+  color: #fff;
+  border: 2px solid #777984;
+  border-radius: 16px;
+}
+.mangala-room img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 9px;
+}
+.mangala-room .room-sign { color: #ffd37d; }
+.mangala-room.room-calling {
+  border-color: #ffd37d;
+  animation: mangala-room-call 1.9s ease-in-out infinite;
+}
+.room-calling img { filter: brightness(.78); }
+.mangala-room.room-locked { cursor: not-allowed; color: #bac0cc; }
+.room-locked img { object-fit: contain; background: #131923; filter: grayscale(.8) brightness(.35); }
+.room-locked .room-sign { color: inherit; }
+.room-lock {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  background: #101722;
+}
+@keyframes mangala-room-call {
+  0%, 100% { box-shadow: 0 0 7px #ffbd5555; }
+  50% { box-shadow: 0 0 23px #ffbd55c0; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .mangala-room.room-calling { animation: none; box-shadow: 0 0 10px #ffbd5590; }
+}
+
+.taurus-call.kailash-call { left: 79%; top: 75%; width: 22%; }
+.map-building-open.btn { pointer-events: auto; }
+.shukra-room-symbol {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16/9;
+  border-radius: 9px;
+  background: #302536;
+  font-size: clamp(32px, 8vw, 72px);
+  color: #ffdb97;
+}
+.room-locked .shukra-room-symbol { color: #737586; background: #151821; }
+
+.kailash-clouds { position: absolute; inset: 0; pointer-events: none; }
+.kailash-clouds img {
+  position: absolute;
+  left: 0;
+  height: auto;
+  opacity: .5;
+  animation: kailash-cloud-drift linear infinite;
+}
+@keyframes kailash-cloud-drift {
+  from { left: -24%; }
+  to { left: 104%; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .kailash-clouds { display: none; }
+}
+
+.topbar { justify-content: flex-end; }
+.topbar > div { margin-right: auto; }
+.signs-map-heading { text-align: center; }
+#previewRoot .signs-map-heading h2 { font-size: clamp(1rem, 2.5vw, 1.8rem); }
+@media (min-width: 501px) {
+  .map-only .world-map { width: min(100%, calc(100dvh - 225px)); }
+}
+.world-map .map-building { pointer-events: auto; }
+.signs-building-label {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 100px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease;
+}
+.map-building:hover, .map-building:focus-visible { z-index: 2; }
+.map-building:hover > .signs-building-label,
+.map-building:focus-visible > .signs-building-label,
+.kailash-call:hover > .signs-building-label,
+.kailash-call:focus-visible > .signs-building-label { opacity: 1; }
+
+.gemini-call.kailash-call { left: 50%; top: 14%; width: 22%; }
+
+.cancer-call.kailash-call { left: 12%; top: 25%; width: 22%; }

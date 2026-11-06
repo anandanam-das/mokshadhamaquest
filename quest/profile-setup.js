@@ -20,14 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       await saveQuestProfile({ firstName, lastName, email, patronPlanet: state.character?.patronPlanet || null });
-      const updated = getUserState();
-      if (!updated.character) {
-        window.location.href = 'create-character.html';
-      } else if (!updated.hasSeenPrologue) {
-        window.location.href = 'prologue.html';
-      } else {
-        window.location.href = 'village.html';
-      }
+      window.location.href = 'checking.html' + window.location.search;
     } catch (error) {
       statusEl.textContent = 'Не удалось сохранить. Проверьте связь и попробуйте ещё раз.';
       submitBtn.disabled = false;

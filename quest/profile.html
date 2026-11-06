@@ -19,7 +19,7 @@
     <header class="app-nav">
       <nav class="nav">
         <div class="nav-links">
-          <a href="village.html" class="btn btn-secondary">← Обитель богов</a>
+          <a href="checking.html" class="btn btn-secondary">← Обитель богов</a>
         </div>
       </nav>
     </header>
@@ -29,6 +29,14 @@
         <div class="section-heading">
           <h2>Личный кабинет</h2>
           <p class="section-subheading" id="cabinetGreeting">Загрузка…</p>
+        </div>
+
+        <div class="panel" id="courseAccessPanel" hidden>
+          <h3>Доступные блоки</h3>
+          <p id="courseAccessStatus" role="status"></p>
+          <a class="btn btn-secondary" id="planetsCourseLink" href="checking.html?block=planets" hidden>Граха-таттва · Планеты</a>
+          <a class="btn btn-secondary" id="signsCourseLink" href="signs-preview.html" hidden>Раши-таттва · Знаки зодиака</a>
+          <p id="signsCourseStatus" hidden>Раши-таттва · Задания готовятся к запуску.</p>
         </div>
 
         <div class="panel tattva-path-panel">
@@ -58,12 +66,13 @@
 
         <div class="panel cabinet-certificate-panel" id="certificatePanel"></div>
 
-        <a href="village.html" class="btn btn-secondary cabinet-back">← Назад в обитель</a>
+        <a href="checking.html" class="btn btn-secondary cabinet-back">← Назад в обитель</a>
       </section>
     </main>
 
     <script src="state.js"></script>
     <script src="src/config.js"></script>
+    <script src="src/api/auth.js"></script>
     <script src="questApi.js"></script>
     <script src="characters.js"></script>
     <script src="reactions.js"></script>

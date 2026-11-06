@@ -43,16 +43,20 @@ export default async function middleware(request) {
   const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
 
   const session = await verify(getCookie(request, SESSION_COOKIE), secret);
-  if (!session) {
+  if (!session || typeof session.first_name !== 'string' || session.exp) {
     return redirectNoStore(new URL('/quest/login.html', url));
   }
 
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
-  if (!access || String(access.id) !== String(session.id)) {
-    return redirectNoStore(new URL('/quest/checking.html', url));
+  const block = url.pathname.endsWith('/signs-preview.html') ? 'signs' : 'planets';
+  const blocks = access?.blocks || (!process.env.TELEGRAM_SIGNS_CHANNEL_ID && access ? ['planets'] : []);
+  if (!access || String(access.id) !== String(session.id) || !blocks.includes(block)) {
+    const target = new URL('/quest/checking.html', url);
+    target.searchParams.set('block', block);
+    return redirectNoStore(target);
   }
 }
 
 export const config = {
-  matcher: ['/quest/village.html', '/quest/prologue.html', '/quest/create-character.html'],
+  matcher: ['/quest/village.html', '/quest/prologue.html', '/quest/create-character.html', '/quest/signs-preview.html'],
 };

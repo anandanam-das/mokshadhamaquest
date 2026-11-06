@@ -19,7 +19,7 @@ module.exports = async (req, res) => {
   const message = req.body && req.body.message;
   const text = message && message.text;
 
-  if (message && typeof text === 'string' && text.startsWith('/start')) {
+  if (message?.chat?.type === 'private' && typeof text === 'string' && text.startsWith('/start')) {
     const { id, first_name, username } = message.from;
     const token = jwt.sign({ id, first_name, username }, SESSION_SECRET, { expiresIn: '10m' });
     const loginUrl = `${SITE_URL}/api/auth/telegram-callback?token=${encodeURIComponent(token)}`;

@@ -34,7 +34,10 @@ module.exports = (req, res) => {
 
   let session;
   try {
-    session = jwt.verify(cookieToken, SESSION_SECRET);
+    session = jwt.verify(cookieToken, SESSION_SECRET, { algorithms: ['HS256'] });
+    if (!session.id || typeof session.first_name !== 'string' || session.exp) {
+      return sendJson(res, 401, { error: 'not_authenticated' });
+    }
   } catch (error) {
     return sendJson(res, 401, { error: 'not_authenticated' });
   }

@@ -14,7 +14,10 @@ module.exports = (req, res) => {
 
   let payload;
   try {
-    payload = jwt.verify(token, SESSION_SECRET);
+    payload = jwt.verify(token, SESSION_SECRET, { algorithms: ['HS256'] });
+    if (!payload.id || typeof payload.first_name !== 'string' || typeof payload.exp !== 'number' || payload.blocks) {
+      throw new Error('Invalid Telegram login token');
+    }
   } catch (error) {
     res.writeHead(302, { Location: '/quest/login.html?error=expired' });
     return res.end();

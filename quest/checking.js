@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const params = new URLSearchParams(window.location.search);
-  const telegramIdFromCallback = params.get('telegramId');
-  if (telegramIdFromCallback) {
-    setUserState({ telegramId: telegramIdFromCallback });
-    window.history.replaceState({}, '', window.location.pathname);
+  const requestedBlock = params.get('block');
+  if (params.has('telegramId')) {
+    params.delete('telegramId');
+    window.history.replaceState({}, '', window.location.pathname + (params.size ? '?' + params : ''));
   }
 
   const state = getUserState();
@@ -29,12 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     access = {
       telegramId: state.telegramId || 'local-dev',
       hasPlanetsAccess: true,
-      hasSignsAccess: true,
-      hasNakshatrasAccess: true,
+      hasSignsAccess: false,
+      hasNakshatrasAccess: false,
     };
   } else {
     try {
-      access = await checkSubscription(state.telegramId);
+      access = await checkSubscription();
     } catch (error) {
       if (error.status === 401) {
         clearUserState();
@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  if (!isLocalDevHost() && String(state.telegramId) !== String(access.telegramId)) {
+    clearUserState();
+    sessionStorage.removeItem(QUEST_TOKEN_KEY);
+  }
   setUserState({
     telegramId: access.telegramId ? String(access.telegramId) : state.telegramId,
     hasPlanetsAccess: access.hasPlanetsAccess,
@@ -54,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     hasNakshatrasAccess: access.hasNakshatrasAccess,
   });
 
-  if (!access.hasPlanetsAccess) {
+  if (!access.hasPlanetsAccess && !access.hasSignsAccess) {
     checkingView.hidden = true;
     noAccessView.hidden = false;
     return;
@@ -73,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const profile = await fetchQuestProfile();
       if (!profile) {
-        window.location.href = 'profile-setup.html';
+        window.location.href = 'profile-setup.html' + (requestedBlock ? '?block=' + encodeURIComponent(requestedBlock) : '');
         return;
       }
       // The server copy is the one thing that survives a logout (which
@@ -94,8 +98,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Admins skip the whole player onboarding (character, prologue, village)
   // entirely — they have no game progress of their own, they go straight
   // to the participants dashboard.
-  if (isAdminTelegramId(updated.telegramId)) {
+  if (isAdminTelegramId(updated.telegramId) && !access.hasSignsAccess) {
     window.location.href = 'admin.html';
+    return;
+  }
+
+  if ((requestedBlock === 'signs' && access.hasSignsAccess) || !access.hasPlanetsAccess) {
+    window.location.href = 'signs-preview.html';
+    return;
+  }
+
+  if (access.hasSignsAccess && requestedBlock !== 'planets') {
+    checkingView.hidden = true;
+    document.getElementById('chooseBlockView').hidden = false;
     return;
   }
 

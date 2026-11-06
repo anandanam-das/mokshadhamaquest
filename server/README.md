@@ -32,6 +32,7 @@ Fill in `.env`:
 
 - `TELEGRAM_BOT_TOKEN` — from step 1.
 - `TELEGRAM_CHANNEL_ID` — the chat id from step 1.3.
+- `TELEGRAM_SIGNS_CHANNEL_ID` — optional Telegram chat ID for the signs block. Add the same bot as an administrator there before setting this variable.
 - `SESSION_SECRET` — any long random string.
 - `ALLOWED_ORIGIN` — where the frontend is served from.
 

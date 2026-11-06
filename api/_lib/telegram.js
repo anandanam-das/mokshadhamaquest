@@ -5,11 +5,12 @@ async function getChatMemberStatus(botToken, chatId, userId) {
   if (!data.ok) {
     throw new Error(data.description || 'Telegram getChatMember request failed');
   }
-  return data.result.status;
+  return data.result;
 }
 
-function isActiveMember(status) {
-  return status === 'creator' || status === 'administrator' || status === 'member';
+function isActiveMember({ status, is_member }) {
+  return status === 'creator' || status === 'administrator' || status === 'member' ||
+    (status === 'restricted' && is_member === true);
 }
 
 async function sendMessage(botToken, chatId, text, replyMarkup) {

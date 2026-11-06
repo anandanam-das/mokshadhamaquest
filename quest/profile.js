@@ -329,6 +329,23 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  if (!isLocalDevHost()) {
+    const panel = document.getElementById('courseAccessPanel');
+    const status = document.getElementById('courseAccessStatus');
+    panel.hidden = false;
+    status.textContent = 'Проверяем доступ к блокам…';
+    checkSubscription().then((access) => {
+      document.getElementById('planetsCourseLink').hidden = !access.hasPlanetsAccess;
+      document.getElementById('signsCourseLink').hidden = !access.hasSignsAccess;
+      document.getElementById('signsCourseStatus').hidden = !access.hasSignsAccess;
+      status.textContent = access.unavailableBlocks?.length
+        ? 'Доступ к одному из блоков сейчас не удалось проверить.'
+        : access.hasPlanetsAccess || access.hasSignsAccess ? '' : 'Доступ к учебным блокам закрыт.';
+    }).catch(() => {
+      status.textContent = 'Не удалось проверить доступ. Попробуй обновить страницу.';
+    });
+  }
+
   const greeting = document.getElementById('cabinetGreeting');
   const { courseComplete, percent } = renderProgress(state);
   renderTattvaPath(percent, courseComplete);
@@ -342,10 +359,19 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         greeting.textContent = 'Твой прогресс и покровитель';
       }
+      if (profile) {
+        const serverState = {
+          ...state,
+          taskProgress: Object.keys(profile.task_progress || {}).length ? profile.task_progress : state.taskProgress,
+          stepProgress: Object.keys(profile.step_progress || {}).length ? profile.step_progress : state.stepProgress,
+        };
+        const result = renderProgress(serverState);
+        renderTattvaPath(result.percent, result.courseComplete);
+        renderCertificatePanel(result.courseComplete, profile);
+      } else {
+        renderCertificatePanel(courseComplete, profile);
+      }
       renderEmailPanel(profile);
-      // Перерисовываем панель сертификата теперь, когда известен статус
-      // почты — только так кнопка "Отправить на почту" появится вовремя.
-      renderCertificatePanel(courseComplete, profile);
     })
     .catch(() => {
       greeting.textContent = 'Твой прогресс и покровитель';
