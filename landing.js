@@ -1,6 +1,36 @@
 (() => {
   'use strict';
 
+  // Direct links can arrive before images and fonts settle, especially in
+  // the Telegram browser. The query also works when the fragment is dropped.
+  const openPricing = location.hash === '#pricing' ||
+    (!location.hash && new URLSearchParams(location.search).get('section') === 'pricing');
+  if (openPricing) {
+    const pricing = document.getElementById('pricing');
+    const header = document.querySelector('.site-header');
+    const interaction = new AbortController();
+    const stop = () => interaction.abort();
+    for (const event of ['pointerdown', 'touchstart', 'wheel', 'keydown', 'hashchange']) {
+      window.addEventListener(event, stop, { passive: true, signal: interaction.signal });
+    }
+
+    const alignPricing = () => {
+      if (interaction.signal.aborted) return;
+      pricing.style.scrollMarginTop = (header.offsetHeight + 12) + 'px';
+      pricing.scrollIntoView({ block: 'start', behavior: 'instant' });
+    };
+    alignPricing();
+    const loaded = document.readyState === 'complete'
+      ? Promise.resolve()
+      : new Promise(resolve => window.addEventListener('load', resolve, { once: true }));
+    Promise.all([loaded, document.fonts?.ready]).then(() => {
+      requestAnimationFrame(() => {
+        alignPricing();
+        stop();
+      });
+    });
+  }
+
   /* ---- Scroll reveal ---- */
   const revealTargets = document.querySelectorAll('.reveal, .fit-card');
   if ('IntersectionObserver' in window && revealTargets.length) {
