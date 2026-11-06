@@ -1,11 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-  if (!getUserState().telegramId) {
+  const ketuPreview = isLocalDevHost() && new URLSearchParams(location.search).get('preview') === 'ketu';
+  if (!ketuPreview && !getUserState().telegramId) {
     window.location.href = 'checking.html';
     return;
   }
 
   const creatorState = {
-    characterIndex: 0,
+    characterIndex: ketuPreview ? MOKSHA_CHARACTERS.findIndex(character => character.id === 'ketu') : 0,
   };
 
   const previewImg = document.getElementById('creatorPreviewImg');
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const render = () => {
     const character = getCharacter();
 
-    previewImg.src = character.file;
+    previewImg.src = ketuPreview ? 'assets/characters/ketu-pixel-512.webp' : character.file;
     previewImg.alt = character.title;
     previewName.textContent = character.title.toUpperCase();
 
@@ -44,6 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
 
   const createHeroBtn = document.getElementById('createHeroBtn');
+  if (ketuPreview) {
+    createHeroBtn.hidden = true;
+    prevBtn.hidden = true;
+    nextBtn.hidden = true;
+    document.querySelector('.section-subheading').textContent = 'Предпросмотр нового Кету';
+    return;
+  }
   createHeroBtn.addEventListener('click', () => {
     const character = getCharacter();
     const state = setUserState({ character: { patronPlanet: character.id } });

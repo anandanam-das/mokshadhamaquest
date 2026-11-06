@@ -50,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   const CHARACTER_FILES = {
-    shiva: 'assets/prologue/shiva.png',
-    demon: 'assets/prologue/demon-andhakasura.png',
-    'vastu-purusha': 'assets/prologue/vastu-purusha.png',
+    shiva: 'assets/prologue/shiva.webp',
+    demon: 'assets/prologue/demon-andhakasura.webp',
+    'vastu-purusha': 'assets/prologue/vastu-purusha.webp',
   };
 
   const characterEls = {

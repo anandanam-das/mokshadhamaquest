@@ -64,12 +64,16 @@
             </p>
           </div>
           <div class="hero-scene">
-            <img
+            <picture>
+              <source media="(max-width: 760px)" srcset="/assets/illustrations/hero-scene-small.webp" />
+              <img
               class="hero-scene-float"
               src="/assets/illustrations/hero-scene.webp"
+              fetchpriority="high"
               alt="Обитель богов джйотиш-мира на&nbsp;фоне гигантского Сатурна"
               loading="eager"
             />
+            </picture>
           </div>
           <a href="#choose" class="btn btn-primary btn-large hero-cta">Выбрать персонажа</a>
         </div>
@@ -581,6 +585,6 @@
       <a class="offer-link" href="/offer.html">Публичная оферта</a>
     </footer>
 
-    <script src="landing.js?v=26"></script>
+    <script src="landing.js?v=27"></script>
   </body>
 </html>

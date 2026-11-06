@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailRoot = document.getElementById('villageDetail');
   const taskContentPanel = document.getElementById('taskContentPanel');
 
-  // Координаты — % от квадратного landscape.png (assets/village/landscape.png,
+  // Координаты — % от квадратного landscape.png (assets/village/landscape-play.webp,
   // 1256×1256), не пиксели: так здания масштабируются вместе с картой на
   // любом экране и остаются привязанными к своей точке на рисунке.
   // Направления — по мандале, которую задал пользователь. У Раху и Кету
@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Завершение всей Граха-таттвы (девятая планета) — не рядовой переход
   // между зданиями, а отдельная кат-сцена: вместо покровителя в виджете
-  // на время реплики появляется сам Шива (assets/prologue/shiva.png, уже
+  // на время реплики появляется сам Шива (assets/prologue/shiva.webp, уже
   // использован в прологе). Держим дольше обычного перехода — момент
   // значимый, читать чуть дольше.
   const SHIVA_HOLD_MS = 8000;
@@ -282,10 +282,10 @@ document.addEventListener('DOMContentLoaded', () => {
     afterOverlayCallback = onDone || null;
     shivaCutsceneActive = true;
     const img = document.getElementById('patronWidgetImage');
-    img.src = 'assets/prologue/shiva.png';
+    img.src = 'assets/prologue/shiva.webp';
     img.alt = 'Шива';
     const reopenImg = document.getElementById('patronReopenImage');
-    reopenImg.src = 'assets/prologue/shiva.png';
+    reopenImg.src = 'assets/prologue/shiva.webp';
     reopenImg.alt = 'Шива';
 
     const overlay = document.createElement('div');
@@ -3409,7 +3409,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.appendChild(iconEl);
       } else {
         const img = document.createElement('img');
-        img.src = 'assets/prologue/shiva.png';
+        img.src = 'assets/prologue/shiva.webp';
         img.alt = 'Шива';
         card.appendChild(img);
       }
@@ -3604,10 +3604,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     shivaActive = true;
     const img = document.getElementById('patronWidgetImage');
-    img.src = 'assets/prologue/shiva.png';
+    img.src = 'assets/prologue/shiva.webp';
     img.alt = 'Шива';
     const reopenImg = document.getElementById('patronReopenImage');
-    reopenImg.src = 'assets/prologue/shiva.png';
+    reopenImg.src = 'assets/prologue/shiva.webp';
     reopenImg.alt = 'Шива';
     // Если оставался пузырь с репликой прежнего покровителя — прячем его:
     // иначе портрет уже Шива, а текст ещё звучит чужим голосом.
@@ -3957,7 +3957,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (status === 'unlocked') {
       if (building.file) {
         const img = document.createElement('img');
-        img.src = `assets/village/buildings/${building.file}.png`;
+        img.src = `assets/village/buildings/${building.file}.webp`;
         img.alt = building.name;
         img.className = 'village-building-image';
         if (building.glow) img.style.setProperty('--building-glow', building.glow);
@@ -4083,7 +4083,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!justUnlocked || prefersReducedMotion) {
       const ground = document.createElement('img');
       ground.className = 'village-ground';
-      ground.src = unlocked ? 'assets/village/landscape.png' : 'assets/village/clouds/cloud-cover.png';
+      ground.src = unlocked ? 'assets/village/landscape-play.webp' : 'assets/village/clouds/cloud-cover-play.webp';
       ground.alt = '';
       stage.appendChild(ground);
       return;
@@ -4091,13 +4091,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const oldGround = document.createElement('img');
     oldGround.className = 'village-ground village-ground-whiteout';
-    oldGround.src = 'assets/village/clouds/cloud-cover.png';
+    oldGround.src = 'assets/village/clouds/cloud-cover-play.webp';
     oldGround.alt = '';
     stage.appendChild(oldGround);
 
     const newGround = document.createElement('img');
     newGround.className = 'village-ground village-ground-reveal';
-    newGround.src = 'assets/village/landscape.png';
+    newGround.src = 'assets/village/landscape-play.webp';
     newGround.alt = '';
     stage.appendChild(newGround);
 
@@ -4141,7 +4141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     CLOUD_PUFFS.forEach(({ n, x, y, size }) => {
       const puff = document.createElement('img');
-      puff.src = `assets/village/clouds/cloud-puff-${n}.png`;
+      puff.src = `assets/village/clouds/cloud-puff-${n}-play.webp`;
       puff.alt = '';
       puff.className = `village-cloud-puff village-cloud-puff-${n}`;
       puff.style.left = `${x}%`;

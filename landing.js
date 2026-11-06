@@ -166,6 +166,19 @@
     });
   }
 
+  function whenNearViewport(element, callback) {
+    if (!('IntersectionObserver' in window)) {
+      callback();
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      callback();
+    }, { rootMargin: '400px 0px' });
+    observer.observe(element);
+  }
+
   /* ---- Character-choice scene: Chandra walks the road, callouts pop in ---- */
   const chooseScene = document.getElementById('choose-scene');
   if (chooseScene) {
@@ -181,9 +194,11 @@
 
     const walkFrames = [1, 2, 3, 4].map((n) => `${BASE}chandra-step${n}.webp`);
     const meetFrames = [1, 2, 3, 4, 5, 6].map((n) => `${BASE}chandra-surya${n}.webp`);
-    [...walkFrames, ...meetFrames].forEach((src) => {
-      const img = new Image();
-      img.src = src;
+    whenNearViewport(chooseScene, () => {
+      [...walkFrames, ...meetFrames].forEach((src) => {
+        const img = new Image();
+        img.src = src;
+      });
     });
 
     // Timeline constants (seconds) — tweak these to retime the scene.
@@ -320,10 +335,6 @@
     const seq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2];
     // per-frame dwell (ms); the blink frames (2, 3) flick past, gaze frames linger
     const hold = { 1: 700, 2: 80, 3: 60, 4: 240, 5: 400, 6: 280, 7: 320, 8: 200, 9: 600 };
-    seq.forEach((n) => {
-      const img = new Image();
-      img.src = `${dir}head-${n}.webp`;
-    });
 
     let i = 0;
     function tick() {
@@ -334,7 +345,13 @@
     }
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setTimeout(tick, 300);
+      whenNearViewport(teacherHead, () => {
+        for (const n of new Set(seq)) {
+          const img = new Image();
+          img.src = `${dir}head-${n}.webp`;
+        }
+        setTimeout(tick, 300);
+      });
     }
   }
 

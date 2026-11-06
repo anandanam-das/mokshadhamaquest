@@ -385,7 +385,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Раннее Средневековье, бедное крестьянское жилище',
-          imageUrl: 'assets/images/sun-tamas-scene.jpg',
+          imageUrl: 'assets/images/sun-tamas-scene.webp',
           details: [
             {
               text: 'Плотная ткань закрывает окно, но сквозь щель пробивается яркий солнечный луч',
@@ -429,7 +429,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Древний Египет, рыночный ряд',
-          imageUrl: 'assets/images/sun-rajas-scene.jpg',
+          imageUrl: 'assets/images/sun-rajas-scene.webp',
           details: [
             {
               text: 'Держит один плод высоко над головой торжествующим жестом, ловя на нём луч света',
@@ -477,7 +477,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Послевоенная Европа, расчистка разрушенной улицы',
-          imageUrl: 'assets/images/sun-sattva-scene.jpg',
+          imageUrl: 'assets/images/sun-sattva-scene.webp',
           details: [
             {
               text: 'Уже работает один, расчищая завалы вручную, пока остальные только выходят из домов',
@@ -1001,7 +1001,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Викторианская гостиная, женщина у зарешёченного окна',
-          imageUrl: 'assets/images/moon-tamas-scene.jpg',
+          imageUrl: 'assets/images/moon-tamas-scene.webp',
           details: [
             {
               text: 'Девочка протягивает женщине рисунок, а та выставляет ладонь и не желает его принимать.',
@@ -1049,7 +1049,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'США, 1950-е, закулисье детского конкурса талантов',
-          imageUrl: 'assets/images/moon-rajas-scene.jpg',
+          imageUrl: 'assets/images/moon-rajas-scene.webp',
           details: [
             {
               text: 'Мать одновременно занимается дочерью и внимательно следит за происходящим на сцене.',
@@ -1097,7 +1097,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Традиционный индийский двор, женщина среди детей и животных',
-          imageUrl: 'assets/images/moon-sattva-scene.jpg',
+          imageUrl: 'assets/images/moon-sattva-scene.webp',
           details: [
             {
               text: 'Спокойно находится среди нескольких детей без раздражения и суеты.',
@@ -1567,7 +1567,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Портовая таверна XVIII века',
-          imageUrl: 'assets/images/mars-tamas-scene.jpg',
+          imageUrl: 'assets/images/mars-tamas-scene.webp',
           details: [
             {
               text: 'Продолжает нападать на уже лежащего и защищающегося человека.',
@@ -1615,7 +1615,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Состязание силачей начала XX века',
-          imageUrl: 'assets/images/mars-rajas-scene.jpg',
+          imageUrl: 'assets/images/mars-rajas-scene.webp',
           details: [
             { text: 'Соревнуется в физической силе с другим атлетом.', kind: 'correct', note: 'соперничество' },
             {
@@ -1659,7 +1659,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Пожар начала XX века',
-          imageUrl: 'assets/images/mars-sattva-scene.jpg',
+          imageUrl: 'assets/images/mars-sattva-scene.webp',
           details: [
             {
               text: 'Несёт ребёнка из горящего здания, подвергая себя опасности.',
@@ -2182,7 +2182,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Урок в классе, ученик за партой',
-          imageUrl: 'assets/images/budha-tamas-scene.jpg',
+          imageUrl: 'assets/images/budha-tamas-scene.webp',
           details: [
             {
               text: 'Ученик демонстративно отворачивается от учителя и отказывается слушать объяснение, хотя материал находится прямо перед ним.',
@@ -2230,7 +2230,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Интеллектуальное собрание, оратор в центре внимания',
-          imageUrl: 'assets/images/budha-rajas-scene.jpg',
+          imageUrl: 'assets/images/budha-rajas-scene.webp',
           details: [
             {
               text: 'Демонстративно выступает перед собравшимися, стараясь впечатлить их своим красноречием и знаниями.',
@@ -2278,7 +2278,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Обсерватория, учёный среди приборов и учеников',
-          imageUrl: 'assets/images/budha-sattva-scene.jpg',
+          imageUrl: 'assets/images/budha-sattva-scene.webp',
           details: [
             {
               text: 'Учёный сопоставляет устройство небесной модели со схемами и закономерностями.',
@@ -2841,7 +2841,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Европа XVI–XVII века, богословский спор в университете',
-          imageUrl: 'assets/images/guru-tamas-scene.jpg',
+          imageUrl: 'assets/images/guru-tamas-scene.webp',
           details: [
             {
               text: 'Агрессивно осуждает человека, чьи убеждения отличаются от его собственных.',
@@ -2889,7 +2889,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Османская империя XVII века, покои религиозного сановника',
-          imageUrl: 'assets/images/guru-rajas-scene.jpg',
+          imageUrl: 'assets/images/guru-rajas-scene.webp',
           details: [
             {
               text: 'Принимает богатые подношения, соединяя свой духовный авторитет с материальной выгодой.',
@@ -2937,7 +2937,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Тибетский монастырь XVII века, учитель среди учеников',
-          imageUrl: 'assets/images/guru-sattva-scene.jpg',
+          imageUrl: 'assets/images/guru-sattva-scene.webp',
           details: [
             {
               text: 'Учитель сидит рядом с учеником и внимательно слушает его, проявляя уважение и почтительность.',
@@ -3471,7 +3471,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Старинный печатный комикс, мужчина с чемоданом у двери',
-          imageUrl: 'assets/images/shukra-tamas-scene.jpg',
+          imageUrl: 'assets/images/shukra-tamas-scene.webp',
           details: [
             {
               text: 'Женщина предъявляет фотографию мужчины рядом с другой женщиной — ревность.',
@@ -3519,7 +3519,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Париж 1920–1930-х, кабаре в стиле ар-деко',
-          imageUrl: 'assets/images/shukra-rajas-scene.jpg',
+          imageUrl: 'assets/images/shukra-rajas-scene.webp',
           details: [
             {
               text: 'Женщина активно использует внешность и флирт, привлекая поклонника — манипуляция красотой.',
@@ -3567,7 +3567,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Япония, эпоха Эдо, чайная церемония в павильоне',
-          imageUrl: 'assets/images/shukra-sattva-scene.jpg',
+          imageUrl: 'assets/images/shukra-sattva-scene.webp',
           details: [
             {
               text: 'Цветы, керамика, ткани и предметы пространства тонко сочетаются между собой — чувство прекрасного и создание гармонии.',
@@ -4104,7 +4104,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'XIX век, запущенный старый дом, мужчина у запертой двери',
-          imageUrl: 'assets/images/shani-tamas-scene.jpg',
+          imageUrl: 'assets/images/shani-tamas-scene.webp',
           details: [
             {
               text: 'Мужчина испуганно отшатывается от мирных посетителей и дополнительно запирает дверь.',
@@ -4152,7 +4152,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'США, конец XIX века, текстильная фабрика поздним вечером',
-          imageUrl: 'assets/images/shani-rajas-scene.jpg',
+          imageUrl: 'assets/images/shani-rajas-scene.webp',
           details: [
             {
               text: 'Когда рабочая смена уже закончилась и остальные собираются домой, управляющий продолжает заниматься делами фабрики.',
@@ -4200,7 +4200,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Япония, конец XIX века, восстановление моста в снежной деревне',
-          imageUrl: 'assets/images/shani-sattva-scene.jpg',
+          imageUrl: 'assets/images/shani-sattva-scene.webp',
           details: [
             {
               text: 'Мужчина спокойно и последовательно восстанавливает большой повреждённый мост, понимая, что работа займёт много времени.',
@@ -4717,7 +4717,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Захламлённая комната, человек погружён в компьютер',
-          imageUrl: 'assets/images/rahu-tamas-scene.jpg',
+          imageUrl: 'assets/images/rahu-tamas-scene.webp',
           details: [
             {
               text: 'Человек настолько погружён в интернет, что всё его внимание приковано к экрану, несмотря на наступившее утро.',
@@ -4765,7 +4765,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Медиамагнат в центре телевизионной студии',
-          imageUrl: 'assets/images/rahu-rajas-scene.jpg',
+          imageUrl: 'assets/images/rahu-rajas-scene.webp',
           details: [
             {
               text: 'Он находится в центре огромной аудитории и через сцену и камеры удерживает внимание множества людей.',
@@ -4813,7 +4813,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Учёный-изобретатель в простой светлой мастерской',
-          imageUrl: 'assets/images/rahu-sattva-scene.jpg',
+          imageUrl: 'assets/images/rahu-sattva-scene.webp',
           details: [
             {
               text: 'Он создаёт собственное необычное устройство, самостоятельно разрабатывая его конструкцию и механизм.',
@@ -5290,7 +5290,7 @@ const PLANET_TASK_CONTENT = {
           id: 'tamas',
           guna: 'Тамас',
           setting: 'Старая станция, смотритель у фонаря',
-          imageUrl: 'assets/images/ketu-tamas-scene.jpg',
+          imageUrl: 'assets/images/ketu-tamas-scene.webp',
           details: [
             {
               text: 'Смотритель крепко прижимает к себе старый станционный фонарь, не позволяя рабочим его забрать.',
@@ -5338,7 +5338,7 @@ const PLANET_TASK_CONTENT = {
           id: 'rajas',
           guna: 'Раджас',
           setting: 'Комната слежения, стены увешаны картами и часами',
-          imageUrl: 'assets/images/ketu-rajas-scene.jpg',
+          imageUrl: 'assets/images/ketu-rajas-scene.webp',
           details: [
             {
               text: 'Он одновременно изучает газеты, карту и слушает радио, стараясь постоянно быть в курсе происходящего.',
@@ -5386,7 +5386,7 @@ const PLANET_TASK_CONTENT = {
           id: 'sattva',
           guna: 'Саттва',
           setting: 'Горный перевал, странник указывает путь',
-          imageUrl: 'assets/images/ketu-sattva-scene.jpg',
+          imageUrl: 'assets/images/ketu-sattva-scene.webp',
           details: [
             {
               text: 'Увидев, что прежний путь разрушен, странник спокойно выбирает другой маршрут и ведёт людей дальше.',
