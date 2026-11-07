@@ -26,7 +26,7 @@ if (getUserState().telegramId) setUserState({ activeBlock: 'signs' });
 let saved;
 try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch{saved={};}
 if(new URLSearchParams(location.search).get('restart')==='1'){saved={};localStorage.removeItem(storageKey);history.replaceState({},'',location.pathname);}
-let state={entered:true,stage:['shiva','map','kailash','shiva-depths','coast','shiva-indra','indra','aries','mangala','indra-taurus','shukra','taurus','indra-gemini','budha','gemini','indra-cancer','cancer','indra-leo','leo','indra-virgo','virgo','indra-libra','libra','indra-scorpio','scorpio','indra-sagittarius','guru','sagittarius'].includes(saved.stage)?saved.stage:'shiva',testBhriguFinished:saved.testBhriguFinished===true,testVarunaFinished:saved.testVarunaFinished===true,indraJoined:saved.indraJoined===true,ariesRestored:saved.ariesRestored===true,taurusUnlocked:saved.taurusUnlocked===true,taurusRestored:saved.taurusRestored===true,geminiUnlocked:saved.geminiUnlocked===true,geminiRestored:saved.geminiRestored===true,cancerUnlocked:saved.cancerUnlocked===true,cancerRestored:saved.cancerRestored===true,leoUnlocked:saved.leoUnlocked===true,leoRestored:saved.leoRestored===true,virgoUnlocked:saved.virgoUnlocked===true,virgoRestored:saved.virgoRestored===true,libraUnlocked:saved.libraUnlocked===true,libraRestored:saved.libraRestored===true,scorpioUnlocked:saved.scorpioUnlocked===true,scorpioRestored:saved.scorpioRestored===true,sagittariusUnlocked:saved.sagittariusUnlocked===true,sagittariusRestored:saved.sagittariusRestored===true};
+let state={entered:true,stage:['shiva','map','kailash','shiva-depths','coast','shiva-indra','indra','aries','mangala','indra-taurus','shukra','taurus','indra-gemini','budha','gemini','indra-cancer','cancer','indra-leo','leo','indra-virgo','virgo','indra-libra','libra','indra-scorpio','scorpio','indra-sagittarius','guru','sagittarius','shani','capricorn','aquarius','pisces','indra-capricorn','indra-aquarius','indra-pisces'].includes(saved.stage)?saved.stage:'shiva',testBhriguFinished:saved.testBhriguFinished===true,testVarunaFinished:saved.testVarunaFinished===true,indraJoined:saved.indraJoined===true,ariesRestored:saved.ariesRestored===true,taurusUnlocked:saved.taurusUnlocked===true,taurusRestored:saved.taurusRestored===true,geminiUnlocked:saved.geminiUnlocked===true,geminiRestored:saved.geminiRestored===true,cancerUnlocked:saved.cancerUnlocked===true,cancerRestored:saved.cancerRestored===true,leoUnlocked:saved.leoUnlocked===true,leoRestored:saved.leoRestored===true,virgoUnlocked:saved.virgoUnlocked===true,virgoRestored:saved.virgoRestored===true,libraUnlocked:saved.libraUnlocked===true,libraRestored:saved.libraRestored===true,scorpioUnlocked:saved.scorpioUnlocked===true,scorpioRestored:saved.scorpioRestored===true,sagittariusUnlocked:saved.sagittariusUnlocked===true,sagittariusRestored:saved.sagittariusRestored===true,capricornUnlocked:saved.capricornUnlocked===true,capricornRestored:saved.capricornRestored===true,aquariusUnlocked:saved.aquariusUnlocked===true,aquariusRestored:saved.aquariusRestored===true,piscesUnlocked:saved.piscesUnlocked===true,piscesRestored:saved.piscesRestored===true};
 let revealGeneration=0;
 function setView(intro) {
   document.body.classList.toggle('intro-active',intro);
@@ -40,12 +40,13 @@ function setView(intro) {
 let dialogue=null,returnFocus=null,typeTimer=null,finishTyping=null;
 let stopStorySpeech = () => {};
 function stopTyping(){clearInterval(typeTimer);typeTimer=null;finishTyping=null;stopStorySpeech();}
-function typeText(node,text,done){
+function typeText(node,text,done,speaker,options){
  stopTyping();node.textContent='';node.setAttribute('aria-label',text);node.setAttribute('aria-live','off');
  let i=0;
  const finish=()=>{clearInterval(typeTimer);typeTimer=null;node.textContent=text;finishTyping=null;stopStorySpeech();done?.();};
  finishTyping=finish;
  if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return;}
+ if(speaker)stopStorySpeech=animateSpeech(speaker,text,options);
  typeTimer=setInterval(()=>{i+=2;node.textContent=text.slice(0,i);if(i>=text.length)finish();},28);
 }
 const dialog=document.getElementById('storyDialog');
@@ -67,7 +68,10 @@ function startStory(kind) {
     'indra-virgo':world.indraVirgo,
     'indra-libra':world.indraLibra,
     'indra-scorpio':world.indraScorpio,
-    'indra-sagittarius':world.indraSagittarius
+    'indra-sagittarius':world.indraSagittarius,
+    'indra-capricorn':world.indraCapricorn,
+    'indra-aquarius':world.indraAquarius,
+    'indra-pisces':world.indraPisces
   };
   dialogue={kind,index:0,lines:scenes[kind]};
   renderStory();
@@ -88,12 +92,11 @@ function renderStory() {
   indra.classList.toggle('facing-shiva',speaker==='indra-dialogue');
   if(meeting)indra.src='assets/signs/characters/'+(addressingPlayer?'indra-idle':'indra-dialogue')+'.webp';
   const next=document.getElementById('storyNext');
-  const lastLabels={'shiva-indra':'Призвать Индру',indra:'К обители','indra-taurus':'К обители','indra-gemini':'К обители','indra-cancer':'К обители','indra-leo':'К обители','indra-virgo':'К обители','indra-libra':'К обители','indra-scorpio':'К обители','indra-sagittarius':'К обители'};
+  const lastLabels={'shiva-indra':'Призвать Индру',indra:'К обители','indra-taurus':'К обители','indra-gemini':'К обители','indra-cancer':'К обители','indra-leo':'К обители','indra-virgo':'К обители','indra-libra':'К обители','indra-scorpio':'К обители','indra-sagittarius':'К обители','indra-capricorn':'К обители','indra-aquarius':'К обители','indra-pisces':'К обители'};
   next.textContent='Показать весь текст';
   typeText(document.getElementById('storyText'),meeting?line.text:line,()=>{
     next.textContent=dialogue.index<dialogue.lines.length-1?'Далее':(lastLabels[dialogue.kind]||'Открыть обитель');
-  });
-  if(speaker==='shiva'&&finishTyping)stopStorySpeech=animateSpeech(shiva,meeting?line.text:line);
+  },speaker==='shiva'?shiva:indra);
   document.getElementById('storyCounter').textContent=(dialogue.index+1)+' / '+dialogue.lines.length;
 }
 document.getElementById('storyNext').addEventListener('click',()=>{
@@ -117,6 +120,8 @@ document.getElementById('storyNext').addEventListener('click',()=>{
   if(kind==='indra-libra')state.libraUnlocked=true;
   if(kind==='indra-scorpio')state.scorpioUnlocked=true;
   if(kind==='indra-sagittarius')state.sagittariusUnlocked=true;
+  const lateSign=kind.slice(6);
+  if(kind.startsWith('indra-')&&Object.hasOwn(lateRooms,lateSign))state[lateSign+'Unlocked']=true;
   state.stage='map';
   save();
   renderMap(kind==='shiva');
@@ -151,6 +156,9 @@ function render(){
  else if(state.stage==='indra-sagittarius')startStory('indra-sagittarius');
  else if(state.stage==='guru')renderGuruRooms();
  else if(state.stage==='sagittarius')renderSagittariusHall();
+ else if(state.stage==='shani')renderShaniRooms();
+ else if(Object.hasOwn(lateRooms,state.stage))renderLateHall(state.stage);
+ else if(state.stage.startsWith('indra-')&&Object.hasOwn(lateRooms,state.stage.slice(6)))startStory(state.stage);
  else startStory(state.stage==='shiva-indra'?'shiva-indra':state.stage==='shiva-depths'?'shiva-depths':'shiva');
 }
 function addMapLabel(node, name) {
@@ -172,7 +180,8 @@ async function renderMap(reveal=false){
     : id==='budha'&&state.cancerUnlocked ? renderBudhaRooms
     : id==='chandra'&&state.leoUnlocked ? renderCancerBaths
     : id==='surya'&&state.leoRestored ? renderLeoHall
-    : id==='guru'&&state.sagittariusRestored ? renderGuruRooms : null;
+    : id==='guru'&&state.sagittariusRestored ? renderGuruRooms
+    : id==='shani'&&state.capricornUnlocked ? renderShaniRooms : null;
   const node=previousRoom
     ? button('',previousRoom,'map-building map-building-open')
     : el('div','map-building');
@@ -181,9 +190,9 @@ async function renderMap(reveal=false){
   addMapLabel(node,img.alt);
   map.append(node);
  }
- const target=state.sagittariusUnlocked?'sagittarius':state.scorpioUnlocked?'scorpio':state.libraUnlocked?'libra':state.virgoUnlocked?'virgo':state.leoUnlocked?'leo':state.cancerUnlocked?'cancer':state.geminiUnlocked?'gemini':state.taurusUnlocked?'taurus':state.indraJoined?'aries':state.testBhriguFinished?'coast':'kailash';
- const markerClass={sagittarius:' sagittarius-call',scorpio:' aries-call',libra:' taurus-call',virgo:' gemini-call',leo:' leo-call',cancer:' cancer-call',gemini:' gemini-call',taurus:' taurus-call',aries:' aries-call',coast:' coast-call',kailash:''};
- const markerLabel={sagittarius:planetBuildings.guru.name,scorpio:world.mangalaBuildingName,libra:planetBuildings.shukra.name,virgo:planetBuildings.budha.name,leo:planetBuildings.surya.name,cancer:world.chandraBuildingName,gemini:planetBuildings.budha.name,taurus:planetBuildings.shukra.name,aries:world.mangalaBuildingName,coast:'Побережье',kailash:'Кайлас'};
+ const target=state.piscesUnlocked?'pisces':state.aquariusUnlocked?'aquarius':state.capricornUnlocked?'capricorn':state.sagittariusUnlocked?'sagittarius':state.scorpioUnlocked?'scorpio':state.libraUnlocked?'libra':state.virgoUnlocked?'virgo':state.leoUnlocked?'leo':state.cancerUnlocked?'cancer':state.geminiUnlocked?'gemini':state.taurusUnlocked?'taurus':state.indraJoined?'aries':state.testBhriguFinished?'coast':'kailash';
+ const markerClass={pisces:' sagittarius-call',aquarius:' shani-call',capricorn:' shani-call',sagittarius:' sagittarius-call',scorpio:' aries-call',libra:' taurus-call',virgo:' gemini-call',leo:' leo-call',cancer:' cancer-call',gemini:' gemini-call',taurus:' taurus-call',aries:' aries-call',coast:' coast-call',kailash:''};
+ const markerLabel={pisces:planetBuildings.guru.name,aquarius:planetBuildings.shani.name,capricorn:planetBuildings.shani.name,sagittarius:planetBuildings.guru.name,scorpio:world.mangalaBuildingName,libra:planetBuildings.shukra.name,virgo:planetBuildings.budha.name,leo:planetBuildings.surya.name,cancer:world.chandraBuildingName,gemini:planetBuildings.budha.name,taurus:planetBuildings.shukra.name,aries:world.mangalaBuildingName,coast:'Побережье',kailash:'Кайлас'};
  for(const id of ['kailash','coast']){
   const completed=id==='kailash'?state.testBhriguFinished:state.testVarunaFinished;
   if(!completed || id===target)continue;
@@ -192,14 +201,15 @@ async function renderMap(reveal=false){
   addMapLabel(revisit,markerLabel[id]);
   map.append(revisit);
  }
- if(state.sagittariusRestored || (state.scorpioRestored && !state.sagittariusUnlocked) || (state.libraRestored && !state.scorpioUnlocked) || (state.virgoRestored && !state.libraUnlocked) || (state.leoRestored && !state.virgoUnlocked))return;
+ if(state.piscesRestored || (state.aquariusRestored&&!state.piscesUnlocked) || (state.capricornRestored&&!state.aquariusUnlocked) || (state.sagittariusRestored&&!state.capricornUnlocked) || (state.scorpioRestored && !state.sagittariusUnlocked) || (state.libraRestored && !state.scorpioUnlocked) || (state.virgoRestored && !state.libraUnlocked) || (state.leoRestored && !state.virgoUnlocked))return;
  const marker=button('',()=>{
   if(target==='aries'||target==='scorpio')renderMangalaRooms();
   else if(target==='taurus'||target==='libra')renderShukraRooms();
   else if(target==='gemini'||target==='virgo')renderBudhaRooms();
   else if(target==='cancer')renderCancerBaths();
   else if(target==='leo')renderLeoHall();
-  else if(target==='sagittarius')renderGuruRooms();
+  else if(target==='sagittarius'||target==='pisces')renderGuruRooms();
+  else if(target==='capricorn'||target==='aquarius')renderShaniRooms();
   else renderLocation(target);
  },'kailash-call'+markerClass[target]);
  marker.setAttribute('aria-label',markerLabel[target]);
@@ -281,14 +291,14 @@ function renderLocation(id){
  const source=el('source');source.type='image/webp';source.srcset='assets/signs/locations/kailash-small-display.webp 768w, assets/signs/locations/kailash-display.webp 1280w';source.sizes='(max-width: 850px) calc(100vw - 32px), min(1260px, calc(100vw - 60px))';
  const bg=el('img');bg.src='assets/signs/locations/kailash.png';bg.alt='Снежные вершины Кайласа над каменной площадкой';bg.width=1280;bg.height=720;bg.decoding='async';
  picture.append(source,bg);
- const teacher=el('picture','teacher-figure');const ts=el('source');ts.type='image/webp';ts.srcset='assets/signs/characters/bhrigu-seated.webp';
- const ti=el('img');ti.src='assets/signs/characters/bhrigu-seated.png';ti.alt='Бхригу Муни сидит на фоне Кайласа';ti.width=512;ti.height=512;ti.decoding='async';teacher.append(ts,ti);scene.append(picture,teacher);
+ const teacher=el('picture','teacher-figure');
+ const ti=el('img');ti.src='assets/signs/characters/bhrigu-seated.webp';ti.alt='Бхригу Муни сидит на фоне Кайласа';ti.width=512;ti.height=512;ti.decoding='async';teacher.append(ti);scene.append(picture,teacher);
  }else{
  const picture=el('picture','location-landscape');
  const source=el('source');source.type='image/webp';source.srcset='assets/signs/locations/coast-small-display.webp 768w, assets/signs/locations/coast-display.webp 1280w';source.sizes='(max-width: 850px) calc(100vw - 32px), min(1260px, calc(100vw - 60px))';
  const bg=el('img');bg.src='assets/signs/locations/coast.png';bg.alt='Бирюзовое мелководье у берега океана';bg.width=1280;bg.height=720;bg.decoding='async';picture.append(source,bg);
- const teacher=el('picture','teacher-figure varuna-figure'),ts=el('source');ts.type='image/webp';ts.srcset='assets/signs/characters/varuna-standing.webp';
- const ti=el('img');ti.src='assets/signs/characters/varuna-standing.png';ti.alt='Варуна стоит в водах океана';ti.width=512;ti.height=768;ti.decoding='async';teacher.append(ts,ti);scene.append(picture,teacher);
+ const teacher=el('picture','teacher-figure varuna-figure');
+ const ti=el('img');ti.src='assets/signs/characters/varuna-standing.webp';ti.alt='Варуна стоит в водах океана';ti.width=512;ti.height=768;ti.decoding='async';teacher.append(ti);scene.append(picture,teacher);
  }
  animateLandscape(scene, kailash);
  const copy=el('div','location-conversation');copy.append(el('p','eyebrow',kailash?'Первый урок':'Второй урок'),el('h2','',kailash?'Взгляд с небесных высот':'Знание из глубин'),el('p','',kailash?'В этой локации тебя встретит Бхригу Муни. Он познакомит тебя с устройством небес.':'У океана тебя встречает Варуна — здесь начнётся знакомство с природой и стихиями.'));
@@ -309,7 +319,7 @@ function renderLocation(id){
   typeText(speech,lines[Math.min(index,lines.length-1)],()=>{
    if(index<lines.length-1)talk.textContent='Далее';
    else talk.textContent=completed?'Завершить повторный урок':'Завершить задания (тест)';
-  });
+  },scene.querySelector('.teacher-figure img'),{ layered: true });
  },'primary');
  copy.append(speech,talk);
 
@@ -340,7 +350,7 @@ function renderMangalaRooms() {
   const rooms=el('div','mangala-rooms');
   const aries=button('',renderAriesHall,'mangala-room'+(state.ariesRestored?'':' room-calling'));
   const ariesImage=el('img');
-  ariesImage.src='assets/signs/locations/play/aries-'+(state.ariesRestored?'ready':'unfinished')+'.webp';
+  ariesImage.src='assets/signs/locations/fine-pixel/aries-'+(state.ariesRestored?'ready':'unfinished')+'.webp';
   ariesImage.alt='';
   aries.append(ariesImage,el('span','room-sign','Овен'),el('strong','','Зал сражений'));
 
@@ -370,7 +380,7 @@ function renderAriesHall() {
   header.append(button('← К Мангале',renderMangalaRooms),el('p','eyebrow','Мангала · Овен'),el('h1','','Зал сражений'));
   const scene=el('section','location-scene aries-hall');
   const image=el('img','aries-hall-image');
-  image.src='assets/signs/locations/play/aries-'+(state.ariesRestored?'ready':'unfinished')+'.webp';
+  image.src='assets/signs/locations/fine-pixel/aries-'+(state.ariesRestored?'ready':'unfinished')+'.webp';
   image.alt=state.ariesRestored?'Четыре бойца тренируются в восстановленном зале':'Тёмный недостроенный зал с лесами и горами за проёмами';
   image.width=1280;
   image.height=720;
@@ -415,7 +425,7 @@ function renderShukraRooms() {
   const rooms=el('div','mangala-rooms');
   const taurus=button('',renderTaurusKitchen,'mangala-room'+(state.taurusRestored?'':' room-calling'));
   const kitchenPreview=el('img');
-  kitchenPreview.src='assets/signs/locations/play/taurus-'+(state.taurusRestored?'ready':'ruined')+'.webp';
+  kitchenPreview.src='assets/signs/locations/fine-pixel/taurus-'+(state.taurusRestored?'ready':'ruined')+'.webp';
   kitchenPreview.alt='';
   taurus.append(kitchenPreview,el('span','room-sign','Телец'),el('strong','','Божественная кухня'));
   const libra=button('',renderLibraHall,'mangala-room'+(!state.libraUnlocked?' room-locked':state.libraRestored?'':' room-calling'));
@@ -443,7 +453,7 @@ function renderTaurusKitchen() {
   header.append(button('← К Чертогам Шукры',renderShukraRooms),el('p','eyebrow','Шукра · Телец'),el('h1','','Божественная кухня'));
   const scene=el('section','location-scene taurus-kitchen');
   const image=el('img','aries-hall-image');
-  image.src='assets/signs/locations/play/taurus-'+(state.taurusRestored?'ready':'ruined')+'.webp';
+  image.src='assets/signs/locations/fine-pixel/taurus-'+(state.taurusRestored?'ready':'ruined')+'.webp';
   image.alt=state.taurusRestored?'В восстановленной кухне работают повара':'Разрушенная кухня с погасшими очагами';
   image.width=1280;
   image.height=720;
@@ -489,7 +499,7 @@ function renderBudhaRooms() {
   const rooms=el('div','mangala-rooms');
   const gemini=button('',renderGeminiHall,'mangala-room'+(state.geminiRestored?'':' room-calling'));
   const preview=el('img');
-  preview.src='assets/signs/locations/play/gemini-'+(state.geminiRestored?'ready':'ruined')+'.webp';
+  preview.src='assets/signs/locations/fine-pixel/gemini-'+(state.geminiRestored?'ready':'ruined')+'.webp';
   preview.alt='';
   gemini.append(preview,el('span','room-sign','Близнецы'),el('strong','','Зал вестей'));
   const virgo=button('',renderVirgoHall,'mangala-room'+(!state.virgoUnlocked?' room-locked':state.virgoRestored?'':' room-calling'));
@@ -517,7 +527,7 @@ function renderGeminiHall() {
   header.append(button('← К Торговой гильдии',renderBudhaRooms),el('p','eyebrow','Буддха · Близнецы'),el('h1','','Зал вестей'));
   const scene=el('section','location-scene gemini-hall');
   const image=el('img','aries-hall-image');
-  image.src='assets/signs/locations/play/gemini-'+(state.geminiRestored?'ready':'ruined')+'.webp';
+  image.src='assets/signs/locations/fine-pixel/gemini-'+(state.geminiRestored?'ready':'ruined')+'.webp';
   image.alt=state.geminiRestored?'В восстановленном зале жители обмениваются вестями':'Заброшенный Зал вестей с разбитой доской объявлений';
   image.width=1280;
   image.height=720;
@@ -565,7 +575,7 @@ function renderCancerBaths() {
 
   const scene=el('section','location-scene cancer-baths');
   const image=el('img','aries-hall-image');
-  image.src='assets/signs/locations/play/cancer-'+(state.cancerRestored?'ready':'ruined')+'.webp';
+  image.src='assets/signs/locations/fine-pixel/cancer-'+(state.cancerRestored?'ready':'ruined')+'.webp';
   image.alt=state.cancerRestored?'Чандра на троне среди цветущих купален':'Разрушенные купальни с пустыми бассейнами и троном';
   image.width=1280;
   image.height=720;
@@ -614,7 +624,7 @@ function renderLeoHall() {
 
   const scene=el('section','location-scene');
   const image=el('img','aries-hall-image');
-  image.src='assets/signs/locations/play/surya-town-hall-'+(state.leoRestored?'ready':'ruined')+'.webp';
+  image.src='assets/signs/locations/fine-pixel/surya-town-hall-'+(state.leoRestored?'ready':'ruined')+'.webp';
   image.alt=state.leoRestored?'Сурья на троне в восстановленной ратуше с четырьмя столами':'Разрушенный зал ратуши с пустым троном';
   image.width=1280;
   image.height=720;
@@ -638,7 +648,7 @@ function renderLeoHall() {
 }
 
 function virgoHallImage() {
-  return 'assets/signs/locations/play/virgo-'+(state.virgoRestored?'ready':'ruined')+'.webp';
+  return 'assets/signs/locations/fine-pixel/virgo-'+(state.virgoRestored?'ready':'ruined')+'.webp';
 }
 
 function renderVirgoHall() {
@@ -677,7 +687,7 @@ function renderVirgoHall() {
 }
 
 function libraHallImage() {
-  return 'assets/signs/locations/play/libra-'+(state.libraRestored?'ready':'ruined')+'.webp';
+  return 'assets/signs/locations/fine-pixel/libra-'+(state.libraRestored?'ready':'ruined')+'.webp';
 }
 
 function renderLibraHall() {
@@ -716,7 +726,7 @@ function renderLibraHall() {
 }
 
 function scorpioHallImage() {
-  return 'assets/signs/locations/play/scorpio-'+(state.scorpioRestored?'ready':'ruined')+'.webp';
+  return 'assets/signs/locations/fine-pixel/scorpio-'+(state.scorpioRestored?'ready':'ruined')+'.webp';
 }
 
 function renderScorpioHall() {
@@ -755,7 +765,7 @@ function renderScorpioHall() {
 }
 
 function sagittariusHallImage() {
-  return 'assets/signs/locations/play/sagittarius-'+(state.sagittariusRestored?'ready':'ruined')+'.webp';
+  return 'assets/signs/locations/fine-pixel/sagittarius-'+(state.sagittariusRestored?'ready':'ruined')+'.webp';
 }
 
 function renderGuruRooms() {
@@ -780,10 +790,7 @@ function renderGuruRooms() {
   preview.src=sagittariusHallImage();
   preview.alt='';
   sagittarius.append(preview,el('span','room-sign','Стрелец'),el('strong','','Зал Тримурти'));
-  const pisces=button('',()=>{},'mangala-room room-locked');
-  pisces.disabled=true;
-  pisces.append(el('span','shukra-room-symbol','♓'),el('span','room-lock','🔒'),el('span','room-sign','Рыбы'),el('strong','','Закрыто'));
-  rooms.append(sagittarius,pisces);
+  rooms.append(sagittarius,lateRoomButton('pisces'));
   root.append(header,ruler,rooms);
 }
 
@@ -807,10 +814,111 @@ function renderSagittariusHall() {
   const card=el('div','location-conversation');
   if(state.sagittariusRestored){
     card.append(el('h2','','Алтарь Тримурти восстановлен'),el('p','','Изваяния Брахмы, Вишну и Шивы снова на алтаре. Свет из Горнила поднимается к чаше.'));
+    appendNextRoom(card,'capricorn');
   }else{
     card.append(el('h2','','Восстанови алтарь Тримурти'),el('p','','Гуру: «'+world.guruAltarRequest+'»'),button('Завершить задания (тест)',()=>{
       state.sagittariusRestored=true;
       renderSagittariusHall();
+    },'primary'));
+  }
+  root.append(header,scene,card);
+}
+
+const lateRooms = {
+  capricorn: {
+    sign:'Козерог', symbol:'♑', title:'Палата предприятий', restoredTitle:'Палата предприятий восстановлена', ruler:'Шани',
+    test:'Испытания Козерога', request:'Помоги мне восстановить Палату предприятий. Мастерам нужно снова собраться за одним столом, чтобы воплотить божественный план в материальном мире.',
+    restored:'Мастера снова сверяют чертежи, распределяют материалы и планируют общую работу.', next:'aquarius', pixelSuffix:'-pixel',
+  },
+  aquarius: {
+    sign:'Водолей', symbol:'♒', title:'Зал инноваций', restoredTitle:'Зал инноваций восстановлен', ruler:'Шани',
+    test:'Испытания Водолея', request:'Помоги мне восстановить Зал инноваций, чтобы учёные снова могли испытывать свои изобретения.',
+    restored:'Насос снова подаёт воду, подъёмник поднимает грузы, а учёные записывают результаты испытаний.', next:'pisces', pixelSuffix:'-pixel',
+  },
+  pisces: {
+    sign:'Рыбы', symbol:'♓', title:'Берег прощания', restoredTitle:'Берег прощания восстановлен', ruler:'Гуру',
+    test:'Испытания Рыб', request:'Помоги мне восстановить Берег прощания, чтобы близкие могли побыть рядом и проводить тех, кому пора дальше.',
+    restored:'У берега снова можно посидеть вместе. Светильники плывут по воде и постепенно скрываются за дальней аркой.', pixelSuffix:'',
+  }
+};
+
+function lateRoomImage(id) {
+  const condition=state[id+'Restored']?'ready':'ruined';
+  return 'assets/signs/locations/fine-pixel/'+id+'-'+condition+lateRooms[id].pixelSuffix+'.webp';
+}
+
+function appendNextRoom(card,id) {
+  if(state[id+'Unlocked'])return;
+  card.append(button('Далее',()=>{
+    state.stage='indra-'+id;
+    save();
+    render();
+  },'primary'));
+}
+
+function lateRoomButton(id) {
+  const room=lateRooms[id];
+  const unlocked=state[id+'Unlocked'];
+  const entry=button('',()=>renderLateHall(id),'mangala-room'+(!unlocked?' room-locked':state[id+'Restored']?'':' room-calling'));
+  entry.disabled=!unlocked;
+  if(unlocked){
+    const preview=el('img');
+    preview.src=lateRoomImage(id);
+    preview.alt='';
+    entry.append(preview);
+  }else{
+    entry.append(el('span','shukra-room-symbol',room.symbol),el('span','room-lock','🔒'));
+  }
+  entry.append(el('span','room-sign',room.sign),el('strong','',room.title));
+  return entry;
+}
+
+function renderShaniRooms() {
+  stopTyping();
+  setView(false);
+  root.replaceChildren();
+  window.scrollTo(0,0);
+  state.stage='shani';
+  save();
+  const header=el('div','page-heading');
+  header.append(button('← К обители',()=>{state.stage='map';save();renderMap();}),el('h1','',planetBuildings.shani.name));
+  const ruler=el('div','mangala-ruler');
+  const portrait=el('img');
+  portrait.src='assets/characters/shani-pixel-512.webp';
+  portrait.alt='Шани';
+  ruler.append(portrait,el('p','eyebrow','Шани'));
+  const rooms=el('div','mangala-rooms');
+  rooms.append(lateRoomButton('capricorn'),lateRoomButton('aquarius'));
+  root.append(header,ruler,rooms);
+}
+
+function renderLateHall(id) {
+  stopTyping();
+  setView(false);
+  root.replaceChildren();
+  window.scrollTo(0,0);
+  state.stage=id;
+  save();
+  const room=lateRooms[id];
+  const restored=state[id+'Restored'];
+  const back=id==='pisces'?renderGuruRooms:renderShaniRooms;
+  const header=el('div','page-heading');
+  header.append(button(id==='pisces'?'← В Храм мудрости':'← В Ремесленный двор',back),el('p','eyebrow',room.ruler+' · '+room.sign),el('h1','',room.title));
+  const scene=el('section','location-scene');
+  const image=el('img','aries-hall-image');
+  image.src=lateRoomImage(id);
+  image.alt=room.title+(restored?' после восстановления':' до восстановления');
+  image.width=960;
+  image.height=540;
+  scene.append(image);
+  const card=el('div','location-conversation');
+  if(restored){
+    card.append(el('h2','',room.restoredTitle),el('p','',room.restored));
+    if(room.next)appendNextRoom(card,room.next);
+  }else{
+    card.append(el('h2','',room.test),el('p','',room.ruler+': «'+room.request+'»'),button('Завершить задания (тест)',()=>{
+      state[id+'Restored']=true;
+      renderLateHall(id);
     },'primary'));
   }
   root.append(header,scene,card);

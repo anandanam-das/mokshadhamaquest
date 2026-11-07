@@ -243,3 +243,9 @@ body.intro-active #previewRoot{min-height:100dvh}
 .leo-call.kailash-call { left: 50%; top: 50%; width: 28%; }
 
 .sagittarius-call.kailash-call { left: 89%; top: 25%; width: 22%; }
+
+.teacher-figure > .speech-frame-overlay { position: absolute; inset: 0; visibility: hidden; pointer-events: none; }
+.teacher-figure > .speech-frame-visible { visibility: visible; }
+.teacher-figure > .speech-frame-hidden { visibility: hidden; }
+
+.shani-call.kailash-call { left: 12%; top: 50%; width: 22%; }
