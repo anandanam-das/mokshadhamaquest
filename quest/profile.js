@@ -329,6 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  const currentBlock = state.activeBlock === 'signs' ? 'signs' : 'planets';
+  const returnPath = currentBlock === 'signs' ? 'signs-preview.html' : 'village.html';
+  document.querySelectorAll('[data-return-to-course]').forEach(link => {
+    link.href = returnPath;
+  });
+  document.getElementById(currentBlock === 'signs' ? 'signsCourseLink' : 'planetsCourseLink')
+    .setAttribute('aria-current', 'true');
+
   if (!isLocalDevHost()) {
     const panel = document.getElementById('courseAccessPanel');
     const status = document.getElementById('courseAccessStatus');

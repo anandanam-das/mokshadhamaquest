@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   const finalPreview = isLocalDevHost() && new URLSearchParams(location.search).get('dev') === 'final';
-  if(finalPreview && !getUserState().telegramId) setUserState({telegramId:'local-final-preview',character:{patronPlanet:'surya'},hasSeenPrologue:true,introCompleted:true});
+  const speechPreview = isLocalDevHost() && new URLSearchParams(location.search).get('dev') === 'speech';
+  if ((finalPreview || speechPreview) && !getUserState().telegramId) {
+    setUserState({ telegramId: 'local-preview', character: { patronPlanet: 'surya' }, hasSeenPrologue: true, introCompleted: true });
+  }
   const state = getUserState();
 
   if (!state.telegramId) {
@@ -13,13 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  if (!finalPreview && !speechPreview) setUserState({ activeBlock: 'planets' });
+
   // Выбор покровителя (creator.js) сохраняется в quest-api "best-effort" —
   // если в тот момент запрос не прошёл, локально всё работает (персонаж
   // лежит в localStorage), но в БД patron_planet так и остаётся пустым
   // навсегда — в админке это выглядит как "—" у игрока, который явно уже
   // играет. Подстраховка: на каждом заходе в деревню тихо повторяем
   // синхронизацию, пока она не пройдёт.
-  if (!finalPreview && typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
+  if (!finalPreview && !speechPreview && typeof saveQuestProfile === 'function' && state.character.patronPlanet) {
     saveQuestProfile({ patronPlanet: state.character.patronPlanet, ...(state.hasSeenPrologue ? { hasSeenPrologue: true } : {}) }).catch(() => {});
   }
 
@@ -170,6 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const SPEECH_AUTO_HIDE_MS = 6000;
   let speechHideTimer = null;
+  const patronImage = document.getElementById('patronWidgetImage');
+  let stopPatronAnimation = () => {};
+
+  const animatePatronSpeech = (message) => {
+    stopPatronAnimation();
+    if (!patronWidget.classList.contains('patron-widget-hidden')) {
+      stopPatronAnimation = animateSpeech(patronImage, message);
+    }
+  };
 
   // Переход между зданиями (конец Введения → Сурья, конец планеты →
   // следующая) — единственный случай, когда реплика обязана появиться,
@@ -218,18 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const hidePatronSpeech = () => {
     clearTimeout(speechHideTimer);
+    stopPatronAnimation();
     patronSpeechBubble.classList.remove('speech-bubble-visible');
     patronSpeechBubble.hidden = true;
     clearTransitionOverlay();
-  };
-
-  const bumpPatronImage = () => {
-    const img = document.getElementById('patronWidgetImage');
-    img.classList.remove('patron-react');
-    // eslint-disable-next-line no-void
-    void img.offsetWidth;
-    img.classList.add('patron-react');
-    img.addEventListener('animationend', () => img.classList.remove('patron-react'), { once: true });
   };
 
   const showPatronSpeech = (message) => {
@@ -239,10 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
     patronSpeechBubble.textContent = message;
     patronSpeechBubble.hidden = false;
     patronSpeechBubble.classList.add('speech-bubble-visible');
+    animatePatronSpeech(message);
 
     clearTimeout(speechHideTimer);
     speechHideTimer = setTimeout(hidePatronSpeech, SPEECH_AUTO_HIDE_MS);
-    bumpPatronImage();
   };
 
   const TRANSITION_HOLD_MS = 5000;
@@ -262,10 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
     patronSpeechBubble.textContent = message;
     patronSpeechBubble.hidden = false;
     patronSpeechBubble.classList.add('speech-bubble-visible');
+    animatePatronSpeech(message);
 
     clearTimeout(speechHideTimer);
     speechHideTimer = setTimeout(hidePatronSpeech, TRANSITION_HOLD_MS);
-    bumpPatronImage();
   };
 
   // Завершение всей Граха-таттвы (девятая планета) — не рядовой переход
@@ -281,6 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     afterOverlayCallback = onDone || null;
     shivaCutsceneActive = true;
+    stopPatronAnimation();
     const img = document.getElementById('patronWidgetImage');
     img.src = 'assets/prologue/shiva.webp';
     img.alt = 'Шива';
@@ -299,10 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
     patronSpeechBubble.textContent = message;
     patronSpeechBubble.hidden = false;
     patronSpeechBubble.classList.add('speech-bubble-visible');
+    animatePatronSpeech(message);
 
     clearTimeout(speechHideTimer);
     speechHideTimer = setTimeout(hidePatronSpeech, SHIVA_HOLD_MS);
-    bumpPatronImage();
   };
 
   patronSpeechBubble.addEventListener('click', hidePatronSpeech);
@@ -3398,7 +3405,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     let stepIdx = 0;
+    let stopStepAnimation = () => {};
     const showStep = () => {
+      stopStepAnimation();
       card.innerHTML = '';
       const step = GRADUATION_STEPS[stepIdx];
 
@@ -3412,6 +3421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = 'assets/prologue/shiva.webp';
         img.alt = 'Шива';
         card.appendChild(img);
+        stopStepAnimation = animateSpeech(img, step.text);
       }
 
       const heading = document.createElement('h3');
@@ -3554,6 +3564,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const speech=document.createElement('p');speech.className='task-content-feedback';
         speech.textContent='Шива: «Ты разобрался в отношениях грах. Теперь узнай их в человеке, различи похожие силы и найди их в общей истории».';
         doneWrap.appendChild(speech);
+        animatePatronSpeech(speech.textContent);
       }
       if(i<REL_ROUNDS.length-1 && getRelRoundStatus(i+1,getTaskProgress('relationships'))!=='locked'){
         const next=document.createElement('button');next.type='button';next.className='btn btn-primary';
@@ -3592,6 +3603,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // когда экзамен реально закрыт — см. exitRelationshipsTask.
   const exitRelationshipsTask = () => {
     shivaActive = false;
+    stopPatronAnimation();
     setupPatronWidget();
   };
 
@@ -3602,6 +3614,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activeTaskId = null;
     relActiveRoundIndex = null;
 
+    stopPatronAnimation();
     shivaActive = true;
     const img = document.getElementById('patronWidgetImage');
     img.src = 'assets/prologue/shiva.webp';
@@ -4261,6 +4274,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // Деревня уже открыта — это не первый заход, а возвращение.
     // welcomeBack есть только в расширенном пуле, базового аналога нет.
     showPatronSpeech(pickExpandedOnly('welcomeBack'));
+  }
+
+  if (speechPreview) {
+    const panel = document.createElement('section');
+    panel.className = 'panel';
+    panel.style.padding = '16px';
+    const heading = document.createElement('h2');
+    heading.textContent = 'Проверка разговорных спрайтов';
+    const instructions = document.createElement('p');
+    instructions.textContent = 'Выбери персонажа и нажми «Показать реплику». Он появится в правом нижнем углу.';
+    const selector = document.createElement('select');
+    selector.setAttribute('aria-label', 'Персонаж для проверки');
+    const speakers = [...MOKSHA_CHARACTERS, { title: 'Шива', file: 'assets/prologue/shiva.webp' }];
+    for (const [index, speaker] of speakers.entries()) {
+      selector.add(new Option(speaker.title, String(index)));
+    }
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'btn btn-primary';
+    play.textContent = 'Показать реплику';
+    play.addEventListener('click', () => {
+      hidePatronSpeech();
+      showPatronWidget();
+      const speaker = speakers[Number(selector.value)];
+      patronImage.src = speaker.file;
+      patronImage.alt = speaker.title;
+      showPatronSpeech('Привет! Посмотри, как меняется моя поза, пока я говорю. После реплики я вернусь в обычную позу.');
+    });
+    panel.append(heading, instructions, selector, play);
+    (document.querySelector('main') || document.body).prepend(panel);
+    play.click();
   }
 
   if(finalPreview){

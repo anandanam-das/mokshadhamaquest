@@ -1,4 +1,5 @@
-const USER_STATE_KEY = isLocalDevHost() && new URLSearchParams(location.search).get('dev') === 'final' ? 'mokshaFinalExamPreview' : 'mokshaUserState';
+const DEV_STATE_KEYS = new Map([['final', 'mokshaFinalExamPreview'], ['speech', 'mokshaSpeechPreview']]);
+const USER_STATE_KEY = (isLocalDevHost() && DEV_STATE_KEYS.get(new URLSearchParams(location.search).get('dev'))) || 'mokshaUserState';
 
 // Локальная разработка: localhost/127.0.0.1 — обычный случай (сервер и
 // браузер на одной машине), плюс приватные IP-диапазоны (192.168.x.x,

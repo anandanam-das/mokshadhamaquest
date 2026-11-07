@@ -22,6 +22,7 @@ if (!local) {
     return;
   }
 }
+if (getUserState().telegramId) setUserState({ activeBlock: 'signs' });
 let saved;
 try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch{saved={};}
 if(new URLSearchParams(location.search).get('restart')==='1'){saved={};localStorage.removeItem(storageKey);history.replaceState({},'',location.pathname);}
@@ -37,11 +38,12 @@ function setView(intro) {
   }
 }
 let dialogue=null,returnFocus=null,typeTimer=null,finishTyping=null;
-function stopTyping(){clearInterval(typeTimer);typeTimer=null;finishTyping=null;}
+let stopStorySpeech = () => {};
+function stopTyping(){clearInterval(typeTimer);typeTimer=null;finishTyping=null;stopStorySpeech();}
 function typeText(node,text,done){
  stopTyping();node.textContent='';node.setAttribute('aria-label',text);node.setAttribute('aria-live','off');
  let i=0;
- const finish=()=>{clearInterval(typeTimer);typeTimer=null;node.textContent=text;finishTyping=null;done?.();};
+ const finish=()=>{clearInterval(typeTimer);typeTimer=null;node.textContent=text;finishTyping=null;stopStorySpeech();done?.();};
  finishTyping=finish;
  if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return;}
  typeTimer=setInterval(()=>{i+=2;node.textContent=text.slice(0,i);if(i>=text.length)finish();},28);
@@ -91,6 +93,7 @@ function renderStory() {
   typeText(document.getElementById('storyText'),meeting?line.text:line,()=>{
     next.textContent=dialogue.index<dialogue.lines.length-1?'Далее':(lastLabels[dialogue.kind]||'Открыть обитель');
   });
+  if(speaker==='shiva'&&finishTyping)stopStorySpeech=animateSpeech(shiva,meeting?line.text:line);
   document.getElementById('storyCounter').textContent=(dialogue.index+1)+' / '+dialogue.lines.length;
 }
 document.getElementById('storyNext').addEventListener('click',()=>{
