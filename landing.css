@@ -189,7 +189,7 @@ main {
 }
 
 .section {
-  padding: 60px 0;
+  padding: clamp(18px, 2.4vw, 30px) 0;
 }
 
 .section-center {
@@ -207,7 +207,7 @@ main {
 /* Extra top clearance for the section right after the hero, since the cat
    strip straddles the seam and paints above it (z-index) while walking. */
 .section-cat-clearance {
-  padding-top: clamp(90px, 7vw, 120px);
+  padding-top: clamp(60px, 4.5vw, 88px);
 }
 
 .eyebrow {
@@ -244,7 +244,7 @@ main {
      peeks into view on load instead of the fold landing exactly on the
      seam. */
   min-height: clamp(360px, 38vw, 860px);
-  padding: clamp(20px, 3vw, 60px) 0 clamp(50px, 5vw, 90px);
+  padding: clamp(20px, 3vw, 60px) 0 clamp(34px, 4vw, 60px);
 }
 
 .hero-inner {
@@ -1638,6 +1638,264 @@ main {
   background: #ffffff;
 }
 
+/* Telegram reviews */
+
+#reviews .practice-heading {
+  margin: 0 0 10px;
+}
+
+.reviews-source {
+  margin: 0 0 16px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.reviews-carousel {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.reviews-track {
+  align-items: flex-start;
+  overflow-y: hidden;
+  gap: 0;
+  padding: 0 0 6px;
+}
+
+.review-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 0 3px 4px;
+  scroll-snap-align: start;
+  display: flex;
+}
+
+.review-card {
+  border: 2px solid var(--cream-border);
+  border-radius: 16px;
+  background: var(--cream);
+  color: var(--navy);
+  text-align: left;
+}
+
+.review-card {
+  width: 100%;
+  padding: clamp(16px, 3vw, 26px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 0 rgba(20, 20, 30, 0.3);
+}
+
+.review-author {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar {
+  position: relative;
+  display: block;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 2px solid var(--cream-border);
+  border-radius: 7px;
+  background: radial-gradient(circle at 50% 40%, #577cb2, var(--navy-soft) 80%);
+  box-shadow: 0 2px 0 rgba(42, 36, 64, 0.24);
+}
+
+.review-avatar img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--portrait-size);
+  max-width: none;
+  height: auto;
+  transform: translate(var(--portrait-x), var(--portrait-y));
+  image-rendering: pixelated;
+}
+
+.review-author h3 {
+  font-size: 1rem;
+  margin: 0 0 3px;
+}
+
+.review-author p {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.review-card blockquote {
+  margin: 14px 0 0;
+  padding-left: 13px;
+  border-left: 3px solid var(--gold);
+  font-size: clamp(0.9rem, 2.4vw, 1rem);
+  line-height: 1.6;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .review-dialog-copy {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) #e6d6b2;
+  }
+}
+
+.review-dialog-copy::-webkit-scrollbar {
+  width: 12px;
+}
+
+.review-dialog-copy::-webkit-scrollbar-track {
+  background: #e6d6b2;
+  border: 1px solid #c6b48e;
+  border-radius: 3px;
+}
+
+.review-dialog-copy::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #ffd270 0 25%, #f9ae38 25% 75%, #d89529 75%);
+  border: 2px solid var(--cream-border);
+  border-radius: 3px;
+  min-height: 24px;
+}
+
+.review-dialog-copy::-webkit-scrollbar-thumb:hover {
+  background: #ffd270;
+}
+
+.review-dialog-copy p {
+  margin: 0 0 0.75em;
+}
+
+.review-dialog-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.reviews-carousel .carousel-controls {
+  margin-top: 8px;
+}
+
+.reviews-carousel .carousel-arrow:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.review-count {
+  min-width: 7ch;
+  color: white;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.review-more {
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.review-dialog {
+  width: min(640px, calc(100% - 32px));
+  max-height: 85dvh;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid var(--cream-border);
+  border-radius: 16px;
+  background: var(--cream);
+  color: var(--navy);
+  text-align: left;
+  box-shadow: 0 5px 0 #131c35, 0 18px 48px rgba(12, 23, 45, 0.46);
+}
+
+.review-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-dialog::backdrop {
+  background: rgba(12, 23, 45, 0.76);
+}
+
+.review-dialog-header,
+.review-dialog-copy {
+  padding-inline: clamp(16px, 4vw, 28px);
+}
+
+.review-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-shrink: 0;
+  padding-block: 16px;
+  border-bottom: 1px solid #c6b48e;
+  background: #f0e2c3;
+}
+
+.review-dialog-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-dialog-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.review-dialog-header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.review-close {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 2px solid var(--cream-border);
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--navy);
+  box-shadow: 0 2px 0 #b6761a;
+  font: inherit;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.review-close:hover {
+  background: #ffd270;
+}
+
+.review-dialog-copy {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 18px 24px;
+  font-size: clamp(0.92rem, 2.4vw, 1rem);
+  line-height: 1.7;
+}
+
+.review-dialog-copy:focus-visible {
+  outline: 2px solid var(--navy-soft);
+  outline-offset: -3px;
+}
+
 /* Placeholder sections (teacher / pricing) */
 
 .placeholder-section {
@@ -1670,7 +1928,7 @@ main {
   position: relative;
   z-index: 1;
   text-align: center;
-  padding: 30px 20px 44px;
+  padding: 18px 20px 32px;
   color: #ffffff;
   opacity: 0.9;
   display: flex;
@@ -1773,7 +2031,7 @@ main {
   }
 
   .hero-cat-strip {
-    bottom: calc(var(--cat-track-h) / -2 - 24px);
+    bottom: calc(var(--cat-track-h) / -2 - 8px);
   }
 
   .difference-grid {
@@ -1863,7 +2121,7 @@ main {
   }
 
   .hero {
-    padding: 34px 0 58px;
+    padding: 34px 0 40px;
   }
 
   /* Mobile: the 3-card grid becomes a one-at-a-time swipeable carousel */

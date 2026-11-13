@@ -123,6 +123,75 @@
   // one-at-a-time swipeable carousel on mobile (CSS switches the display mode).
   setupCarousel('fit-grid', 'fit-prev', 'fit-next', 'fit-dots');
 
+  /* ---- Telegram reviews ---- */
+  const reviewsTrack = document.getElementById('reviews-track');
+  if (reviewsTrack) {
+    const slides = [...reviewsTrack.children];
+    const prev = document.getElementById('reviews-prev');
+    const next = document.getElementById('reviews-next');
+    const count = document.getElementById('reviews-count');
+    let selected = 0;
+
+
+    function fitActiveReview() {
+      const trackPadding = parseFloat(getComputedStyle(reviewsTrack).paddingBottom);
+      const slideHeight = slides[selected].getBoundingClientRect().height;
+      reviewsTrack.style.height = `${Math.ceil(slideHeight + trackPadding)}px`;
+    }
+
+    function updateReview() {
+      const width = slides[0].getBoundingClientRect().width;
+      const index = width ? Math.max(0, Math.min(slides.length - 1, Math.round(reviewsTrack.scrollLeft / width))) : selected;
+      selected = index;
+      fitActiveReview();
+      slides.forEach((slide, i) => { slide.inert = i !== index; });
+      count.value = `${index + 1} / ${slides.length}`;
+      prev.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+    }
+
+    function moveReview(step) {
+      selected = Math.min(slides.length - 1, Math.max(0, selected + step));
+      reviewsTrack.scrollTo({
+        left: selected * slides[0].getBoundingClientRect().width,
+        behavior: 'instant',
+      });
+    }
+
+    prev.addEventListener('click', () => moveReview(-1));
+    next.addEventListener('click', () => moveReview(1));
+    let reviewScrollTimer;
+    reviewsTrack.addEventListener('scroll', () => {
+      clearTimeout(reviewScrollTimer);
+      reviewScrollTimer = setTimeout(() => {
+        updateReview();
+      }, 100);
+    }, { passive: true });
+    updateReview();
+
+    const reviewResize = new ResizeObserver(fitActiveReview);
+    slides.forEach((slide) => reviewResize.observe(slide));
+
+    const dialog = document.getElementById('review-dialog');
+    const dialogAvatar = dialog.querySelector('.review-dialog-avatar');
+    const dialogTitle = document.getElementById('review-dialog-title');
+    const dialogMeta = dialog.querySelector('.review-dialog-header p');
+    const dialogCopy = dialog.querySelector('.review-dialog-copy');
+
+    reviewsTrack.addEventListener('click', (event) => {
+      const button = event.target.closest('.review-more');
+      if (!button) return;
+
+      const card = button.closest('.review-card');
+      dialogAvatar.replaceChildren(card.querySelector('.review-avatar').cloneNode(true));
+      dialogTitle.textContent = card.querySelector('h3').textContent;
+      dialogMeta.textContent = card.querySelector('.review-author p').textContent;
+      dialogCopy.replaceChildren(card.querySelector('template').content.cloneNode(true));
+      dialog.showModal();
+      dialogCopy.scrollTop = 0;
+    });
+  }
+
   /* ---- Draggable planets on the console chart ---- */
   const chartZone = document.getElementById('chart-zone');
   if (chartZone) {
