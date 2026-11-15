@@ -161,7 +161,7 @@ h3 {
 .btn-primary {
   background: linear-gradient(135deg, #86b85c, #4f8e39);
   color: #ffffff;
-  box-shadow: 0 10px 0 rgba(40, 84, 35, 0.35);
+  box-shadow: 0 3px 0 rgba(40, 84, 35, 0.28);
 }
 
 .btn-secondary {

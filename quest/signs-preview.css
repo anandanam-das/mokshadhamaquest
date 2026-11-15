@@ -249,3 +249,91 @@ body.intro-active #previewRoot{min-height:100dvh}
 .teacher-figure > .speech-frame-hidden { visibility: hidden; }
 
 .shani-call.kailash-call { left: 12%; top: 50%; width: 22%; }
+
+.bhrigu-speech {
+  position: absolute;
+  z-index: 6;
+  top: 11%;
+  left: 7%;
+  width: min(42%, 450px);
+  margin: 0;
+  padding: clamp(12px, 2.3vw, 23px);
+  border: 2px solid #547461;
+  border-radius: 18px;
+  background: #fffdf3;
+  color: #1d352f;
+  box-shadow: 0 4px 0 #24463233;
+  font-size: clamp(.82rem, 1.55vw, 1.12rem);
+  line-height: 1.5;
+}
+
+.bhrigu-speech::after {
+  content: '';
+  position: absolute;
+  right: 15%;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  transform: skewX(18deg) rotate(45deg);
+  border-right: 2px solid #547461;
+  border-bottom: 2px solid #547461;
+  background: inherit;
+}
+
+@media (min-width: 851px) {
+  .bhrigu-speech {
+    top: 51.5%;
+    right: 44%;
+    left: auto;
+    transform: translateY(-100%);
+  }
+
+  .bhrigu-speech::after {
+    right: 7px;
+  }
+}
+
+@media (max-width: 550px) {
+  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) { min-height: 290px; }
+
+  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) .teacher-figure {
+    left: 69%;
+    bottom: 2%;
+  }
+
+  .bhrigu-speech {
+    top: auto;
+    bottom: 49%;
+    left: 4%;
+    width: 56%;
+    padding: 8px 10px;
+    border-radius: 13px;
+    font-size: clamp(.72rem, 2.8vw, .82rem);
+    line-height: 1.38;
+  }
+
+  .bhrigu-speech::after { right: 7px; width: 10px; height: 10px; bottom: -7px; }
+}
+
+@media (max-width: 350px) {
+  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) { min-height: 310px; }
+}
+
+.location-heading {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.location-heading > .btn,
+.location-heading > .eyebrow,
+.location-heading > h1 { margin: 0; }
+.location-heading > .eyebrow { justify-self: start; max-width: 100%; }
+.location-heading > h1 { grid-column: 1 / -1; }
+
+@media (max-width: 420px) {
+  .location-heading > .eyebrow { padding-inline: 10px; letter-spacing: .09em; }
+}
+
+.kailash-tasks { scroll-margin-top: 12px; }

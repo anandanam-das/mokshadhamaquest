@@ -1,0 +1,171 @@
+.kailash-lesson {
+  max-width: 740px;
+  margin-inline: auto;
+}
+
+.lesson-top, .lesson-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 9px;
+}
+
+.lesson-top {
+  justify-content: space-between;
+}
+
+.lesson-heading { margin: 20px 0 14px; }
+
+.lesson-card {
+  padding: clamp(15px, 4vw, 28px);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+  box-shadow: 0 5px 0 #24463233;
+  color: var(--text);
+}
+
+.lesson-kicker { color: var(--muted); font-weight: 700; font-size: .85rem; margin: 0; }
+.lesson-card progress { width: 100%; height: 10px; accent-color: #51965c; }
+.lesson-board { display: grid; gap: 12px; margin-top: 12px; }
+.lesson-board [hidden], .lesson-card > .btn[hidden] { display: none; }
+.lesson-prompt, .lesson-reading { margin: 0; line-height: 1.55; }
+.lesson-reading { text-align: center; font-weight: 700; }
+.lesson-board input[type="range"] { width: min(100%, 420px); margin-inline: auto; accent-color: #34755d; }
+.lesson-controls button[aria-pressed="true"] { outline: 2px solid #2a715b; outline-offset: 1px; }
+.lesson-answer-list { display: grid; }
+.lesson-answer-list button { justify-content: flex-start; text-align: left; line-height: 1.4; white-space: normal; }
+
+.lesson-feedback {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff2d8;
+  color: #634b20;
+  line-height: 1.45;
+}
+
+.lesson-feedback:empty { display: none; }
+.lesson-feedback.lesson-correct { background: #ddf1d9; color: #235335; }
+.lesson-card > .btn { margin-top: 10px; }
+
+.lesson-wheel {
+  display: block;
+  justify-self: center;
+  width: min(100%, 310px);
+  height: auto;
+  background: radial-gradient(ellipse at center, #29496a, #14283f 75%);
+  border: 2px solid #395975;
+  border-radius: 16px;
+  color: #fff2d0;
+  user-select: none;
+}
+
+.lesson-wheel-draggable { cursor: grab; touch-action: none; }
+.lesson-wheel-draggable:active { cursor: grabbing; }
+.wheel-rim, .wheel-tick { fill: none; stroke: #87c0d7; stroke-width: 2; }
+.wheel-untraced { stroke-dasharray: 4 6; opacity: .55; }
+.wheel-inner .wheel-rim, .wheel-inner .wheel-tick { stroke: #fed173; }
+.wheel-sign, .wheel-caption, .wheel-marker { text-anchor: middle; dominant-baseline: central; fill: currentColor; }
+.wheel-sign { font-size: 17px; }
+.wheel-filled, .wheel-marker { fill: #ffd775; }
+.wheel-marker { font-size: 21px; }
+.wheel-caption { font-size: 16px; font-weight: 700; }
+.wheel-highlight { fill: none; stroke: #ffd775; stroke-width: 5; stroke-linecap: round; }
+
+.lesson-boundary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+.lesson-boundary span { padding: 9px 4px; text-align: center; border-radius: 8px; background: #e8f0f6; color: #214660; font-size: .83rem; }
+.lesson-boundary .current { background: #ffdf8a; outline: 2px solid #866127; }
+.lesson-record { padding: 12px; background: #fff4d8; border: 1px solid #d9bd7b; border-radius: 10px; }
+.lesson-record .btn { margin-left: 5px; }
+
+.lesson-fine-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.lesson-fine-controls label { display: grid; gap: 5px; font-size: .85rem; font-weight: 700; }
+.lesson-fine-controls label input[type="range"] { width: 100%; margin: 0; }
+
+.lesson-task-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.lesson-task-list .btn {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  white-space: normal;
+}
+
+.lesson-task-status { flex-shrink: 0; font-size: .75rem; }
+
+.lesson-minute-answer { display: grid; gap: 4px; font-size: .85rem; font-weight: 700; }
+.lesson-minute-answer input { width: 105px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; font: inherit; background: #fff; color: var(--text); }
+.lesson-board form { align-items: end; }
+.lesson-boundary-result { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.wheel-degree { text-anchor: middle; dominant-baseline: central; fill: #c5e4ee; font-size: 10px; }
+.wheel-house-token { touch-action: none; cursor: grab; }
+.wheel-house-token:active { cursor: grabbing; }
+.wheel-house-token circle { fill: #a16c20; stroke: #ffda83; stroke-width: 2; }
+.wheel-house-token text { pointer-events: none; }
+
+.kailash-tasks {
+  max-width: 790px;
+  margin: 16px auto 0;
+  padding: 0 clamp(14px, 3vw, 24px);
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+}
+
+.kailash-tasks-title {
+  padding-block: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.kailash-tasks-title:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.kailash-tasks-content { padding: 4px 0 12px; border-top: 1px solid var(--border); }
+.kailash-tasks-content > .btn { margin-top: 10px; }
+
+.lesson-journal-instruction { margin: 0; color: var(--muted); font-size: .9rem; }
+.lesson-journal-cards .btn { border: 1px solid #d9bd7b; background: #fff4d8; }
+.lesson-journal-cards .btn[aria-pressed="true"] { background: #ffdf8a; }
+.lesson-journal-grid { display: grid; gap: 8px; }
+.lesson-journal-grid .btn {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 12px;
+  text-align: left;
+  border: 1px dashed var(--border);
+}
+.lesson-journal-grid .btn.lesson-journal-filled { border-style: solid; background: #ddf1d9; }
+.lesson-journal-grid .btn span { font-weight: 500; }
+.lesson-journal-grid + .btn { justify-self: start; }
+
+.lesson-attempts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: .85rem;
+}
+
+.lesson-attempts .btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+}
