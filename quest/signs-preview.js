@@ -3,8 +3,10 @@
 const root=document.getElementById('previewRoot');
 const local=['localhost','127.0.0.1','[::1]'].includes(location.hostname);
 const world=window.MOKSHA_SIGNS_WORLD;
-const directKailash = local && new URLSearchParams(location.search).get('lesson') === 'kailash';
-let storageKey=world.storageKey + (directKailash ? ':kailash-walkthrough' : '');
+const lessonParam = new URLSearchParams(location.search).get('lesson');
+const directLocation = !local ? null : lessonParam === 'varuna' ? 'coast' : lessonParam === 'kailash' ? 'kailash' : null;
+const previewVarunaTasks = directLocation === 'coast' && new URLSearchParams(location.search).get('all') === '1';
+let storageKey=world.storageKey + (directLocation ? ':' + directLocation + '-walkthrough' : '');
 if (!local) {
   document.getElementById('resetPreview').hidden = true;
   try {
@@ -27,8 +29,9 @@ if (getUserState().telegramId) setUserState({ activeBlock: 'signs' });
 let saved;
 try{saved=JSON.parse(localStorage.getItem(storageKey)||'{}');}catch{saved={};}
 if(new URLSearchParams(location.search).get('restart')==='1'){saved={};localStorage.removeItem(storageKey);history.replaceState({},'',location.pathname);}
-let state={entered:true,stage:['shiva','map','kailash','shiva-depths','coast','shiva-indra','indra','aries','mangala','indra-taurus','shukra','taurus','indra-gemini','budha','gemini','indra-cancer','cancer','indra-leo','leo','indra-virgo','virgo','indra-libra','libra','indra-scorpio','scorpio','indra-sagittarius','guru','sagittarius','shani','capricorn','aquarius','pisces','indra-capricorn','indra-aquarius','indra-pisces'].includes(saved.stage)?saved.stage:'shiva',bhriguFinished:(saved.bhriguFinished ?? saved.testBhriguFinished)===true,testVarunaFinished:saved.testVarunaFinished===true,indraJoined:saved.indraJoined===true,ariesRestored:saved.ariesRestored===true,taurusUnlocked:saved.taurusUnlocked===true,taurusRestored:saved.taurusRestored===true,geminiUnlocked:saved.geminiUnlocked===true,geminiRestored:saved.geminiRestored===true,cancerUnlocked:saved.cancerUnlocked===true,cancerRestored:saved.cancerRestored===true,leoUnlocked:saved.leoUnlocked===true,leoRestored:saved.leoRestored===true,virgoUnlocked:saved.virgoUnlocked===true,virgoRestored:saved.virgoRestored===true,libraUnlocked:saved.libraUnlocked===true,libraRestored:saved.libraRestored===true,scorpioUnlocked:saved.scorpioUnlocked===true,scorpioRestored:saved.scorpioRestored===true,sagittariusUnlocked:saved.sagittariusUnlocked===true,sagittariusRestored:saved.sagittariusRestored===true,capricornUnlocked:saved.capricornUnlocked===true,capricornRestored:saved.capricornRestored===true,aquariusUnlocked:saved.aquariusUnlocked===true,aquariusRestored:saved.aquariusRestored===true,piscesUnlocked:saved.piscesUnlocked===true,piscesRestored:saved.piscesRestored===true};
+let state={entered:true,stage:['shiva','map','kailash','shiva-depths','coast','shiva-indra','indra','aries','mangala','indra-taurus','shukra','taurus','indra-gemini','budha','gemini','indra-cancer','cancer','indra-leo','leo','indra-virgo','virgo','indra-libra','libra','indra-scorpio','scorpio','indra-sagittarius','guru','sagittarius','shani','capricorn','aquarius','pisces','indra-capricorn','indra-aquarius','indra-pisces'].includes(saved.stage)?saved.stage:'shiva',bhriguFinished:(saved.bhriguFinished ?? saved.testBhriguFinished)===true,varunaFinished:(saved.varunaFinished ?? saved.testVarunaFinished)===true,indraJoined:saved.indraJoined===true,ariesRestored:saved.ariesRestored===true,taurusUnlocked:saved.taurusUnlocked===true,taurusRestored:saved.taurusRestored===true,geminiUnlocked:saved.geminiUnlocked===true,geminiRestored:saved.geminiRestored===true,cancerUnlocked:saved.cancerUnlocked===true,cancerRestored:saved.cancerRestored===true,leoUnlocked:saved.leoUnlocked===true,leoRestored:saved.leoRestored===true,virgoUnlocked:saved.virgoUnlocked===true,virgoRestored:saved.virgoRestored===true,libraUnlocked:saved.libraUnlocked===true,libraRestored:saved.libraRestored===true,scorpioUnlocked:saved.scorpioUnlocked===true,scorpioRestored:saved.scorpioRestored===true,sagittariusUnlocked:saved.sagittariusUnlocked===true,sagittariusRestored:saved.sagittariusRestored===true,capricornUnlocked:saved.capricornUnlocked===true,capricornRestored:saved.capricornRestored===true,aquariusUnlocked:saved.aquariusUnlocked===true,aquariusRestored:saved.aquariusRestored===true,piscesUnlocked:saved.piscesUnlocked===true,piscesRestored:saved.piscesRestored===true};
 state.kailashLessonStep = saved.kailashLessonStep;
+state.varunaLessonStep = saved.varunaLessonStep;
 let revealGeneration=0;
 function setView(intro) {
   document.body.classList.toggle('intro-active',intro);
@@ -130,7 +133,7 @@ document.getElementById('storyNext').addEventListener('click',()=>{
 });
 dialog.addEventListener('cancel',event=>event.preventDefault());
 dialog.addEventListener('close',()=>{stopTyping();if(returnFocus?.isConnected)returnFocus.focus();});
-document.getElementById('resetPreview').addEventListener('click',()=>{if(dialog.open)dialog.close();state={entered:true,stage:'shiva'};localStorage.removeItem(storageKey);if(directKailash)renderLocation('kailash',{tasksOpen:true});else render();});
+document.getElementById('resetPreview').addEventListener('click',()=>{if(dialog.open)dialog.close();state={entered:true,stage:'shiva'};localStorage.removeItem(storageKey);if(directLocation)renderLocation(directLocation,{tasksOpen:true});else render();});
 function render(){
  stopTyping();root.replaceChildren();
  if(state.stage==='kailash')renderLocation('kailash');
@@ -196,7 +199,7 @@ async function renderMap(reveal=false){
  const markerClass={pisces:' sagittarius-call',aquarius:' shani-call',capricorn:' shani-call',sagittarius:' sagittarius-call',scorpio:' aries-call',libra:' taurus-call',virgo:' gemini-call',leo:' leo-call',cancer:' cancer-call',gemini:' gemini-call',taurus:' taurus-call',aries:' aries-call',coast:' coast-call',kailash:''};
  const markerLabel={pisces:planetBuildings.guru.name,aquarius:planetBuildings.shani.name,capricorn:planetBuildings.shani.name,sagittarius:planetBuildings.guru.name,scorpio:world.mangalaBuildingName,libra:planetBuildings.shukra.name,virgo:planetBuildings.budha.name,leo:planetBuildings.surya.name,cancer:world.chandraBuildingName,gemini:planetBuildings.budha.name,taurus:planetBuildings.shukra.name,aries:world.mangalaBuildingName,coast:'Побережье',kailash:'Кайлас'};
  for(const id of ['kailash','coast']){
-  const completed=id==='kailash'?state.bhriguFinished:state.testVarunaFinished;
+  const completed=id==='kailash'?state.bhriguFinished:state.varunaFinished;
   if(!completed || id===target)continue;
   const revisit=button('',()=>renderLocation(id),'kailash-call location-revisit'+markerClass[id]);
   revisit.setAttribute('aria-label',markerLabel[id]);
@@ -305,74 +308,69 @@ function renderLocation(id,{tasksOpen=false}={}){
  animateLandscape(scene, kailash);
  const copy=el('div','location-conversation');copy.append(el('p','eyebrow',kailash?'Первый урок':'Второй урок'),el('h2','',kailash?'Взгляд с небесных высот':'Знание из глубин'),el('p','',kailash?'В этой локации тебя встретит Бхригу Муни. Он познакомит тебя с устройством небес.':'У океана тебя встречает Варуна — здесь начнётся знакомство с природой и стихиями.'));
  const lines=kailash?world.bhriguIntro:world.varunaIntro;
- const completed=kailash?state.bhriguFinished:state.testVarunaFinished;
+ const lesson=locationLessons[id];
  let index=-1;
- const speech=el('p','teacher-speech');
- if(kailash){
-  speech.classList.add('bhrigu-speech');
-  speech.hidden=true;
-  scene.append(speech);
- }
+ const speech=el('p','teacher-speech location-speech');
+ speech.hidden=true;
+ scene.append(speech);
  const talk=button(kailash?'Поговорить с Бхригу Муни':'Поговорить с Варуной',()=>{
   if(finishTyping){finishTyping();return;}
   if(index>=lines.length-1){
    stopTyping();++revealGeneration;
-   if(kailash){showKailashList(taskList);return;}
-   if(completed){state.stage='map';save();renderMap();return;}
-   state.testVarunaFinished=true;state.stage='shiva-indra';
-   save();root.replaceChildren();startStory(state.stage);return;
+   showLocationTaskList(taskList);
+   return;
   }
   index++;talk.textContent='Показать весь текст';
-  if(kailash && speech.hidden){
+  if(speech.hidden){
    speech.hidden=false;
    scene.scrollIntoView({block:'nearest'});
   }
   typeText(speech,lines[Math.min(index,lines.length-1)],()=>{
    if(index<lines.length-1)talk.textContent='Далее';
-   else talk.textContent=kailash?'К заданиям':completed?'Завершить повторный урок':'Завершить задания (тест)';
+   else talk.textContent='К заданиям';
   },scene.querySelector('.teacher-figure img'),{ layered: true });
  },'primary');
- if(!kailash)copy.append(speech);
  copy.append(talk);
 
  root.append(heading,scene,copy);
- const taskList=kailash?window.createKailashTaskList({
-  progress:state.kailashLessonStep,
-  completed:state.bhriguFinished,
-  onSelect:openKailashLesson,
+ const taskList=lesson.game.createTaskList({
+  progress:state[lesson.progress],
+  completed:state[lesson.completed],
+  preview:id==='coast' && previewVarunaTasks,
+  onSelect:(...options)=>openLocationLesson(id,...options),
   open:tasksOpen,
- }):null;
- if(taskList)root.append(taskList);
+ });
+ root.append(taskList);
  state.stage=id;save();
 }
-function enterKailashChallenge() {
- stopTyping();
- ++revealGeneration;
- setView(false);
- state.stage='kailash';
- save();
-}
-function showKailashList(list) {
+
+const locationLessons={
+ kailash:{game:window.kailashLesson,progress:'kailashLessonStep',completed:'bhriguFinished',next:'shiva-depths'},
+ coast:{game:window.varunaLesson,progress:'varunaLessonStep',completed:'varunaFinished',next:'shiva-indra'},
+};
+function showLocationTaskList(list) {
  list.open=true;
  list.querySelector('summary').focus({preventScroll:true});
  list.scrollIntoView({block:'start'});
 }
-function openKailashTasks() {
- renderLocation('kailash',{tasksOpen:true});
- showKailashList(root.querySelector('.kailash-tasks'));
-}
-function openKailashLesson(startAt=state.kailashLessonStep,practice=false,returnToList=false) {
- enterKailashChallenge();
- window.renderKailashLesson(root,{
-  startAt,
-  practice,
-  returnToList,
-  onTasks:openKailashTasks,
-  onProgress:step=>{state.kailashLessonStep=step;save();},
+function openLocationLesson(id,startAt,practice=false,returnToList=false) {
+ const lesson=locationLessons[id];
+ stopTyping();
+ ++revealGeneration;
+ setView(false);
+ state.stage=id;
+ save();
+ lesson.game.render(root,{
+  startAt, practice, returnToList,
+  onTasks:()=>{
+   renderLocation(id,{tasksOpen:true});
+   showLocationTaskList(root.querySelector('.kailash-tasks'));
+  },
+  onProgress:step=>{state[lesson.progress]=step;save();},
   onFinish:()=>{
-   state.bhriguFinished=true;
-   delete state.kailashLessonStep;
-   state.stage='shiva-depths';
+   state[lesson.completed]=true;
+   delete state[lesson.progress];
+   state.stage=lesson.next;
    save();
    root.replaceChildren();
    startStory(state.stage);
@@ -977,5 +975,5 @@ function renderLateHall(id) {
   root.append(header,scene,card);
 }
 
-if(directKailash)renderLocation('kailash',{tasksOpen:true});else render();
+if(directLocation)renderLocation(directLocation,{tasksOpen:true});else render();
 })();

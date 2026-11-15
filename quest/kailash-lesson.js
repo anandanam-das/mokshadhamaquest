@@ -5,7 +5,7 @@
   const glyphs = [...'♈♉♊♋♌♍♎♏♐♑♒♓'];
   const sampleOffset = 24 * 60 + 13;
   const maxMistakes = 3;
-  const steps = [
+  const kailashSteps = [
     { title: 'Что такое эклиптика?', play: traceSun },
     { title: 'Собери зодиак', play: buildWheel },
     { title: 'Знак и созвездие', prompt: 'На карте неба ты видишь созвездие Льва. А что такое знак Льва на зодиакальном круге?', choices: ['Группа звёзд, образующая фигуру Льва.', 'Участок зодиакального круга шириной 30°.', 'Точка, в которой сейчас находится Солнце.'], answer: 1, hint: 'Вспомни размер каждого сектора на круге, который ты собрал.', explanation: 'Созвездие — область звёздного неба. Знак Льва, как и каждый из 12 знаков, занимает ровно 30° зодиакального круга.' },
@@ -477,118 +477,129 @@
     ui.board.append(cards, grid, check);
   }
 
-  function validProgress(value) {
-    return Number.isInteger(value) && value >= 0 && value <= steps.length ? value : 0;
-  }
-
-  window.createKailashTaskList = function ({ progress, completed, onSelect, open }) {
-    const available = completed ? steps.length : validProgress(progress);
-    const panel = element('details', 'kailash-tasks', '');
-    panel.id = 'kailash-task-list';
-    panel.open = open;
-    panel.append(element('summary', 'kailash-tasks-title', 'Задания Бхригу'));
-    const content = element('div', 'kailash-tasks-content', '');
-    const list = element('ol', 'lesson-task-list', '');
-    steps.forEach((step, index) => {
-      const item = element('li', '', '');
-      const done = index < available;
-      const next = index === available;
-      const status = done ? 'Пройдено' : next ? 'Текущее' : 'Закрыто';
-      const entry = button('', () => onSelect(index, done, true), next);
-      entry.disabled = !done && !next;
-      entry.append(element('strong', '', (index + 1) + '. ' + step.title), element('span', 'lesson-task-status', status));
-      item.append(entry);
-      list.append(item);
-    });
-    if (available < steps.length) {
-      const label = available === 0 ? 'Пройти урок по порядку' : 'Продолжить урок по порядку';
-      content.append(button(label, () => onSelect(available, false), true));
+  function create({ steps, location, listTitle, finishTitle, finishText }) {
+    function validProgress(value) {
+      return Number.isInteger(value) && value >= 0 && value <= steps.length ? value : 0;
     }
-    if (available === steps.length && !completed) content.append(button('Завершить урок', () => onSelect(available, false), true));
-    content.append(list);
-    panel.append(content);
-    return panel;
-  };
 
-  window.renderKailashLesson = function (root, { onTasks, onFinish, onProgress, startAt, practice, returnToList }) {
-    let index = validProgress(startAt);
-    function render(notice = '') {
-      const page = element('section', 'kailash-lesson', '');
-      const header = element('div', 'lesson-top', '');
-      header.append(button('← К заданиям', onTasks), element('span', 'lesson-kicker', 'Кайлас · урок 1'));
-      const stage = steps[index];
-      const heading = element('h1', 'lesson-heading', stage ? stage.title : 'Небесный прибор восстановлен');
-      heading.tabIndex = -1;
-      const card = element('div', 'lesson-card', '');
-      page.append(header, heading, card);
-      root.replaceChildren(page);
-      if (!stage) {
-        card.append(element('p', 'lesson-prompt', 'Ты собрал зодиакальный круг, настроил две шкалы и исправил записи наблюдателя. Возвращайся к Шиве.'), button('Завершить урок', onFinish, true));
-      } else {
-        let mistakes = 0;
-        const tools = element('div', 'lesson-attempts', '');
-        const counter = element('span', '', 'Ошибки: 0 из ' + maxMistakes);
-        tools.append(counter, button('Начать задание заново', () => render('Задание начато заново.')));
-        const progress = document.createElement('progress');
-        progress.max = steps.length;
-        progress.value = index + 1;
-        progress.setAttribute('aria-label', 'Ход испытания');
-        card.append(element('p', 'lesson-kicker', (index + 1) + ' / ' + steps.length), progress, tools);
-        const board = element('div', 'lesson-board', '');
-        const status = element('p', 'lesson-feedback', '');
-        status.setAttribute('role', 'status');
-        const resetNotice = element('p', 'lesson-feedback', notice);
-        resetNotice.hidden = !notice;
-        if (notice) heading.setAttribute('aria-describedby', 'kailash-reset-notice');
-        resetNotice.id = 'kailash-reset-notice';
-        card.append(resetNotice);
-        const canFinish = index === steps.length - 1 && !practice;
-        const nextLabel = canFinish ? 'Завершить урок' : returnToList ? 'К заданиям' : 'Далее';
-        const next = button(nextLabel, () => {
-          if (canFinish) {
-            onFinish();
-            return;
-          }
-          if (!practice) {
-            index++;
-            onProgress(index);
-          }
-          if (returnToList) onTasks();
-          else render();
-        }, true);
-        next.hidden = true;
-        card.append(board, status, next);
-        function feedback(message) {
-          resetNotice.hidden = true;
-          status.textContent = message;
-          status.classList.remove('lesson-correct');
-        }
-        const ui = {
-          board,
-          note: feedback,
-          mistake(message) {
-            mistakes++;
-            if (mistakes === maxMistakes) {
-              render('Три неверных ответа. Задание начинается заново. ' + message);
+    const createTaskList = function ({ progress, completed, onSelect, open, preview = false }) {
+      const available = completed ? steps.length : validProgress(progress);
+      const panel = element('details', 'kailash-tasks', '');
+      panel.open = open;
+      panel.append(element('summary', 'kailash-tasks-title', listTitle));
+      const content = element('div', 'kailash-tasks-content', '');
+      const list = element('ol', 'lesson-task-list', '');
+      steps.forEach((step, index) => {
+        const item = element('li', '', '');
+        const done = index < available;
+        const next = index === available;
+        const status = done ? 'Пройдено' : next ? 'Текущее' : preview ? 'Пробное' : 'Закрыто';
+        const entry = button('', () => onSelect(index, !next, true), next);
+        entry.disabled = !done && !next && !preview;
+        entry.append(element('strong', '', (index + 1) + '. ' + step.title), element('span', 'lesson-task-status', status));
+        item.append(entry);
+        list.append(item);
+      });
+      if (available < steps.length) {
+        const label = available === 0 ? 'Пройти урок по порядку' : 'Продолжить урок по порядку';
+        content.append(button(label, () => onSelect(available, false), true));
+      }
+      if (available === steps.length && !completed) content.append(button('Завершить урок', () => onSelect(available, false), true));
+      content.append(list);
+      panel.append(content);
+      return panel;
+    };
+
+    const render = function (root, { onTasks, onFinish, onProgress, startAt, practice, returnToList }) {
+      let index = validProgress(startAt);
+      function render(notice = '') {
+        const page = element('section', 'kailash-lesson', '');
+        const header = element('div', 'lesson-top', '');
+        header.append(button('← К заданиям', onTasks), element('span', 'lesson-kicker', location));
+        const stage = steps[index];
+        const heading = element('h1', 'lesson-heading', stage ? stage.title : finishTitle);
+        heading.tabIndex = -1;
+        const card = element('div', 'lesson-card', '');
+        page.append(header, heading, card);
+        root.replaceChildren(page);
+        if (!stage) {
+          card.append(element('p', 'lesson-prompt', finishText), button('Завершить урок', onFinish, true));
+        } else {
+          let mistakes = 0;
+          const tools = element('div', 'lesson-attempts', '');
+          const counter = element('span', '', 'Ошибки: 0 из ' + maxMistakes);
+          tools.append(counter, button('Начать задание заново', () => render('Задание начато заново.')));
+          const progress = document.createElement('progress');
+          progress.max = steps.length;
+          progress.value = index + 1;
+          progress.setAttribute('aria-label', 'Ход испытания');
+          card.append(element('p', 'lesson-kicker', (index + 1) + ' / ' + steps.length), progress, tools);
+          const board = element('div', 'lesson-board', '');
+          const status = element('p', 'lesson-feedback', '');
+          status.setAttribute('role', 'status');
+          const resetNotice = element('p', 'lesson-feedback', notice);
+          resetNotice.hidden = !notice;
+          if (notice) heading.setAttribute('aria-describedby', 'lesson-reset-notice');
+          resetNotice.id = 'lesson-reset-notice';
+          card.append(resetNotice);
+          const canFinish = index === steps.length - 1 && !practice;
+          const nextLabel = canFinish ? 'Завершить урок' : returnToList ? 'К заданиям' : 'Далее';
+          const next = button(nextLabel, () => {
+            if (canFinish) {
+              onFinish();
               return;
             }
-            counter.textContent = 'Ошибки: ' + mistakes + ' из ' + maxMistakes;
-            feedback(message + ' До сброса: ' + (maxMistakes - mistakes) + '.');
-          },
-          success(message) {
-            feedback(message);
-            status.classList.add('lesson-correct');
-            board.inert = true;
-            next.hidden = false;
-            next.focus({ preventScroll: true });
-          },
-        };
-        if (stage.play) stage.play(ui);
-        else question(stage, ui);
+            if (!practice) {
+              index++;
+              onProgress(index);
+            }
+            if (returnToList) onTasks();
+            else render();
+          }, true);
+          next.hidden = true;
+          card.append(board, status, next);
+          function feedback(message) {
+            resetNotice.hidden = true;
+            status.textContent = message;
+            status.classList.remove('lesson-correct');
+          }
+          const ui = {
+            board,
+            note: feedback,
+            mistake(message) {
+              mistakes++;
+              if (mistakes === maxMistakes) {
+                render('Три неверных ответа. Задание начинается заново. ' + message);
+                return;
+              }
+              counter.textContent = 'Ошибки: ' + mistakes + ' из ' + maxMistakes;
+              feedback(message + ' До сброса: ' + (maxMistakes - mistakes) + '.');
+            },
+            success(message) {
+              feedback(message);
+              status.classList.add('lesson-correct');
+              board.inert = true;
+              next.hidden = false;
+              next.focus({ preventScroll: true });
+            },
+          };
+          if (stage.play) stage.play(ui);
+          else question(stage, ui);
+        }
+        heading.focus({ preventScroll: true });
+        window.scrollTo(0, 0);
       }
-      heading.focus({ preventScroll: true });
-      window.scrollTo(0, 0);
-    }
-    render();
-  };
+      render();
+    };
+    return { createTaskList, render };
+  }
+
+  window.MokshaLessons = { create, element, button, choiceButtons, choose };
+  window.kailashLesson = create({
+    steps: kailashSteps,
+    location: 'Кайлас · урок 1',
+    listTitle: 'Задания Бхригу',
+    finishTitle: 'Небесный прибор восстановлен',
+    finishText: 'Ты собрал зодиакальный круг, настроил две шкалы и исправил записи наблюдателя. Возвращайся к Шиве.',
+  });
 })();

@@ -250,7 +250,7 @@ body.intro-active #previewRoot{min-height:100dvh}
 
 .shani-call.kailash-call { left: 12%; top: 50%; width: 22%; }
 
-.bhrigu-speech {
+.location-speech {
   position: absolute;
   z-index: 6;
   top: 11%;
@@ -267,7 +267,7 @@ body.intro-active #previewRoot{min-height:100dvh}
   line-height: 1.5;
 }
 
-.bhrigu-speech::after {
+.location-speech::after {
   content: '';
   position: absolute;
   right: 15%;
@@ -281,27 +281,32 @@ body.intro-active #previewRoot{min-height:100dvh}
 }
 
 @media (min-width: 851px) {
-  .bhrigu-speech {
+  .location-speech {
     top: 51.5%;
     right: 44%;
     left: auto;
     transform: translateY(-100%);
   }
 
-  .bhrigu-speech::after {
+  .coast .location-speech {
+    top: 30%;
+    right: 42%;
+  }
+
+  .location-speech::after {
     right: 7px;
   }
 }
 
 @media (max-width: 550px) {
-  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) { min-height: 290px; }
+  .location-scene:has(.location-speech:not([hidden])) { min-height: 290px; }
 
-  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) .teacher-figure {
+  .location-scene:has(.location-speech:not([hidden])) .teacher-figure {
     left: 69%;
     bottom: 2%;
   }
 
-  .bhrigu-speech {
+  .location-speech {
     top: auto;
     bottom: 49%;
     left: 4%;
@@ -312,11 +317,18 @@ body.intro-active #previewRoot{min-height:100dvh}
     line-height: 1.38;
   }
 
-  .bhrigu-speech::after { right: 7px; width: 10px; height: 10px; bottom: -7px; }
+  .coast:has(.location-speech:not([hidden])) .teacher-figure {
+    height: 66%;
+    bottom: 1%;
+  }
+
+  .coast .location-speech { bottom: 53%; }
+  .location-speech::after { right: 7px; width: 10px; height: 10px; bottom: -7px; }
 }
 
 @media (max-width: 350px) {
-  .location-scene.kailash:has(.bhrigu-speech:not([hidden])) { min-height: 310px; }
+  .location-scene:has(.location-speech:not([hidden])) { min-height: 310px; }
+  .coast:has(.location-speech:not([hidden])) { min-height: 340px; }
 }
 
 .location-heading {
