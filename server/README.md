@@ -33,6 +33,7 @@ Fill in `.env`:
 - `TELEGRAM_BOT_TOKEN` — from step 1.
 - `TELEGRAM_CHANNEL_ID` — the chat id from step 1.3.
 - `TELEGRAM_SIGNS_CHANNEL_ID` — optional Telegram chat ID for the signs block. Add the same bot as an administrator there before setting this variable.
+- `MOKSHA_SIGNS_ENABLED` — Vercel feature switch for block 2. Access is paused by default. Set to `true` in the Production environment and redeploy to open the block to members of its Telegram chat.
 - `SESSION_SECRET` — any long random string.
 - `ALLOWED_ORIGIN` — where the frontend is served from.
 

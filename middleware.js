@@ -50,7 +50,8 @@ export default async function middleware(request) {
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
   const block = url.pathname.endsWith('/signs-preview.html') ? 'signs' : 'planets';
   const blocks = access?.blocks || (!process.env.TELEGRAM_SIGNS_CHANNEL_ID && access ? ['planets'] : []);
-  if (!access || String(access.id) !== String(session.id) || !blocks.includes(block)) {
+  const signsPaused = block === 'signs' && process.env.MOKSHA_SIGNS_ENABLED !== 'true';
+  if (signsPaused || !access || String(access.id) !== String(session.id) || !blocks.includes(block)) {
     const target = new URL('/quest/checking.html', url);
     target.searchParams.set('block', block);
     return redirectNoStore(target);

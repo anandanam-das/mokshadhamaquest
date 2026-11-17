@@ -346,6 +346,13 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('planetsCourseLink').hidden = !access.hasPlanetsAccess;
       document.getElementById('signsCourseLink').hidden = !access.hasSignsAccess;
       document.getElementById('signsCourseStatus').hidden = !access.hasSignsAccess;
+      if (access.signsPaused && currentBlock === 'signs' && access.hasPlanetsAccess) {
+        document.querySelectorAll('[data-return-to-course]').forEach(link => {
+          link.href = 'village.html';
+        });
+        document.getElementById('signsCourseLink').removeAttribute('aria-current');
+        document.getElementById('planetsCourseLink').setAttribute('aria-current', 'true');
+      }
       status.textContent = access.unavailableBlocks?.length
         ? 'Доступ к одному из блоков сейчас не удалось проверить.'
         : access.hasPlanetsAccess || access.hasSignsAccess ? '' : 'Доступ к учебным блокам закрыт.';

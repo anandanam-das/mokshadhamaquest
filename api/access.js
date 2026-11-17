@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
   }
 
 
-  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, TELEGRAM_SIGNS_CHANNEL_ID, SESSION_SECRET } = process.env;
+  const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, TELEGRAM_SIGNS_CHANNEL_ID, MOKSHA_SIGNS_ENABLED, SESSION_SECRET } = process.env;
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID || !SESSION_SECRET) {
     return sendJson(res, 500, { error: 'server_misconfigured' });
   }
@@ -54,8 +54,9 @@ module.exports = async (req, res) => {
   const session = readSession(req);
   if (!session?.id) return sendJson(res, 401, { error: 'not_authenticated' });
 
-  const chats = Object.entries({ planets: TELEGRAM_CHANNEL_ID, signs: TELEGRAM_SIGNS_CHANNEL_ID })
-    .filter(([, chatId]) => chatId);
+  const signsPaused = MOKSHA_SIGNS_ENABLED !== 'true';
+  const chats = [['planets', TELEGRAM_CHANNEL_ID]];
+  if (!signsPaused && TELEGRAM_SIGNS_CHANNEL_ID) chats.push(['signs', TELEGRAM_SIGNS_CHANNEL_ID]);
   const checks = await Promise.allSettled(chats.map(async ([block, chatId]) => {
     const member = await getChatMemberStatus(TELEGRAM_BOT_TOKEN, chatId, session.id);
     return isActiveMember(member) ? block : null;
@@ -73,6 +74,7 @@ module.exports = async (req, res) => {
     telegramId: session.id,
     hasPlanetsAccess: blocks.includes('planets'),
     hasSignsAccess: blocks.includes('signs'),
+    signsPaused,
     hasNakshatrasAccess: false,
     unavailableBlocks,
   });

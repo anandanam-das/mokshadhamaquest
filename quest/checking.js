@@ -59,6 +59,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   if (!access.hasPlanetsAccess && !access.hasSignsAccess) {
+    if (access.signsPaused && requestedBlock !== 'planets') {
+      noAccessView.querySelector('h2').textContent = 'Блок «Знаки зодиака» пока закрыт';
+      noAccessView.querySelector('.section-subheading').textContent =
+        'О начале обучения сообщим в учебном Telegram-чате. Для входа в блок «Планеты» нужен доступ к его учебному чату.';
+    }
     checkingView.hidden = true;
     noAccessView.hidden = false;
     return;
