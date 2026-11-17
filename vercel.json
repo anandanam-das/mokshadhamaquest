@@ -1,0 +1,16 @@
+{
+  "headers": [
+    {
+      "source": "/quest/village.html",
+      "headers": [{ "key": "Cache-Control", "value": "private, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/quest/prologue.html",
+      "headers": [{ "key": "Cache-Control", "value": "private, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/quest/create-character.html",
+      "headers": [{ "key": "Cache-Control", "value": "private, no-store, must-revalidate" }]
+    }
+  ]
+}

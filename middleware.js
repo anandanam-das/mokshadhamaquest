@@ -1,4 +1,7 @@
 import { jwtVerify } from 'jose';
+import telegram from './api/_lib/telegram.js';
+
+const { getChatMemberStatus, isActiveMember } = telegram;
 
 const SESSION_COOKIE = 'moksha_session';
 const ACCESS_COOKIE = 'moksha_access';
@@ -43,18 +46,37 @@ export default async function middleware(request) {
   const secret = new TextEncoder().encode(process.env.SESSION_SECRET);
 
   const session = await verify(getCookie(request, SESSION_COOKIE), secret);
-  if (!session || typeof session.first_name !== 'string' || session.exp) {
+  if (!session?.id || typeof session.first_name !== 'string' || session.exp) {
     return redirectNoStore(new URL('/quest/login.html', url));
   }
 
   const access = await verify(getCookie(request, ACCESS_COOKIE), secret);
   const block = url.pathname.endsWith('/signs-preview.html') ? 'signs' : 'planets';
-  const blocks = access?.blocks || (!process.env.TELEGRAM_SIGNS_CHANNEL_ID && access ? ['planets'] : []);
+  const blocks = Array.isArray(access?.blocks) ? access.blocks : [];
   const signsPaused = block === 'signs' && process.env.MOKSHA_SIGNS_ENABLED !== 'true';
+  const checking = new URL('/quest/checking.html', url);
+  checking.searchParams.set('block', block);
   if (signsPaused || !access || String(access.id) !== String(session.id) || !blocks.includes(block)) {
-    const target = new URL('/quest/checking.html', url);
-    target.searchParams.set('block', block);
-    return redirectNoStore(target);
+    return redirectNoStore(checking);
+  }
+
+  if (block === 'planets') {
+    try {
+      const { TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID } = process.env;
+      if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHANNEL_ID) throw new Error('Telegram is not configured');
+      // The signed grant identifies the block, but chat membership can change before it expires.
+      const member = await getChatMemberStatus(TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID, session.id);
+      if (!isActiveMember(member)) return redirectNoStore(checking);
+    } catch {
+      return new Response('Не удалось проверить участие в Telegram-чате. Обнови страницу через несколько секунд.', {
+        status: 503,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'private, no-store, must-revalidate',
+          'Retry-After': '5',
+        },
+      });
+    }
   }
 }
 

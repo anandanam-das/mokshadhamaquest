@@ -1,9 +1,12 @@
 async function getChatMemberStatus(botToken, chatId, userId) {
   const url = `https://api.telegram.org/bot${botToken}/getChatMember?chat_id=${encodeURIComponent(chatId)}&user_id=${encodeURIComponent(userId)}`;
-  const response = await fetch(url);
+  const response = await fetch(url, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(6500),
+  });
   const data = await response.json();
-  if (!data.ok) {
-    throw new Error(data.description || 'Telegram getChatMember request failed');
+  if (!response.ok || !data.ok || !data.result) {
+    throw new Error('Telegram getChatMember request failed');
   }
   return data.result;
 }
